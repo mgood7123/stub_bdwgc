@@ -26,7 +26,7 @@
 # define FINALIZER_CLOSURE_FLAG 0x1
 #endif
 
-STATIC int GC_CALLBACK GC_finalized_disclaim(void *obj)
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_disclaim(void *obj)
 {
 #   ifdef AO_HAVE_load
         word fc_word = (word)AO_load((volatile AO_t *)obj);
@@ -41,33 +41,33 @@ STATIC int GC_CALLBACK GC_finalized_disclaim(void *obj)
        /* on such fragments is always multiple of 4 (a link to the next */
        /* fragment, or NULL).  If it is desirable to have a finalizer   */
        /* which does not use the first word for storing finalization    */
-       /* info, GC_disclaim_and_reclaim() must be extended to clear     */
+       /* info, MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_and_reclaim() must be extended to clear     */
        /* fragments so that the assumption holds for the selected word. */
-        const struct GC_finalizer_closure *fc
-                        = (struct GC_finalizer_closure *)(fc_word
+        const struct MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_closure *fc
+                        = (struct MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_closure *)(fc_word
                                         & ~(word)FINALIZER_CLOSURE_FLAG);
-        GC_ASSERT(!GC_find_leak);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak);
         (*fc->proc)((word *)obj + 1, fc->cd);
     }
     return 0;
 }
 
-STATIC void GC_register_disclaim_proc_inner(unsigned kind,
-                                            GC_disclaim_proc proc,
-                                            GC_bool mark_unconditionally)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_register_disclaim_proc_inner(unsigned kind,
+                                            MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_proc proc,
+                                            MANAGED_STACK_ADDRESS_BOEHM_GC_bool mark_unconditionally)
 {
-    GC_ASSERT(kind < MAXOBJKINDS);
-    if (EXPECT(GC_find_leak, FALSE)) return;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(kind < MAXOBJKINDS);
+    if (EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak, FALSE)) return;
 
-    GC_obj_kinds[kind].ok_disclaim_proc = proc;
-    GC_obj_kinds[kind].ok_mark_unconditionally = mark_unconditionally;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_disclaim_proc = proc;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_mark_unconditionally = mark_unconditionally;
 }
 
-GC_API void GC_CALL GC_init_finalized_malloc(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_init_finalized_malloc(void)
 {
-    GC_init();  /* In case it's not already done.       */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_init();  /* In case it's not already done.       */
     LOCK();
-    if (GC_finalized_kind != 0) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind != 0) {
         UNLOCK();
         return;
     }
@@ -75,42 +75,42 @@ GC_API void GC_CALL GC_init_finalized_malloc(void)
     /* The finalizer closure is placed in the first word in order to    */
     /* use the lower bits to distinguish live objects from objects on   */
     /* the free list.  The downside of this is that we need one-word    */
-    /* offset interior pointers, and that GC_base does not return the   */
+    /* offset interior pointers, and that MANAGED_STACK_ADDRESS_BOEHM_GC_base does not return the   */
     /* start of the user region.                                        */
-    GC_register_displacement_inner(sizeof(word));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner(sizeof(word));
 
     /* And, the pointer to the finalizer closure object itself is       */
     /* displaced due to baking in this indicator.                       */
-    GC_register_displacement_inner(FINALIZER_CLOSURE_FLAG);
-    GC_register_displacement_inner(sizeof(oh) + FINALIZER_CLOSURE_FLAG);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner(FINALIZER_CLOSURE_FLAG);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner(sizeof(oh) + FINALIZER_CLOSURE_FLAG);
 
-    GC_finalized_kind = GC_new_kind_inner(GC_new_free_list_inner(),
-                                          GC_DS_LENGTH, TRUE, TRUE);
-    GC_ASSERT(GC_finalized_kind != 0);
-    GC_register_disclaim_proc_inner(GC_finalized_kind, GC_finalized_disclaim,
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind = MANAGED_STACK_ADDRESS_BOEHM_GC_new_kind_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_new_free_list_inner(),
+                                          MANAGED_STACK_ADDRESS_BOEHM_GC_DS_LENGTH, TRUE, TRUE);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_disclaim_proc_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind, MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_disclaim,
                                     TRUE);
     UNLOCK();
 }
 
-GC_API void GC_CALL GC_register_disclaim_proc(int kind, GC_disclaim_proc proc,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_register_disclaim_proc(int kind, MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_proc proc,
                                               int mark_unconditionally)
 {
     LOCK();
-    GC_register_disclaim_proc_inner((unsigned)kind, proc,
-                                    (GC_bool)mark_unconditionally);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_disclaim_proc_inner((unsigned)kind, proc,
+                                    (MANAGED_STACK_ADDRESS_BOEHM_GC_bool)mark_unconditionally);
     UNLOCK();
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_finalized_malloc(size_t lb,
-                                const struct GC_finalizer_closure *fclos)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_malloc(size_t lb,
+                                const struct MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_closure *fclos)
 {
     void *op;
 
-    GC_ASSERT(GC_finalized_kind != 0);
-    GC_ASSERT(NONNULL_ARG_NOT_NULL(fclos));
-    GC_ASSERT(((word)fclos & FINALIZER_CLOSURE_FLAG) == 0);
-    op = GC_malloc_kind(SIZET_SAT_ADD(lb, sizeof(word)),
-                        (int)GC_finalized_kind);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NONNULL_ARG_NOT_NULL(fclos));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(((word)fclos & FINALIZER_CLOSURE_FLAG) == 0);
+    op = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind(SIZET_SAT_ADD(lb, sizeof(word)),
+                        (int)MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind);
     if (EXPECT(NULL == op, FALSE))
         return NULL;
 #   ifdef AO_HAVE_store
@@ -118,7 +118,7 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_finalized_malloc(size_t lb,
 #   else
         *(word *)op = (word)fclos | FINALIZER_CLOSURE_FLAG;
 #   endif
-    GC_dirty(op);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_dirty(op);
     REACHABLE_AFTER_DIRTY(fclos);
     return (word *)op + 1;
 }

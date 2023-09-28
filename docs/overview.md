@@ -58,8 +58,8 @@ See the LICENSE file in the distribution for more details.
 ANY USE IS AT YOUR OWN RISK.**
 
 Empirically, this collector works with most unmodified C programs, simply
-by replacing `malloc` and `calloc` with `GC_malloc` calls, replacing `realloc`
-with `GC_realloc` calls, and removing `free` calls. Exceptions are discussed
+by replacing `malloc` and `calloc` with `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` calls, replacing `realloc`
+with `MANAGED_STACK_ADDRESS_BOEHM_GC_realloc` calls, and removing `free` calls. Exceptions are discussed
 [here](http://www.hboehm.info/gc/issues.html).
 
 ## Platforms

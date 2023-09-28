@@ -191,16 +191,16 @@ static int extract_conv_spec(CORD_pos source, char *buf,
 
 #if defined(__DJGPP__) || defined(__STRICT_ANSI__)
   /* vsnprintf is missing in DJGPP (v2.0.3) */
-# define GC_VSNPRINTF(buf, bufsz, format, args) vsprintf(buf, format, args)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_VSNPRINTF(buf, bufsz, format, args) vsprintf(buf, format, args)
 #elif defined(_MSC_VER)
 # if defined(_WIN32_WCE)
     /* _vsnprintf is deprecated in WinCE */
-#   define GC_VSNPRINTF StringCchVPrintfA
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_VSNPRINTF StringCchVPrintfA
 # else
-#   define GC_VSNPRINTF _vsnprintf
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_VSNPRINTF _vsnprintf
 # endif
 #else
-# define GC_VSNPRINTF vsnprintf
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_VSNPRINTF vsnprintf
 #endif
 
 int CORD_vsprintf(CORD * out, CORD format, va_list args)
@@ -264,7 +264,7 @@ int CORD_vsprintf(CORD * out, CORD format, va_list args)
                           len = (unsigned)prec;
                         }
                         if (width != NONE && len < (unsigned)width) {
-                          char * blanks = (char *)GC_MALLOC_ATOMIC(
+                          char * blanks = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(
                                                 (unsigned)width - len + 1);
 
                           if (NULL == blanks) OUT_OF_MEMORY;
@@ -324,7 +324,7 @@ int CORD_vsprintf(CORD * out, CORD format, va_list args)
                     if (prec != NONE && prec > max_size) max_size = prec;
                     max_size += CONV_RESULT_LEN;
                     if (max_size >= CORD_BUFSZ) {
-                        buf = (char *)GC_MALLOC_ATOMIC((unsigned)max_size + 1);
+                        buf = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC((unsigned)max_size + 1);
                         if (NULL == buf) OUT_OF_MEMORY;
                     } else {
                         if (CORD_BUFSZ - (result[0].ec_bufptr-result[0].ec_buf)
@@ -364,7 +364,7 @@ int CORD_vsprintf(CORD * out, CORD format, va_list args)
                             res = -1;
                     }
                     if (0 == res)
-                      res = GC_VSNPRINTF(buf, (unsigned)max_size + 1,
+                      res = MANAGED_STACK_ADDRESS_BOEHM_GC_VSNPRINTF(buf, (unsigned)max_size + 1,
                                          conv_spec, vsprintf_args);
 #                   if defined(CPPCHECK) || defined(__va_copy) \
                        || (defined(__GNUC__) && !defined(__DJGPP__) \
@@ -372,7 +372,7 @@ int CORD_vsprintf(CORD * out, CORD format, va_list args)
                       va_end(vsprintf_args);
 #                   endif
                     len = (unsigned)res;
-                    if ((char *)(GC_word)res == buf) {
+                    if ((char *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)res == buf) {
                         /* old style vsprintf */
                         len = strlen(buf);
                     } else if (res < 0) {

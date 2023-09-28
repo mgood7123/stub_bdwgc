@@ -27,24 +27,24 @@
  * But then not much of anything is safe in the presence of dlclose.
  */
 
-/* BTL: avoid circular redefinition of dlopen if GC_SOLARIS_THREADS defined */
-#undef GC_MUST_RESTORE_REDEFINED_DLOPEN
-#if defined(GC_PTHREADS) && !defined(GC_NO_DLOPEN) \
-    && !defined(GC_NO_THREAD_REDIRECTS) && !defined(GC_USE_LD_WRAP)
+/* BTL: avoid circular redefinition of dlopen if MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS defined */
+#undef MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_DLOPEN) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USE_LD_WRAP)
   /* To support threads in Solaris, gc.h interposes on dlopen by        */
-  /* defining "dlopen" to be "GC_dlopen", which is implemented below.   */
-  /* However, both GC_FirstDLOpenedLinkMap() and GC_dlopen() use the    */
+  /* defining "dlopen" to be "MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen", which is implemented below.   */
+  /* However, both MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap() and MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen() use the    */
   /* real system dlopen() in their implementation. We first remove      */
-  /* gc.h's dlopen definition and restore it later, after GC_dlopen().  */
+  /* gc.h's dlopen definition and restore it later, after MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen().  */
 # undef dlopen
-# define GC_MUST_RESTORE_REDEFINED_DLOPEN
-#endif /* !GC_NO_DLOPEN */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_NO_DLOPEN */
 
 /* A user-supplied routine (custom filter) that might be called to      */
 /* determine whether a DSO really needs to be scanned by the GC.        */
 /* 0 means no filter installed.  May be unused on some platforms.       */
 /* FIXME: Add filter support for more platforms.                        */
-STATIC GC_has_static_roots_func GC_has_static_roots = 0;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots_func MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots = 0;
 
 #if defined(DYNAMIC_LOADING) && !defined(PCR) || defined(ANY_MSWIN)
 
@@ -100,7 +100,7 @@ STATIC GC_has_static_roots_func GC_has_static_roots = 0;
 #     undef EM_ALPHA
 #   endif
 #   include <link.h>
-#   if !defined(GC_DONT_DEFINE_LINK_MAP) && !(__ANDROID_API__ >= 21)
+#   if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_DEFINE_LINK_MAP) && !(__ANDROID_API__ >= 21)
       /* link_map and r_debug are defined in link.h of NDK r10+.        */
       /* bionic/linker/linker.h defines them too but the header         */
       /* itself is a C++ one starting from Android 4.3.                 */
@@ -160,7 +160,7 @@ STATIC GC_has_static_roots_func GC_has_static_roots = 0;
   EXTERN_C_END
 
   STATIC struct link_map *
-  GC_FirstDLOpenedLinkMap(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap(void)
   {
     ElfW(Dyn) *dp;
     static struct link_map * cachedResult = 0;
@@ -203,26 +203,26 @@ STATIC GC_has_static_roots_func GC_has_static_roots = 0;
 
 #endif /* SOLARISDL ... */
 
-/* BTL: added to fix circular dlopen definition if GC_SOLARIS_THREADS defined */
-# ifdef GC_MUST_RESTORE_REDEFINED_DLOPEN
-#   define dlopen GC_dlopen
+/* BTL: added to fix circular dlopen definition if MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS defined */
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
+#   define dlopen MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen
 # endif
 
 # if defined(SOLARISDL)
 
 /* Add dynamic library data sections to the root set.           */
-# if !defined(PCR) && !defined(GC_SOLARIS_THREADS) && defined(THREADS) \
+# if !defined(PCR) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS) && defined(THREADS) \
      && !defined(CPPCHECK)
 #   error Fix mutual exclusion with dlopen
 # endif
 
 # ifndef USE_PROC_FOR_LIBRARIES
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
   struct link_map *lm;
 
-  GC_ASSERT(I_HOLD_LOCK());
-  for (lm = GC_FirstDLOpenedLinkMap(); lm != 0; lm = lm->l_next) {
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  for (lm = MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap(); lm != 0; lm = lm->l_next) {
         ElfW(Ehdr) * e;
         ElfW(Phdr) * p;
         unsigned long offset;
@@ -238,7 +238,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
               {
                 if( !(p->p_flags & PF_W) ) break;
                 start = ((char *)(p->p_vaddr)) + offset;
-                GC_add_roots_inner(start, start + p->p_memsz, TRUE);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, start + p->p_memsz, TRUE);
               }
               break;
             default:
@@ -281,7 +281,7 @@ static void sort_heap_sects(struct HeapSect *base, size_t number_of_elements)
              (word)base[nsorted-1].hs_start < (word)base[nsorted].hs_start)
           ++nsorted;
       if (nsorted == n) break;
-      GC_ASSERT((word)base[nsorted-1].hs_start > (word)base[nsorted].hs_start);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)base[nsorted-1].hs_start > (word)base[nsorted].hs_start);
       i = nsorted - 1;
       while (i >= 0 && (word)base[i].hs_start > (word)base[i+1].hs_start) {
         struct HeapSect tmp = base[i];
@@ -289,12 +289,12 @@ static void sort_heap_sects(struct HeapSect *base, size_t number_of_elements)
         base[i+1] = tmp;
         --i;
       }
-      GC_ASSERT((word)base[nsorted-1].hs_start < (word)base[nsorted].hs_start);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)base[nsorted-1].hs_start < (word)base[nsorted].hs_start);
       ++nsorted;
     }
 }
 
-STATIC void GC_register_map_entries(const char *maps)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_register_map_entries(const char *maps)
 {
     const char *prot, *path;
     ptr_t start, end;
@@ -302,14 +302,14 @@ STATIC void GC_register_map_entries(const char *maps)
     ptr_t least_ha, greatest_ha;
     unsigned i;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    sort_heap_sects(GC_our_memory, GC_n_memory);
-    least_ha = GC_our_memory[0].hs_start;
-    greatest_ha = GC_our_memory[GC_n_memory-1].hs_start
-                  + GC_our_memory[GC_n_memory-1].hs_bytes;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    sort_heap_sects(MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory, MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory);
+    least_ha = MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[0].hs_start;
+    greatest_ha = MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory-1].hs_start
+                  + MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory-1].hs_bytes;
 
     for (;;) {
-        maps = GC_parse_map_entry(maps, &start, &end, &prot, &maj_dev, &path);
+        maps = MANAGED_STACK_ADDRESS_BOEHM_GC_parse_map_entry(maps, &start, &end, &prot, &maj_dev, &path);
         if (NULL == maps) break;
 
         if (prot[1] == 'w') {
@@ -317,8 +317,8 @@ STATIC void GC_register_map_entries(const char *maps)
             /* the root set unless it is already otherwise      */
             /* accounted for.                                   */
 #           ifndef THREADS
-              if ((word)start <= (word)GC_stackbottom
-                  && (word)end >= (word)GC_stackbottom) {
+              if ((word)start <= (word)MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom
+                  && (word)end >= (word)MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom) {
                 /* Stack mapping; discard       */
                 continue;
               }
@@ -339,7 +339,7 @@ STATIC void GC_register_map_entries(const char *maps)
               /* we're marking.  Thus the marker is, and has to be      */
               /* prepared to recover from segmentation faults.          */
 
-              if (GC_segment_is_thread_stack(start, end)) continue;
+              if (MANAGED_STACK_ADDRESS_BOEHM_GC_segment_is_thread_stack(start, end)) continue;
 
               /* FIXME: NPTL squirrels                                  */
               /* away pointers in pieces of the stack segment that we   */
@@ -361,47 +361,47 @@ STATIC void GC_register_map_entries(const char *maps)
             if ((word)end <= (word)least_ha
                 || (word)start >= (word)greatest_ha) {
               /* The easy case; just trace entire segment */
-              GC_add_roots_inner(start, end, TRUE);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, end, TRUE);
               continue;
             }
             /* Add sections that don't belong to us. */
               i = 0;
-              while ((word)(GC_our_memory[i].hs_start
-                                + GC_our_memory[i].hs_bytes) < (word)start)
+              while ((word)(MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start
+                                + MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_bytes) < (word)start)
                   ++i;
-              GC_ASSERT(i < GC_n_memory);
-              if ((word)GC_our_memory[i].hs_start <= (word)start) {
-                  start = GC_our_memory[i].hs_start
-                          + GC_our_memory[i].hs_bytes;
+              MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory);
+              if ((word)MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start <= (word)start) {
+                  start = MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start
+                          + MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_bytes;
                   ++i;
               }
-              while (i < GC_n_memory
-                     && (word)GC_our_memory[i].hs_start < (word)end
+              while (i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory
+                     && (word)MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start < (word)end
                      && (word)start < (word)end) {
-                  if ((word)start < (word)GC_our_memory[i].hs_start)
-                    GC_add_roots_inner(start,
-                                       GC_our_memory[i].hs_start, TRUE);
-                  start = GC_our_memory[i].hs_start
-                          + GC_our_memory[i].hs_bytes;
+                  if ((word)start < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start)
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start,
+                                       MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start, TRUE);
+                  start = MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_start
+                          + MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[i].hs_bytes;
                   ++i;
               }
               if ((word)start < (word)end)
-                  GC_add_roots_inner(start, end, TRUE);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, end, TRUE);
         } else if (prot[0] == '-' && prot[1] == '-' && prot[2] == '-') {
             /* Even roots added statically might disappear partially    */
             /* (e.g. the roots added by INCLUDE_LINUX_THREAD_DESCR).    */
-            GC_remove_roots_subregion(start, end);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_remove_roots_subregion(start, end);
         }
     }
 }
 
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
-    GC_register_map_entries(GC_get_maps());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_register_map_entries(MANAGED_STACK_ADDRESS_BOEHM_GC_get_maps());
 }
 
 /* We now take care of the main data segment ourselves: */
-GC_INNER GC_bool GC_register_main_static_data(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void)
 {
     return FALSE;
 }
@@ -414,7 +414,7 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 /* for glibc 2.2.4+.  Unfortunately, it doesn't work for older  */
 /* versions.  Thanks to Jakub Jelinek for most of the code.     */
 
-#if GC_GLIBC_PREREQ(2, 3) || defined(HOST_ANDROID)
+#if MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 3) || defined(HOST_ANDROID)
                         /* Are others OK here, too? */
 # ifndef HAVE_DL_ITERATE_PHDR
 #   define HAVE_DL_ITERATE_PHDR
@@ -452,7 +452,7 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 /* Instead of registering PT_LOAD sections directly, we keep them       */
 /* in a temporary list, and filter them by excluding PT_GNU_RELRO       */
 /* segments.  Processing PT_GNU_RELRO sections with                     */
-/* GC_exclude_static_roots instead would be superficially cleaner.  But */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_exclude_static_roots instead would be superficially cleaner.  But */
 /* it runs into trouble if a client registers an overlapping segment,   */
 /* which unfortunately seems quite possible.                            */
 
@@ -468,17 +468,17 @@ GC_INNER GC_bool GC_register_main_static_data(void)
     } load_segs[MAX_LOAD_SEGS];
 
     static int n_load_segs;
-    static GC_bool load_segs_overflow;
+    static MANAGED_STACK_ADDRESS_BOEHM_GC_bool load_segs_overflow;
 # endif /* PT_GNU_RELRO */
 
-STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynlib_callback(struct dl_phdr_info * info,
                                        size_t size, void * ptr)
 {
   const ElfW(Phdr) * p;
   ptr_t start, end;
   int i;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   /* Make sure struct dl_phdr_info is at least as big as we need.  */
   if (size < offsetof(struct dl_phdr_info, dlpi_phnum)
                 + sizeof(info->dlpi_phnum))
@@ -487,7 +487,7 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
   p = info->dlpi_phdr;
   for (i = 0; i < (int)info->dlpi_phnum; i++, p++) {
     if (p->p_type == PT_LOAD) {
-      GC_has_static_roots_func callback = GC_has_static_roots;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots_func callback = MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots;
       if ((p->p_flags & PF_W) == 0) continue;
 
       start = (ptr_t)p->p_vaddr + info->dlpi_addr;
@@ -496,10 +496,10 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
         continue;
 #     ifdef PT_GNU_RELRO
 #       if CPP_WORDSZ == 64
-          /* TODO: GC_push_all eventually does the correct          */
+          /* TODO: MANAGED_STACK_ADDRESS_BOEHM_GC_push_all eventually does the correct          */
           /* rounding to the next multiple of ALIGNMENT, so, most   */
           /* probably, we should remove the corresponding assertion */
-          /* check in GC_add_roots_inner along with this code line. */
+          /* check in MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner along with this code line. */
           /* start pointer value may require aligning.              */
           start = (ptr_t)((word)start & ~(word)(sizeof(word)-1));
 #       endif
@@ -509,7 +509,7 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
                  " registering as roots directly...\n", 0);
             load_segs_overflow = TRUE;
           }
-          GC_add_roots_inner(start, end, TRUE);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, end, TRUE);
         } else {
           load_segs[n_load_segs].start = start;
           load_segs[n_load_segs].end = end;
@@ -518,7 +518,7 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
           ++n_load_segs;
         }
 #     else
-        GC_add_roots_inner(start, end, TRUE);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, end, TRUE);
 #     endif /* !PT_GNU_RELRO */
     }
   }
@@ -541,8 +541,8 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
             if (load_segs[j].start2 != 0) {
               WARN("More than one GNU_RELRO segment per load one\n",0);
             } else {
-              GC_ASSERT((word)end <=
-                (word)PTRT_ROUNDUP_BY_MASK(load_segs[j].end, GC_page_size-1));
+              MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)end <=
+                (word)PTRT_ROUNDUP_BY_MASK(load_segs[j].end, MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1));
               /* Remove from the existing load segment. */
               load_segs[j].end2 = load_segs[j].end;
               load_segs[j].end = start;
@@ -552,7 +552,7 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
             }
             break;
           }
-          if (0 == j && 0 == GC_has_static_roots)
+          if (0 == j && 0 == MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots)
             WARN("Failed to find PT_GNU_RELRO segment"
                  " inside PT_LOAD region\n", 0);
             /* No warning reported in case of the callback is present   */
@@ -567,7 +567,7 @@ STATIC int GC_register_dynlib_callback(struct dl_phdr_info * info,
 }
 
 /* Do we need to separately register the main static data segment? */
-GC_INNER GC_bool GC_register_main_static_data(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void)
 {
 # if defined(DL_ITERATE_PHDR_STRONG) && !defined(CPPCHECK)
     /* If dl_iterate_phdr is not a weak symbol then don't test against  */
@@ -579,21 +579,21 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 }
 
 /* Return TRUE if we succeed, FALSE if dl_iterate_phdr wasn't there. */
-STATIC GC_bool GC_register_dynamic_libraries_dl_iterate_phdr(void)
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries_dl_iterate_phdr(void)
 {
   int did_something;
 
-  GC_ASSERT(I_HOLD_LOCK());
-  if (GC_register_main_static_data())
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data())
     return FALSE;
 
 # ifdef PT_GNU_RELRO
     {
-      static GC_bool excluded_segs = FALSE;
+      static MANAGED_STACK_ADDRESS_BOEHM_GC_bool excluded_segs = FALSE;
       n_load_segs = 0;
       load_segs_overflow = FALSE;
       if (!EXPECT(excluded_segs, TRUE)) {
-        GC_exclude_static_roots_inner((ptr_t)load_segs,
+        MANAGED_STACK_ADDRESS_BOEHM_GC_exclude_static_roots_inner((ptr_t)load_segs,
                                       (ptr_t)load_segs + sizeof(load_segs));
         excluded_segs = TRUE;
       }
@@ -601,27 +601,27 @@ STATIC GC_bool GC_register_dynamic_libraries_dl_iterate_phdr(void)
 # endif
 
   did_something = 0;
-  dl_iterate_phdr(GC_register_dynlib_callback, &did_something);
+  dl_iterate_phdr(MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynlib_callback, &did_something);
   if (did_something) {
 #   ifdef PT_GNU_RELRO
       int i;
 
       for (i = 0; i < n_load_segs; ++i) {
         if ((word)load_segs[i].end > (word)load_segs[i].start) {
-          GC_add_roots_inner(load_segs[i].start, load_segs[i].end, TRUE);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(load_segs[i].start, load_segs[i].end, TRUE);
         }
         if ((word)load_segs[i].end2 > (word)load_segs[i].start2) {
-          GC_add_roots_inner(load_segs[i].start2, load_segs[i].end2, TRUE);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(load_segs[i].start2, load_segs[i].end2, TRUE);
         }
       }
 #   endif
   } else {
       ptr_t datastart, dataend;
 #     ifdef DATASTART_IS_FUNC
-        static ptr_t datastart_cached = (ptr_t)GC_WORD_MAX;
+        static ptr_t datastart_cached = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX;
 
         /* Evaluate DATASTART only once.  */
-        if (datastart_cached == (ptr_t)GC_WORD_MAX) {
+        if (datastart_cached == (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX) {
           datastart_cached = DATASTART;
         }
         datastart = datastart_cached;
@@ -647,15 +647,15 @@ STATIC GC_bool GC_register_dynamic_libraries_dl_iterate_phdr(void)
 
       /* dl_iterate_phdr may forget the static data segment in  */
       /* statically linked executables.                         */
-      GC_add_roots_inner(datastart, dataend, TRUE);
-#     ifdef GC_HAVE_DATAREGION2
+      MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(datastart, dataend, TRUE);
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_DATAREGION2
         if ((word)DATASTART2 - 1U >= (word)DATAEND2) {
                         /* Subtract one to check also for NULL  */
                         /* without a compiler warning.          */
           ABORT_ARG2("Wrong DATASTART/END2 pair",
                      ": %p .. %p", (void *)DATASTART2, (void *)DATAEND2);
         }
-        GC_add_roots_inner(DATASTART2, DATAEND2, TRUE);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(DATASTART2, DATAEND2, TRUE);
 #     endif
   }
   return TRUE;
@@ -703,7 +703,7 @@ extern ElfW(Dyn) _DYNAMIC[];
 EXTERN_C_END
 
 STATIC struct link_map *
-GC_FirstDLOpenedLinkMap(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap(void)
 {
     static struct link_map *cachedResult = 0;
 
@@ -714,12 +714,12 @@ GC_FirstDLOpenedLinkMap(void)
     if (NULL == cachedResult) {
 #     if defined(NETBSD) && defined(RTLD_DI_LINKMAP)
 #       if defined(CPPCHECK)
-#         define GC_RTLD_DI_LINKMAP 2
+#         define MANAGED_STACK_ADDRESS_BOEHM_GC_RTLD_DI_LINKMAP 2
 #       else
-#         define GC_RTLD_DI_LINKMAP RTLD_DI_LINKMAP
+#         define MANAGED_STACK_ADDRESS_BOEHM_GC_RTLD_DI_LINKMAP RTLD_DI_LINKMAP
 #       endif
         struct link_map *lm = NULL;
-        if (!dlinfo(RTLD_SELF, GC_RTLD_DI_LINKMAP, &lm) && lm != NULL) {
+        if (!dlinfo(RTLD_SELF, MANAGED_STACK_ADDRESS_BOEHM_GC_RTLD_DI_LINKMAP, &lm) && lm != NULL) {
             /* Now lm points link_map object of libgc.  Since it    */
             /* might not be the first dynamically linked object,    */
             /* try to find it (object next to the main object).     */
@@ -749,17 +749,17 @@ GC_FirstDLOpenedLinkMap(void)
     return cachedResult;
 }
 
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
   struct link_map *lm;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 # ifdef HAVE_DL_ITERATE_PHDR
-    if (GC_register_dynamic_libraries_dl_iterate_phdr()) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries_dl_iterate_phdr()) {
         return;
     }
 # endif
-  for (lm = GC_FirstDLOpenedLinkMap(); lm != 0; lm = lm->l_next)
+  for (lm = MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap(); lm != 0; lm = lm->l_next)
     {
         ElfW(Ehdr) * e;
         ElfW(Phdr) * p;
@@ -780,7 +780,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
               {
                 if( !(p->p_flags & PF_W) ) break;
                 start = ((char *)(p->p_vaddr)) + offset;
-                GC_add_roots_inner(start, start + p->p_memsz, TRUE);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, start + p->p_memsz, TRUE);
               }
               break;
             default:
@@ -809,7 +809,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
 /* We use /proc to track down all parts of the address space that are   */
 /* mapped by the process, and throw out regions we know we shouldn't    */
 /* worry about.  This may also work under other SVR4 variants.          */
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
     static int fd = -1;
     static prmap_t * addr_map = 0;
@@ -828,7 +828,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
 #     define MA_PHYS 0
 #   endif /* SOLARISDL */
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     if (fd < 0) {
       (void)snprintf(buf, sizeof(buf), "/proc/%ld", (long)getpid());
       buf[sizeof(buf) - 1] = '\0';
@@ -842,11 +842,11 @@ GC_INNER void GC_register_dynamic_libraries(void)
                    ": fd= %d, errno= %d", fd, errno);
     }
     if (needed_sz >= current_sz) {
-        GC_scratch_recycle_no_gww(addr_map,
+        MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_no_gww(addr_map,
                                   (size_t)current_sz * sizeof(prmap_t));
         current_sz = needed_sz * 2 + 1;
                         /* Expansion, plus room for 0 record */
-        addr_map = (prmap_t *)GC_scratch_alloc(
+        addr_map = (prmap_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc(
                                 (size_t)current_sz * sizeof(prmap_t));
         if (addr_map == NULL)
           ABORT("Insufficient memory for address map");
@@ -856,11 +856,11 @@ GC_INNER void GC_register_dynamic_libraries(void)
                    ": errcode= %d, needed_sz= %d, addr_map= %p",
                    errno, needed_sz, (void *)addr_map);
     }
-    if (GC_n_heap_sects > 0) {
-        heap_end = GC_heap_sects[GC_n_heap_sects-1].hs_start
-                        + GC_heap_sects[GC_n_heap_sects-1].hs_bytes;
-        if ((word)heap_end < (word)GC_scratch_last_end_ptr)
-          heap_end = GC_scratch_last_end_ptr;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects > 0) {
+        heap_end = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects-1].hs_start
+                        + MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects-1].hs_bytes;
+        if ((word)heap_end < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_last_end_ptr)
+          heap_end = MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_last_end_ptr;
     }
     for (i = 0; i < needed_sz; i++) {
         flags = addr_map[i].pr_mflags;
@@ -874,7 +874,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
           /* mapped readable, writable, executable, and shared(!!).     */
           /* This makes no sense to me. - HB                            */
         start = (ptr_t)(addr_map[i].pr_vaddr);
-        if (GC_roots_present(start)) goto irrelevant;
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_roots_present(start)) goto irrelevant;
         if ((word)start < (word)heap_end && (word)start >= (word)heap_start)
                 goto irrelevant;
 
@@ -912,7 +912,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
             }
           }
 #       endif /* !IRIX6 */
-        GC_add_roots_inner(start, limit, TRUE);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(start, limit, TRUE);
       irrelevant: ;
     }
     /* Don't keep cached descriptor, for now.  Some kernels don't like us */
@@ -928,7 +928,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
 #ifdef ANY_MSWIN
   /* We traverse the entire address space and register all segments     */
   /* that could possibly have been written to.                          */
-  STATIC void GC_cond_add_roots(char *base, char * limit)
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_cond_add_roots(char *base, char * limit)
   {
 #   ifdef THREADS
       char * curr_base = base;
@@ -938,52 +938,52 @@ GC_INNER void GC_register_dynamic_libraries(void)
       char * stack_top;
 #   endif
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     if (base == limit) return;
 #   ifdef THREADS
       for(;;) {
-          GC_get_next_stack(curr_base, limit, &next_stack_lo, &next_stack_hi);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_get_next_stack(curr_base, limit, &next_stack_lo, &next_stack_hi);
           if ((word)next_stack_lo >= (word)limit) break;
           if ((word)next_stack_lo > (word)curr_base)
-            GC_add_roots_inner(curr_base, next_stack_lo, TRUE);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(curr_base, next_stack_lo, TRUE);
           curr_base = next_stack_hi;
       }
       if ((word)curr_base < (word)limit)
-        GC_add_roots_inner(curr_base, limit, TRUE);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(curr_base, limit, TRUE);
 #   else
-      stack_top = (char *)((word)GC_approx_sp() &
-                            ~(word)(GC_sysinfo.dwAllocationGranularity - 1));
+      stack_top = (char *)((word)MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp() &
+                            ~(word)(MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo.dwAllocationGranularity - 1));
       if ((word)limit > (word)stack_top
-          && (word)base < (word)GC_stackbottom) {
+          && (word)base < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom) {
           /* Part of the stack; ignore it. */
           return;
       }
-      GC_add_roots_inner(base, limit, TRUE);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(base, limit, TRUE);
 #   endif
   }
 
 #ifdef DYNAMIC_LOADING
-  /* GC_register_main_static_data is not needed unless DYNAMIC_LOADING. */
-  GC_INNER GC_bool GC_register_main_static_data(void)
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data is not needed unless DYNAMIC_LOADING. */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void)
   {
 #   if defined(MSWINCE) || defined(CYGWIN32)
       /* Do we need to separately register the main static data segment? */
       return FALSE;
 #   else
-      return GC_no_win32_dlls;
+      return MANAGED_STACK_ADDRESS_BOEHM_GC_no_win32_dlls;
 #   endif
   }
 # define HAVE_REGISTER_MAIN_STATIC_DATA
 #endif /* DYNAMIC_LOADING */
 
 # ifdef DEBUG_VIRTUALQUERY
-  void GC_dump_meminfo(MEMORY_BASIC_INFORMATION *buf)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_dump_meminfo(MEMORY_BASIC_INFORMATION *buf)
   {
-    GC_printf("BaseAddress= 0x%lx, AllocationBase= 0x%lx,"
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("BaseAddress= 0x%lx, AllocationBase= 0x%lx,"
               " RegionSize= 0x%lx(%lu)\n",
               buf -> BaseAddress, buf -> AllocationBase,
               buf -> RegionSize, buf -> RegionSize);
-    GC_printf("\tAllocationProtect= 0x%lx, State= 0x%lx, Protect= 0x%lx, "
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\tAllocationProtect= 0x%lx, State= 0x%lx, Protect= 0x%lx, "
               "Type= 0x%lx\n", buf -> AllocationProtect, buf -> State,
               buf -> Protect, buf -> Type);
   }
@@ -993,13 +993,13 @@ GC_INNER void GC_register_dynamic_libraries(void)
     /* FIXME: Should we really need to scan MEM_PRIVATE sections?       */
     /* For now, we don't add MEM_PRIVATE sections to the data roots for */
     /* WinCE because otherwise SEGV fault sometimes happens to occur in */
-    /* GC_mark_from() (and, even if we use WRAP_MARK_SOME, WinCE prints */
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_mark_from() (and, even if we use WRAP_MARK_SOME, WinCE prints */
     /* a "Data Abort" message to the debugging console).                */
-    /* To workaround that, use -DGC_REGISTER_MEM_PRIVATE.               */
-#   define GC_wnt TRUE
+    /* To workaround that, use -DMANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_MEM_PRIVATE.               */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_wnt TRUE
 # endif
 
-  GC_INNER void GC_register_dynamic_libraries(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
   {
     MEMORY_BASIC_INFORMATION buf;
     DWORD protect;
@@ -1007,20 +1007,20 @@ GC_INNER void GC_register_dynamic_libraries(void)
     char * base;
     char * limit, * new_limit;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 #   ifdef MSWIN32
-      if (GC_no_win32_dlls) return;
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_no_win32_dlls) return;
 #   endif
-    p = GC_sysinfo.lpMinimumApplicationAddress;
+    p = MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo.lpMinimumApplicationAddress;
     base = limit = (char *)p;
-    while ((word)p < (word)GC_sysinfo.lpMaximumApplicationAddress) {
+    while ((word)p < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo.lpMaximumApplicationAddress) {
         size_t result = VirtualQuery(p, &buf, sizeof(buf));
 
 #       ifdef MSWINCE
           if (result == 0) {
             /* Page is free; advance to the next possible allocation base */
-            new_limit = (char *)(((word)p + GC_sysinfo.dwAllocationGranularity)
-                 & ~(GC_sysinfo.dwAllocationGranularity-1));
+            new_limit = (char *)(((word)p + MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo.dwAllocationGranularity)
+                 & ~(MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo.dwAllocationGranularity-1));
           } else
 #       endif
         /* else */ {
@@ -1035,22 +1035,22 @@ GC_INNER void GC_register_dynamic_libraries(void)
                     || protect == PAGE_READWRITE
                     || protect == PAGE_WRITECOPY)
                 && (buf.Type == MEM_IMAGE
-#                   ifdef GC_REGISTER_MEM_PRIVATE
+#                   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_MEM_PRIVATE
                       || (protect == PAGE_READWRITE && buf.Type == MEM_PRIVATE)
 #                   else
                       /* There is some evidence that we cannot always   */
                       /* ignore MEM_PRIVATE sections under Windows ME   */
                       /* and predecessors.  Hence we now also check for */
                       /* that case.                                     */
-                      || (!GC_wnt && buf.Type == MEM_PRIVATE)
+                      || (!MANAGED_STACK_ADDRESS_BOEHM_GC_wnt && buf.Type == MEM_PRIVATE)
 #                   endif
                    )
-                && !GC_is_heap_base(buf.AllocationBase)) {
+                && !MANAGED_STACK_ADDRESS_BOEHM_GC_is_heap_base(buf.AllocationBase)) {
 #               ifdef DEBUG_VIRTUALQUERY
-                  GC_dump_meminfo(&buf);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_dump_meminfo(&buf);
 #               endif
                 if ((char *)p != limit) {
-                    GC_cond_add_roots(base, limit);
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_cond_add_roots(base, limit);
                     base = (char *)p;
                 }
                 limit = new_limit;
@@ -1059,7 +1059,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
         if ((word)p > (word)new_limit /* overflow */) break;
         p = (LPVOID)new_limit;
     }
-    GC_cond_add_roots(base, limit);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_cond_add_roots(base, limit);
   }
 #endif /* ANY_MSWIN */
 
@@ -1072,12 +1072,12 @@ GC_INNER void GC_register_dynamic_libraries(void)
   extern int errno;
   EXTERN_C_END
 
-  GC_INNER void GC_register_dynamic_libraries(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
   {
     ldr_module_t moduleid = LDR_NULL_MODULE;
     ldr_process_t mypid;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     mypid = ldr_my_process(); /* obtain id of this process */
 
     /* For each module. */
@@ -1112,11 +1112,11 @@ GC_INNER void GC_register_dynamic_libraries(void)
               continue;    /* skip the main module */
 
 #     ifdef DL_VERBOSE
-        GC_log_printf("---Module---\n");
-        GC_log_printf("Module ID: %ld\n", moduleinfo.lmi_modid);
-        GC_log_printf("Count of regions: %d\n", moduleinfo.lmi_nregion);
-        GC_log_printf("Flags for module: %016lx\n", moduleinfo.lmi_flags);
-        GC_log_printf("Module pathname: \"%s\"\n", moduleinfo.lmi_name);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("---Module---\n");
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Module ID: %ld\n", moduleinfo.lmi_modid);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Count of regions: %d\n", moduleinfo.lmi_nregion);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Flags for module: %016lx\n", moduleinfo.lmi_flags);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Module pathname: \"%s\"\n", moduleinfo.lmi_name);
 #     endif
 
       /* For each region in this module. */
@@ -1132,17 +1132,17 @@ GC_INNER void GC_register_dynamic_libraries(void)
                 continue;
 
 #         ifdef DL_VERBOSE
-            GC_log_printf("--- Region ---\n");
-            GC_log_printf("Region number: %ld\n", regioninfo.lri_region_no);
-            GC_log_printf("Protection flags: %016x\n", regioninfo.lri_prot);
-            GC_log_printf("Virtual address: %p\n", regioninfo.lri_vaddr);
-            GC_log_printf("Mapped address: %p\n", regioninfo.lri_mapaddr);
-            GC_log_printf("Region size: %ld\n", regioninfo.lri_size);
-            GC_log_printf("Region name: \"%s\"\n", regioninfo.lri_name);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("--- Region ---\n");
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Region number: %ld\n", regioninfo.lri_region_no);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Protection flags: %016x\n", regioninfo.lri_prot);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Virtual address: %p\n", regioninfo.lri_vaddr);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Mapped address: %p\n", regioninfo.lri_mapaddr);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Region size: %ld\n", regioninfo.lri_size);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Region name: \"%s\"\n", regioninfo.lri_name);
 #         endif
 
           /* register region as a garbage collection root */
-          GC_add_roots_inner((char *)regioninfo.lri_mapaddr,
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner((char *)regioninfo.lri_mapaddr,
                         (char *)regioninfo.lri_mapaddr + regioninfo.lri_size,
                         TRUE);
 
@@ -1160,11 +1160,11 @@ extern char *sys_errlist[];
 extern int sys_nerr;
 EXTERN_C_END
 
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
   int index = 1; /* Ordinal position in shared library search list */
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   /* For each dynamic library loaded. */
   for (;;) {
       struct shl_descriptor *shl_desc; /* Shared library info, see dl.h */
@@ -1173,7 +1173,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
 
       /* Check if this is the end of the list or if some error occurred */
         if (status != 0) {
-#        ifdef GC_HPUX_THREADS
+#        ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_HPUX_THREADS
            /* I've seen errno values of 0.  The man page is not clear   */
            /* as to whether errno should get set on a -1 return.        */
            break;
@@ -1189,19 +1189,19 @@ GC_INNER void GC_register_dynamic_libraries(void)
         }
 
 #     ifdef DL_VERBOSE
-        GC_log_printf("---Shared library---\n");
-        GC_log_printf("filename= \"%s\"\n", shl_desc->filename);
-        GC_log_printf("index= %d\n", index);
-        GC_log_printf("handle= %08x\n", (unsigned long) shl_desc->handle);
-        GC_log_printf("text seg.start= %08x\n", shl_desc->tstart);
-        GC_log_printf("text seg.end= %08x\n", shl_desc->tend);
-        GC_log_printf("data seg.start= %08x\n", shl_desc->dstart);
-        GC_log_printf("data seg.end= %08x\n", shl_desc->dend);
-        GC_log_printf("ref.count= %lu\n", shl_desc->ref_count);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("---Shared library---\n");
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("filename= \"%s\"\n", shl_desc->filename);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("index= %d\n", index);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("handle= %08x\n", (unsigned long) shl_desc->handle);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("text seg.start= %08x\n", shl_desc->tstart);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("text seg.end= %08x\n", shl_desc->tend);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("data seg.start= %08x\n", shl_desc->dstart);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("data seg.end= %08x\n", shl_desc->dend);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("ref.count= %lu\n", shl_desc->ref_count);
 #     endif
 
       /* register shared library's data segment as a garbage collection root */
-        GC_add_roots_inner((char *) shl_desc->dstart,
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner((char *) shl_desc->dstart,
                            (char *) shl_desc->dend, TRUE);
 
         index++;
@@ -1214,11 +1214,11 @@ GC_INNER void GC_register_dynamic_libraries(void)
 # include <sys/ldr.h>
 # include <sys/errno.h>
 
-  GC_INNER void GC_register_dynamic_libraries(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
   {
       int ldibuflen = 8192;
 
-      GC_ASSERT(I_HOLD_LOCK());
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
       for (;;) {
         int len;
         struct ld_info *ldi;
@@ -1240,7 +1240,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
         ldi = (struct ld_info *)ldibuf;
         while (ldi) {
                 len = ldi->ldinfo_next;
-                GC_add_roots_inner(
+                MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(
                                 ldi->ldinfo_dataorg,
                                 (ptr_t)(unsigned long)ldi->ldinfo_dataorg
                                 + ldi->ldinfo_datasize,
@@ -1270,7 +1270,7 @@ GC_INNER void GC_register_dynamic_libraries(void)
 STATIC const struct dyld_sections_s {
     const char *seg;
     const char *sect;
-} GC_dyld_sections[] = {
+} MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[] = {
     { SEG_DATA, SECT_DATA },
     /* Used by FSF GCC, but not by OS X system tools, so far.   */
     { SEG_DATA, "__static_data" },
@@ -1289,7 +1289,7 @@ STATIC const struct dyld_sections_s {
 /* containing private vs. public symbols.  It also constructs   */
 /* sections specifically for zero-sized objects, when the       */
 /* target supports section anchors.                             */
-STATIC const char * const GC_dyld_add_sect_fmts[] = {
+STATIC const char * const MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_add_sect_fmts[] = {
   "__bss%u",
   "__pu_bss%u",
   "__zo_bss%u",
@@ -1302,35 +1302,35 @@ STATIC const char * const GC_dyld_add_sect_fmts[] = {
 # define L2_MAX_OFILE_ALIGNMENT 15
 #endif
 
-STATIC const char *GC_dyld_name_for_hdr(const struct GC_MACH_HEADER *hdr)
+STATIC const char *MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_name_for_hdr(const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER *hdr)
 {
     unsigned long i, c;
     c = _dyld_image_count();
     for (i = 0; i < c; i++)
-      if ((const struct GC_MACH_HEADER *)_dyld_get_image_header(i) == hdr)
+      if ((const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER *)_dyld_get_image_header(i) == hdr)
         return _dyld_get_image_name(i);
     return NULL;
 }
 
-STATIC void GC_dyld_image_add(const struct GC_MACH_HEADER *hdr,
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_image_add(const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER *hdr,
                               intptr_t slide)
 {
   unsigned long start, end;
   unsigned i, j;
-  const struct GC_MACH_SECTION *sec;
+  const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_SECTION *sec;
   const char *name;
-  GC_has_static_roots_func callback = GC_has_static_roots;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots_func callback = MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots;
 
-  GC_ASSERT(I_DONT_HOLD_LOCK());
-  if (GC_no_dls) return;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_no_dls) return;
 # ifdef DARWIN_DEBUG
-    name = GC_dyld_name_for_hdr(hdr);
+    name = MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_name_for_hdr(hdr);
 # else
-    name = callback != 0 ? GC_dyld_name_for_hdr(hdr) : NULL;
+    name = callback != 0 ? MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_name_for_hdr(hdr) : NULL;
 # endif
-  for (i = 0; i < sizeof(GC_dyld_sections)/sizeof(GC_dyld_sections[0]); i++) {
-    sec = GC_GETSECTBYNAME(hdr, GC_dyld_sections[i].seg,
-                           GC_dyld_sections[i].sect);
+  for (i = 0; i < sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections)/sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[0]); i++) {
+    sec = MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME(hdr, MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].seg,
+                           MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].sect);
     if (sec == NULL || sec->size < sizeof(word))
       continue;
     start = slide + sec->addr;
@@ -1339,19 +1339,19 @@ STATIC void GC_dyld_image_add(const struct GC_MACH_HEADER *hdr,
     /* The user callback is called holding the lock.    */
     if (callback == 0 || callback(name, (void*)start, (size_t)sec->size)) {
 #     ifdef DARWIN_DEBUG
-        GC_log_printf(
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf(
               "Adding section __DATA,%s at %p-%p (%lu bytes) from image %s\n",
-               GC_dyld_sections[i].sect, (void*)start, (void*)end,
+               MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].sect, (void*)start, (void*)end,
                (unsigned long)sec->size, name);
 #     endif
-      GC_add_roots_inner((ptr_t)start, (ptr_t)end, FALSE);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner((ptr_t)start, (ptr_t)end, FALSE);
     }
     UNLOCK();
   }
 
   /* Sections constructed on demand.    */
-  for (j = 0; j < sizeof(GC_dyld_add_sect_fmts) / sizeof(char *); j++) {
-    const char *fmt = GC_dyld_add_sect_fmts[j];
+  for (j = 0; j < sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_add_sect_fmts) / sizeof(char *); j++) {
+    const char *fmt = MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_add_sect_fmts[j];
 
     /* Add our manufactured aligned BSS sections.       */
     for (i = 0; i <= L2_MAX_OFILE_ALIGNMENT; i++) {
@@ -1359,86 +1359,86 @@ STATIC void GC_dyld_image_add(const struct GC_MACH_HEADER *hdr,
 
       (void)snprintf(secnam, sizeof(secnam), fmt, (unsigned)i);
       secnam[sizeof(secnam) - 1] = '\0';
-      sec = GC_GETSECTBYNAME(hdr, SEG_DATA, secnam);
+      sec = MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME(hdr, SEG_DATA, secnam);
       if (sec == NULL || sec->size == 0)
         continue;
       start = slide + sec->addr;
       end = start + sec->size;
 #     ifdef DARWIN_DEBUG
-        GC_log_printf("Adding on-demand section __DATA,%s at"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Adding on-demand section __DATA,%s at"
                       " %p-%p (%lu bytes) from image %s\n",
                       secnam, (void*)start, (void*)end,
                       (unsigned long)sec->size, name);
 #     endif
-      GC_add_roots((char*)start, (char*)end);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots((char*)start, (char*)end);
     }
   }
 
 # if defined(DARWIN_DEBUG) && !defined(NO_DEBUGGING)
     LOCK();
-    GC_print_static_roots();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_static_roots();
     UNLOCK();
 # endif
 }
 
-STATIC void GC_dyld_image_remove(const struct GC_MACH_HEADER *hdr,
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_image_remove(const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER *hdr,
                                  intptr_t slide)
 {
   unsigned long start, end;
   unsigned i, j;
-  const struct GC_MACH_SECTION *sec;
+  const struct MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_SECTION *sec;
 
-  GC_ASSERT(I_DONT_HOLD_LOCK());
-  for (i = 0; i < sizeof(GC_dyld_sections)/sizeof(GC_dyld_sections[0]); i++) {
-    sec = GC_GETSECTBYNAME(hdr, GC_dyld_sections[i].seg,
-                           GC_dyld_sections[i].sect);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+  for (i = 0; i < sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections)/sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[0]); i++) {
+    sec = MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME(hdr, MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].seg,
+                           MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].sect);
     if (sec == NULL || sec->size == 0)
       continue;
     start = slide + sec->addr;
     end = start + sec->size;
 #   ifdef DARWIN_DEBUG
-      GC_log_printf(
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf(
             "Removing section __DATA,%s at %p-%p (%lu bytes) from image %s\n",
-            GC_dyld_sections[i].sect, (void*)start, (void*)end,
-            (unsigned long)sec->size, GC_dyld_name_for_hdr(hdr));
+            MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_sections[i].sect, (void*)start, (void*)end,
+            (unsigned long)sec->size, MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_name_for_hdr(hdr));
 #   endif
-    GC_remove_roots((char*)start, (char*)end);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_remove_roots((char*)start, (char*)end);
   }
 
   /* Remove our on-demand sections.     */
-  for (j = 0; j < sizeof(GC_dyld_add_sect_fmts) / sizeof(char *); j++) {
-    const char *fmt = GC_dyld_add_sect_fmts[j];
+  for (j = 0; j < sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_add_sect_fmts) / sizeof(char *); j++) {
+    const char *fmt = MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_add_sect_fmts[j];
 
     for (i = 0; i <= L2_MAX_OFILE_ALIGNMENT; i++) {
       char secnam[16];
 
       (void)snprintf(secnam, sizeof(secnam), fmt, (unsigned)i);
       secnam[sizeof(secnam) - 1] = '\0';
-      sec = GC_GETSECTBYNAME(hdr, SEG_DATA, secnam);
+      sec = MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME(hdr, SEG_DATA, secnam);
       if (sec == NULL || sec->size == 0)
         continue;
       start = slide + sec->addr;
       end = start + sec->size;
 #     ifdef DARWIN_DEBUG
-        GC_log_printf("Removing on-demand section __DATA,%s at"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Removing on-demand section __DATA,%s at"
                       " %p-%p (%lu bytes) from image %s\n", secnam,
                       (void*)start, (void*)end, (unsigned long)sec->size,
-                      GC_dyld_name_for_hdr(hdr));
+                      MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_name_for_hdr(hdr));
 #     endif
-      GC_remove_roots((char*)start, (char*)end);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_remove_roots((char*)start, (char*)end);
     }
   }
 
 # if defined(DARWIN_DEBUG) && !defined(NO_DEBUGGING)
     LOCK();
-    GC_print_static_roots();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_static_roots();
     UNLOCK();
 # endif
 }
 
-GC_INNER void GC_register_dynamic_libraries(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
 {
-    /* Currently does nothing. The callbacks are setup by GC_init_dyld()
+    /* Currently does nothing. The callbacks are setup by MANAGED_STACK_ADDRESS_BOEHM_GC_init_dyld()
     The dyld library takes it from there. */
 }
 
@@ -1448,15 +1448,15 @@ GC_INNER void GC_register_dynamic_libraries(void)
    This should be called BEFORE any thread in created and WITHOUT the
    allocation lock held. */
 
-GC_INNER void GC_init_dyld(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_dyld(void)
 {
-  static GC_bool initialized = FALSE;
+  static MANAGED_STACK_ADDRESS_BOEHM_GC_bool initialized = FALSE;
 
-  GC_ASSERT(I_DONT_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
   if (initialized) return;
 
 # ifdef DARWIN_DEBUG
-    GC_log_printf("Registering dyld callbacks...\n");
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Registering dyld callbacks...\n");
 # endif
 
   /* Apple's Documentation:
@@ -1470,9 +1470,9 @@ GC_INNER void GC_init_dyld(void)
      linked in the future.
   */
   _dyld_register_func_for_add_image(
-        (void (*)(const struct mach_header*, intptr_t))GC_dyld_image_add);
+        (void (*)(const struct mach_header*, intptr_t))MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_image_add);
   _dyld_register_func_for_remove_image(
-        (void (*)(const struct mach_header*, intptr_t))GC_dyld_image_remove);
+        (void (*)(const struct mach_header*, intptr_t))MANAGED_STACK_ADDRESS_BOEHM_GC_dyld_image_remove);
                         /* Structure mach_header64 has the same fields  */
                         /* as mach_header except for the reserved one   */
                         /* at the end, so these casts are OK.           */
@@ -1483,7 +1483,7 @@ GC_INNER void GC_init_dyld(void)
 # ifdef NO_DYLD_BIND_FULLY_IMAGE
     /* FIXME: What should we do in this case?   */
 # else
-    if (GC_no_dls) return; /* skip main data segment registration */
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_no_dls) return; /* skip main data segment registration */
 
     /* When the environment variable is set, the dynamic linker binds   */
     /* all undefined symbols the application needs at launch time.      */
@@ -1492,18 +1492,18 @@ GC_INNER void GC_init_dyld(void)
     if (GETENV("DYLD_BIND_AT_LAUNCH") == 0) {
       /* The environment variable is unset, so we should bind manually. */
 #     ifdef DARWIN_DEBUG
-        GC_log_printf("Forcing full bind of GC code...\n");
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Forcing full bind of GC code...\n");
 #     endif
       /* FIXME: '_dyld_bind_fully_image_containing_address' is deprecated. */
       if (!_dyld_bind_fully_image_containing_address(
-                                                  (unsigned long *)GC_malloc))
+                                                  (unsigned long *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc))
         ABORT("_dyld_bind_fully_image_containing_address failed");
     }
 # endif
 }
 
 #define HAVE_REGISTER_MAIN_STATIC_DATA
-GC_INNER GC_bool GC_register_main_static_data(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void)
 {
   /* Already done through dyld callbacks */
   return FALSE;
@@ -1514,15 +1514,15 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 #if defined(HAIKU)
 # include <kernel/image.h>
 
-  GC_INNER void GC_register_dynamic_libraries(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
   {
     image_info info;
     int32 cookie = 0;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     while (get_next_image_info(0, &cookie, &info) == B_OK) {
       ptr_t data = (ptr_t)info.data;
-      GC_add_roots_inner(data, data + info.data_size, TRUE);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(data, data + info.data_size, TRUE);
     }
   }
 #endif /* HAIKU */
@@ -1533,7 +1533,7 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 # include "th/PCR_ThCtl.h"
 # include "mm/PCR_MM.h"
 
-  GC_INNER void GC_register_dynamic_libraries(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void)
   {
     /* Add new static data areas of dynamically loaded modules. */
     PCR_IL_LoadedFile * p = PCR_IL_GetLastLoadedFile();
@@ -1552,7 +1552,7 @@ GC_INNER GC_bool GC_register_main_static_data(void)
       for (q = p -> lf_ls; q != NIL; q = q -> ls_next) {
         if ((q -> ls_flags & PCR_IL_SegFlags_Traced_MASK)
             == PCR_IL_SegFlags_Traced_on) {
-          GC_add_roots_inner((ptr_t)q->ls_addr,
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner((ptr_t)q->ls_addr,
                              (ptr_t)q->ls_addr + q->ls_bytes, TRUE);
         }
       }
@@ -1562,15 +1562,15 @@ GC_INNER GC_bool GC_register_main_static_data(void)
 
 #if !defined(HAVE_REGISTER_MAIN_STATIC_DATA) && defined(DYNAMIC_LOADING)
   /* Do we need to separately register the main static data segment? */
-  GC_INNER GC_bool GC_register_main_static_data(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void)
   {
     return TRUE;
   }
 #endif /* HAVE_REGISTER_MAIN_STATIC_DATA */
 
 /* Register a routine to filter dynamic library registration.  */
-GC_API void GC_CALL GC_register_has_static_roots_callback(
-                                        GC_has_static_roots_func callback)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_register_has_static_roots_callback(
+                                        MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots_func callback)
 {
-    GC_has_static_roots = callback;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_has_static_roots = callback;
 }

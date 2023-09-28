@@ -57,13 +57,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WNDCLASS    wndclass;
     HACCEL      hAccel;
 
-    GC_set_find_leak(0);
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 #   ifndef NO_INCREMENTAL
-        GC_enable_incremental();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental();
 #   endif
 #   if defined(CPPCHECK)
-        GC_noop1((GC_word)&WinMain);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((MANAGED_STACK_ADDRESS_BOEHM_GC_word)&WinMain);
 #   endif
 
     if (!hPrevInstance)
@@ -127,7 +127,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /* Return the argument with all control characters replaced by blanks.  */
 static char * plain_chars(char * text, size_t len)
 {
-    char * result = (char *)GC_MALLOC_ATOMIC(len + 1);
+    char * result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
     size_t i;
 
     if (NULL == result) return NULL;
@@ -146,7 +146,7 @@ static char * plain_chars(char * text, size_t len)
 /* blank, and all control characters c replaced by c + 64.              */
 static char * control_chars(char * text, size_t len)
 {
-    char * result = (char *)GC_MALLOC_ATOMIC(len + 1);
+    char * result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
     size_t i;
 
     if (NULL == result) return NULL;
@@ -292,7 +292,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd_arg, UINT message,
 
     case WM_DESTROY:
         PostQuitMessage(0);
-        GC_win32_free_heap();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_win32_free_heap();
         return 0;
 
     case WM_PAINT:
@@ -369,7 +369,7 @@ void invalidate_line(int i)
 
 #else
 
-  extern int GC_quiet;
+  extern int MANAGED_STACK_ADDRESS_BOEHM_GC_quiet;
         /* ANSI C doesn't allow translation units to be empty.  */
         /* So we guarantee this one is nonempty.                */
 

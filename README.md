@@ -108,7 +108,7 @@ from other such accessible objects, or from the registers,
 stack, data, or statically allocated bss segments.  Pointers from
 the stack or registers may point to anywhere inside an object.
 The same is true for heap pointers if the collector is compiled with
-`ALL_INTERIOR_POINTERS` defined, or `GC_all_interior_pointers` is otherwise
+`ALL_INTERIOR_POINTERS` defined, or `MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers` is otherwise
 set, as is now the default.
 
 Compiling without `ALL_INTERIOR_POINTERS` may reduce accidental retention
@@ -118,13 +118,13 @@ issue for most programs occupying a small fraction of the possible
 address space.
 
 There are a number of routines which modify the pointer recognition
-algorithm.  `GC_register_displacement` allows certain interior pointers
+algorithm.  `MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement` allows certain interior pointers
 to be recognized even if `ALL_INTERIOR_POINTERS` is not defined.
-`GC_malloc_ignore_off_page` allows some pointers into the middle of
+`MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page` allows some pointers into the middle of
 large objects to be disregarded, greatly reducing the probability of
 accidental retention of large objects.  For most purposes it seems
 best to compile with `ALL_INTERIOR_POINTERS` and to use
-`GC_malloc_ignore_off_page` if you get collector warnings from
+`MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page` if you get collector warnings from
 allocations of very large objects.  See [here](docs/debugging.md) for details.
 
 _WARNING_: pointers inside memory allocated by the standard (system) `malloc`
@@ -133,21 +133,21 @@ a region may be prematurely deallocated.  It is thus suggested that the
 standard `malloc` be used only for memory regions, such as I/O buffers, that
 are guaranteed not to contain pointers to garbage collectible memory.
 Pointers in C language automatic, static, or register variables,
-are correctly recognized.  (Note that `GC_malloc_uncollectable` has
+are correctly recognized.  (Note that `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable` has
 semantics similar to standard malloc, but allocates objects that are
 traced by the collector.)
 
 _WARNING_: the collector does not always know how to find pointers in data
 areas that are associated with dynamic libraries.  This is easy to remedy
 if you know how to find those data areas on your operating system (see
-`GC_add_roots`).  Code for doing this under SunOS, IRIX 5.X and 6.X, HP/UX,
+`MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots`).  Code for doing this under SunOS, IRIX 5.X and 6.X, HP/UX,
 Alpha OSF/1, Linux, and Win32 is included and used by default.
 (See [README.win32](docs/platforms/README.win32) and
 [README.win64](docs/platforms/README.win64) for Windows details.)  On other
 systems, pointers from dynamic library data areas may not be considered by the
 collector.  If you're writing a program that depends on the collector scanning
 dynamic library data areas, it may be a good idea to include at least one call
-to `GC_is_visible` to ensure that those areas are visible to the collector.
+to `MANAGED_STACK_ADDRESS_BOEHM_GC_is_visible` to ensure that those areas are visible to the collector.
 
 Note that the garbage collector does not need to be informed of shared
 read-only data.  However, if the shared library mechanism can introduce
@@ -176,7 +176,7 @@ stored on the thread's stack for the duration of their lifetime.
 
 The collector operates silently in the default configuration.
 In the event of issues, this can usually be changed by defining the
-`GC_PRINT_STATS` or `GC_PRINT_VERBOSE_STATS` environment variables.  This
+`MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS` or `MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_VERBOSE_STATS` environment variables.  This
 will result in a few lines of descriptive output for each collection.
 (The given statistics exhibit a few peculiarities.
 Things don't appear to add up for a variety of reasons, most notably
@@ -295,20 +295,20 @@ some porting suggestions are provided [here](docs/porting.md).
 ## The C Interface to the Allocator
 
 The following routines are intended to be directly called by the user.
-Note that usually only `GC_malloc` is necessary.  `GC_clear_roots` and
-`GC_add_roots` calls may be required if the collector has to trace
+Note that usually only `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` is necessary.  `MANAGED_STACK_ADDRESS_BOEHM_GC_clear_roots` and
+`MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots` calls may be required if the collector has to trace
 from nonstandard places (e.g. from dynamic library data areas on a
 machine on which the collector doesn't already understand them.)  On
-some machines, it may be desirable to set `GC_stackbottom` to a good
+some machines, it may be desirable to set `MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom` to a good
 approximation of the stack base (bottom).
 
 Client code may include "gc.h", which defines all of the following, plus many
 others.
 
-  1. `GC_malloc(bytes)` - Allocate an object of a given size.  Unlike malloc,
-  the object is cleared before being returned to the user.  `GC_malloc` will
+  1. `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(bytes)` - Allocate an object of a given size.  Unlike malloc,
+  the object is cleared before being returned to the user.  `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` will
   invoke the garbage collector when it determines this to be appropriate.
-  GC_malloc may return 0 if it is unable to acquire sufficient space from the
+  MANAGED_STACK_ADDRESS_BOEHM_GC_malloc may return 0 if it is unable to acquire sufficient space from the
   operating system.  This is the most probable consequence of running out
   of space.  Other possible consequences are that a function call will fail
   due to lack of stack space, or that the collector will fail in other ways
@@ -316,61 +316,61 @@ others.
   system process will fail and take down the machine.  Most of these
   possibilities are independent of the malloc implementation.
 
-  2. `GC_malloc_atomic(bytes)` - Allocate an object of a given size that
+  2. `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic(bytes)` - Allocate an object of a given size that
   is guaranteed not to contain any pointers.  The returned object is not
-  guaranteed to be cleared. (Can always be replaced by `GC_malloc`, but
+  guaranteed to be cleared. (Can always be replaced by `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc`, but
   results in faster collection times.  The collector will probably run faster
-  if large character arrays, etc. are allocated with `GC_malloc_atomic` than
+  if large character arrays, etc. are allocated with `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic` than
   if they are statically allocated.)
 
-  3. `GC_realloc(object, new_bytes)` - Change the size of object to be of
+  3. `MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(object, new_bytes)` - Change the size of object to be of
   a given size.  Returns a pointer to the new object, which may, or may not,
   be the same as the pointer to the old object.  The new object is taken to
   be atomic if and only if the old one was.  If the new object is composite
   and larger than the original object then the newly added bytes are cleared.
   This is very likely to allocate a new object.
 
-  4. `GC_free(object)` - Explicitly deallocate an object returned by
-  `GC_malloc` or `GC_malloc_atomic`, or friends.  Not necessary, but can be
+  4. `MANAGED_STACK_ADDRESS_BOEHM_GC_free(object)` - Explicitly deallocate an object returned by
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` or `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic`, or friends.  Not necessary, but can be
   used to minimize collections if performance is critical.  Probably
   a performance loss for very small objects (<= 8 bytes).
 
-  5. `GC_expand_hp(bytes)` - Explicitly increase the heap size.  (This is
+  5. `MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp(bytes)` - Explicitly increase the heap size.  (This is
   normally done automatically if a garbage collection failed to reclaim
-  enough memory.  Explicit calls to `GC_expand_hp` may prevent unnecessarily
+  enough memory.  Explicit calls to `MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp` may prevent unnecessarily
   frequent collections at program startup.)
 
-  6. `GC_malloc_ignore_off_page(bytes)` - Identical to `GC_malloc`, but the
+  6. `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page(bytes)` - Identical to `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc`, but the
   client promises to keep a pointer to the somewhere within the first GC
   heap block (512 .. 4096 bytes or even more, depending on the configuration)
   of the object while it is live.  (This pointer should normally be
   declared volatile to prevent interference from compiler optimizations.)
   This is the recommended way to allocate anything that is likely to be
-  larger than 100 KB or so.  (`GC_malloc` may result in a failure to reclaim
+  larger than 100 KB or so.  (`MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` may result in a failure to reclaim
   such objects.)
 
-  7. `GC_set_warn_proc(proc)` - Can be used to redirect warnings from the
+  7. `MANAGED_STACK_ADDRESS_BOEHM_GC_set_warn_proc(proc)` - Can be used to redirect warnings from the
   collector.  Such warnings should be rare, and should not be ignored during
   code development.
 
-  8. `GC_enable_incremental()` - Enables generational and incremental
+  8. `MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental()` - Enables generational and incremental
   collection.  Useful for large heaps on machines that provide access to page
   dirty information.  Some dirty bit implementations may interfere with
   debugging (by catching address faults) and place restrictions on heap
   arguments to system calls (since write faults inside a system call may not
   be handled well).
 
-  9. `GC_register_finalizer(object, proc, data, 0, 0)` and friends - Allow for
+  9. `MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer(object, proc, data, 0, 0)` and friends - Allow for
   registration of finalization code.  User supplied finalization code
   (`(*proc)(object, data)`) is invoked after object becomes unreachable.
   For more sophisticated uses, and for finalization ordering issues, see gc.h.
 
-The global variable `GC_free_space_divisor` may be adjusted up from it
+The global variable `MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor` may be adjusted up from it
 default value of 3 to use less space and more collection time, or down for
 the opposite effect.  Setting it to 1 will almost disable collections
 and cause all allocations to simply grow the heap.
 
-The variable `GC_non_gc_bytes`, which is normally 0, may be changed to reflect
+The variable `MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes`, which is normally 0, may be changed to reflect
 the amount of memory allocated by the above routines that should not be
 considered as a candidate for collection.  Careless use may, of course, result
 in excessive memory consumption.
@@ -378,16 +378,16 @@ in excessive memory consumption.
 Some additional tuning is possible through the parameters defined
 near the top of gc_priv.h.
 
-If only `GC_malloc` is intended to be used, it might be appropriate to define:
+If only `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` is intended to be used, it might be appropriate to define:
 
-    #define malloc(n) GC_malloc(n)
-    #define calloc(m,n) GC_malloc((m)*(n))
+    #define malloc(n) MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(n)
+    #define calloc(m,n) MANAGED_STACK_ADDRESS_BOEHM_GC_malloc((m)*(n))
 
 For small pieces of VERY allocation intensive code, `gc_inline.h` includes
-some allocation macros that may be used in place of `GC_malloc` and
+some allocation macros that may be used in place of `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` and
 friends.
 
-All externally visible names in the garbage collector start with `GC_`.
+All externally visible names in the garbage collector start with `MANAGED_STACK_ADDRESS_BOEHM_GC_`.
 To avoid name conflicts, client code should avoid this prefix, except when
 accessing garbage collector routines.
 
@@ -424,7 +424,7 @@ This will cause the collector to print a human-readable object description
 whenever an inaccessible object is found that has not been explicitly freed.
 Such objects will also be automatically reclaimed.
 
-If all objects are allocated with `GC_DEBUG_MALLOC` (see the next section)
+If all objects are allocated with `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG_MALLOC` (see the next section)
 then, by default, the human-readable object description will at least contain
 the source file and the line number at which the leaked object was allocated.
 This may sometimes be sufficient.  (On a few machines, it will also report
@@ -436,15 +436,15 @@ by Scott Schwartz.)
 
 Note that the debugging facilities described in the next section can
 sometimes be slightly LESS effective in leak finding mode, since in the latter
-`GC_debug_free` actually results in reuse of the object.  (Otherwise the
+`MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free` actually results in reuse of the object.  (Otherwise the
 object is simply marked invalid.)  Also, note that most GC tests are not
 designed to run meaningfully in `FIND_LEAK` mode.
 
 
 ## Debugging Facilities
 
-The routines `GC_debug_malloc`, `GC_debug_malloc_atomic`, `GC_debug_realloc`,
-and `GC_debug_free` provide an alternate interface to the collector, which
+The routines `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc`, `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic`, `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc`,
+and `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free` provide an alternate interface to the collector, which
 provides some help with memory overwrite errors, and the like.
 Objects allocated in this way are annotated with additional
 information.  Some of this information is checked during garbage
@@ -454,37 +454,37 @@ Simple cases of writing past the end of an allocated object should
 be caught if the object is explicitly deallocated, or if the
 collector is invoked while the object is live.  The first deallocation
 of an object will clear the debugging info associated with an
-object, so accidentally repeated calls to `GC_debug_free` will report the
+object, so accidentally repeated calls to `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free` will report the
 deallocation of an object without debugging information.  Out of
 memory errors will be reported to stderr, in addition to returning `NULL`.
 
-`GC_debug_malloc` checking during garbage collection is enabled
+`MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc` checking during garbage collection is enabled
 with the first call to this function.  This will result in some
 slowdown during collections.  If frequent heap checks are desired,
-this can be achieved by explicitly invoking `GC_gcollect`, e.g. from
+this can be achieved by explicitly invoking `MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect`, e.g. from
 the debugger.
 
-`GC_debug_malloc` allocated objects should not be passed to `GC_realloc`
-or `GC_free`, and conversely.  It is however acceptable to allocate only
-some objects with `GC_debug_malloc`, and to use `GC_malloc` for other objects,
+`MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc` allocated objects should not be passed to `MANAGED_STACK_ADDRESS_BOEHM_GC_realloc`
+or `MANAGED_STACK_ADDRESS_BOEHM_GC_free`, and conversely.  It is however acceptable to allocate only
+some objects with `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc`, and to use `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` for other objects,
 provided the two pools are kept distinct.  In this case, there is a very
-low probability that `GC_malloc` allocated objects may be misidentified as
+low probability that `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` allocated objects may be misidentified as
 having been overwritten.  This should happen with probability at most
-one in 2**32.  This probability is zero if `GC_debug_malloc` is never called.
+one in 2**32.  This probability is zero if `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc` is never called.
 
-`GC_debug_malloc`, `GC_debug_malloc_atomic`, and `GC_debug_realloc` take two
+`MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc`, `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic`, and `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc` take two
 additional trailing arguments, a string and an integer.  These are not
 interpreted by the allocator.  They are stored in the object (the string is
 not copied).  If an error involving the object is detected, they are printed.
 
-The macros `GC_MALLOC`, `GC_MALLOC_ATOMIC`, `GC_REALLOC`, `GC_FREE`,
-`GC_REGISTER_FINALIZER` and friends are also provided.  These require the same
+The macros `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC`, `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC`, `MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC`, `MANAGED_STACK_ADDRESS_BOEHM_GC_FREE`,
+`MANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_FINALIZER` and friends are also provided.  These require the same
 arguments as the corresponding (nondebugging) routines.  If gc.h is included
-with `GC_DEBUG` defined, they call the debugging versions of these
+with `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG` defined, they call the debugging versions of these
 functions, passing the current file name and line number as the two
-extra arguments, where appropriate.  If gc.h is included without `GC_DEBUG`
+extra arguments, where appropriate.  If gc.h is included without `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG`
 defined then all these macros will instead be defined to their nondebugging
-equivalents.  (`GC_REGISTER_FINALIZER` is necessary, since pointers to
+equivalents.  (`MANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_FINALIZER` is necessary, since pointers to
 objects with debugging information are really pointers to a displacement
 of 16 bytes from the object beginning, and some translation is necessary
 when finalization routines are invoked.  For details, about what's stored
@@ -500,9 +500,9 @@ can also run in a "generational" mode, in which it usually attempts to
 collect only objects allocated since the last garbage collection.
 Furthermore, in this mode, garbage collections run mostly incrementally,
 with a small amount of work performed in response to each of a large number of
-`GC_malloc` requests.
+`MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` requests.
 
-This mode is enabled by a call to `GC_enable_incremental`.
+This mode is enabled by a call to `MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental`.
 
 Incremental and generational collection is effective in reducing
 pause times only if the collector has some way to tell which objects
@@ -518,10 +518,10 @@ of information:
   client code. See `os_dep.c` for details.
 
   2. Information supplied by the programmer.  The object is considered dirty
-  after a call to `GC_end_stubborn_change` provided the library has been
+  after a call to `MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change` provided the library has been
   compiled suitably. It is typically not worth using for short-lived objects.
-  Note that bugs caused by a missing `GC_end_stubborn_change` or
-  `GC_reachable_here` call are likely to be observed very infrequently and
+  Note that bugs caused by a missing `MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change` or
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here` call are likely to be observed very infrequently and
   hard to trace.
 
 

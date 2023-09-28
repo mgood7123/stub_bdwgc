@@ -16,7 +16,7 @@
  */
 
 /* This should never be included directly; it is included only from gc.h. */
-#if defined(GC_H)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_H)
 
 /* The policy regarding version numbers: development code has odd       */
 /* "minor" number (and "micro" part is 0); when development is finished */
@@ -28,20 +28,20 @@
 /* The version here should match that in configure/configure.ac */
 /* Eventually this one may become unnecessary.  For now we need */
 /* it to keep the old-style build process working.              */
-#define GC_TMP_VERSION_MAJOR 8
-#define GC_TMP_VERSION_MINOR 3
-#define GC_TMP_VERSION_MICRO 0 /* 8.3.0 */
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MAJOR 8
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MINOR 3
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MICRO 0 /* 8.3.0 */
 
-#ifdef GC_VERSION_MAJOR
-# if GC_TMP_VERSION_MAJOR != GC_VERSION_MAJOR \
-     || GC_TMP_VERSION_MINOR != GC_VERSION_MINOR \
-     || GC_TMP_VERSION_MICRO != GC_VERSION_MICRO
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MAJOR != MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR \
+     || MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MINOR != MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MINOR \
+     || MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MICRO != MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MICRO
 #   error Inconsistent version info.  Check README.md, include/gc_version.h and configure.ac.
 # endif
 #else
-# define GC_VERSION_MAJOR GC_TMP_VERSION_MAJOR
-# define GC_VERSION_MINOR GC_TMP_VERSION_MINOR
-# define GC_VERSION_MICRO GC_TMP_VERSION_MICRO
-#endif /* !GC_VERSION_MAJOR */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MAJOR
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MINOR MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MINOR
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MICRO MANAGED_STACK_ADDRESS_BOEHM_GC_TMP_VERSION_MICRO
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR */
 
 #endif

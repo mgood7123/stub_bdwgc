@@ -16,7 +16,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 
-#include "gc.h"    /* For GC_INIT() only */
+#include "gc.h"    /* For MANAGED_STACK_ADDRESS_BOEHM_GC_INIT() only */
 #include "gc/cord.h"
 
 /* This is a very incomplete test of the cord package.  It knows about  */
@@ -48,7 +48,7 @@ static int count;
 
 static int test_fn(char c, void * client_data)
 {
-    if (client_data != (void *)(GC_word)13)
+    if (client_data != (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)13)
         ABORT("bad client data");
     if (count < CORD_ITER_CNT + 1) {
         if ((count & 1) == 0) {
@@ -78,7 +78,7 @@ static void test_cord_x1(CORD x)
 
     count = 0;
     if (CORD_iter5(x, CORD_ITER_CNT - 1, test_fn, CORD_NO_FN,
-                   (void *)(GC_word)13) == 0) {
+                   (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)13) == 0) {
         ABORT("CORD_iter5 failed");
     }
     if (count != CORD_ITER_CNT + 2) ABORT("CORD_iter5 failed");
@@ -86,7 +86,7 @@ static void test_cord_x1(CORD x)
     count = 0;
     CORD_set_pos(p, x, CORD_ITER_CNT - 1);
     while (CORD_pos_valid(p)) {
-        (void)test_fn(CORD_pos_fetch(p), (void *)(GC_word)13);
+        (void)test_fn(CORD_pos_fetch(p), (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)13);
         CORD_next(p);
     }
     if (count != CORD_ITER_CNT + 2) ABORT("Position based iteration failed");
@@ -116,7 +116,7 @@ static void test_cord_x2(CORD x)
 
     count = 0;
     if (CORD_iter5(x, CORD_ITER_CNT - 1, test_fn, CORD_NO_FN,
-                   (void *)(GC_word)13) == 0) {
+                   (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)13) == 0) {
         ABORT("CORD_iter5 failed");
     }
     if (count != CORD_ITER_CNT + 2) ABORT("CORD_iter5 failed");
@@ -271,9 +271,9 @@ static void test_extras(void)
     /* TODO: Propose and use CORD_fclose. */
     *(CORD volatile *)&w = CORD_EMPTY;
     *(CORD volatile *)&z = CORD_EMPTY;
-    GC_gcollect();
-#   ifndef GC_NO_FINALIZATION
-      GC_invoke_finalizers();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+      MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers();
             /* Of course, this does not guarantee the files are closed. */
 #   endif
     if (remove(FNAME1) != 0) {
@@ -314,12 +314,12 @@ static int wrap_vfprintf(FILE * f, CORD format, ...)
 # if defined(_MSC_VER)
 #   if defined(_WIN32_WCE)
       /* _snprintf is deprecated in WinCE */
-#     define GC_SNPRINTF StringCchPrintfA
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF StringCchPrintfA
 #   else
-#     define GC_SNPRINTF _snprintf
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF _snprintf
 #   endif
 # else
-#   define GC_SNPRINTF snprintf
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF snprintf
 # endif
 #endif
 
@@ -348,8 +348,8 @@ static void test_printf(void)
     x = CORD_cat(x, x);
     if (CORD_sprintf(&result, "->%-120.78r!\n", x) != 124)
         ABORT("CORD_sprintf failed 3");
-#   ifdef GC_SNPRINTF
-        (void)GC_SNPRINTF(result2, sizeof(result2), "->%-120.78s!\n",
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF
+        (void)MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF(result2, sizeof(result2), "->%-120.78s!\n",
                           CORD_to_char_star(x));
 #   else
         (void)sprintf(result2, "->%-120.78s!\n", CORD_to_char_star(x));
@@ -357,10 +357,10 @@ static void test_printf(void)
     result2[sizeof(result2) - 1] = '\0';
     if (CORD_cmp(result, result2) != 0) ABORT("CORD_sprintf goofed 5");
 
-#   ifdef GC_SNPRINTF
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF
         /* Check whether "%zu" specifier is supported; pass the format  */
         /* string via a variable to avoid a compiler warning if not.    */
-        res = GC_SNPRINTF(result2, sizeof(result2), zu_format, (size_t)0);
+        res = MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF(result2, sizeof(result2), zu_format, (size_t)0);
 #   else
         res = sprintf(result2, zu_format, (size_t)0);
 #   endif
@@ -386,11 +386,11 @@ int main(void)
 #   ifdef THINK_C
         printf("cordtest:\n");
 #   endif
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 #   ifndef NO_INCREMENTAL
-      GC_enable_incremental();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental();
 #   endif
-    if (GC_get_find_leak())
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
         printf("This test program is not designed for leak detection mode\n");
     CORD_oom_fn = 0; /* just test it is accessible */
     test_basics();

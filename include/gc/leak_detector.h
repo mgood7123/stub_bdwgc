@@ -12,18 +12,18 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_LEAK_DETECTOR_H
-#define GC_LEAK_DETECTOR_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_LEAK_DETECTOR_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_LEAK_DETECTOR_H
 
 /* Include this header file (e.g., via gcc --include directive) */
 /* to turn libgc into a leak detector.                          */
 
-#ifndef GC_DEBUG
-# define GC_DEBUG
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
 #endif
 #include "gc.h"
 
-#ifndef GC_DONT_INCLUDE_STDLIB
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_INCLUDE_STDLIB
   /* We ensure stdlib.h and string.h are included before        */
   /* redirecting malloc() and the accompanying functions.       */
 # include <stdlib.h>
@@ -31,27 +31,27 @@
 #endif
 
 #undef malloc
-#define malloc(n) GC_MALLOC(n)
+#define malloc(n) MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(n)
 #undef calloc
-#define calloc(m,n) GC_MALLOC((m)*(n))
+#define calloc(m,n) MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC((m)*(n))
 #undef free
-#define free(p) GC_FREE(p)
+#define free(p) MANAGED_STACK_ADDRESS_BOEHM_GC_FREE(p)
 #undef realloc
-#define realloc(p,n) GC_REALLOC(p,n)
+#define realloc(p,n) MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC(p,n)
 #undef reallocarray
-#define reallocarray(p,m,n) GC_REALLOC(p,(m)*(n))
+#define reallocarray(p,m,n) MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC(p,(m)*(n))
 
 #undef strdup
-#define strdup(s) GC_STRDUP(s)
+#define strdup(s) MANAGED_STACK_ADDRESS_BOEHM_GC_STRDUP(s)
 #undef strndup
-#define strndup(s,n) GC_STRNDUP(s,n)
+#define strndup(s,n) MANAGED_STACK_ADDRESS_BOEHM_GC_STRNDUP(s,n)
 
-#ifdef GC_REQUIRE_WCSDUP
-  /* The collector should be built with GC_REQUIRE_WCSDUP       */
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP
+  /* The collector should be built with MANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP       */
   /* defined as well to redirect wcsdup().                      */
 # include <wchar.h>
 # undef wcsdup
-# define wcsdup(s) GC_WCSDUP(s)
+# define wcsdup(s) MANAGED_STACK_ADDRESS_BOEHM_GC_WCSDUP(s)
 #endif
 
 /* The following routines for the aligned objects allocation    */
@@ -60,30 +60,30 @@
 /* may output a warning that the pointer has no debugging info. */
 
 #undef aligned_alloc
-#define aligned_alloc(a,n) GC_memalign(a,n) /* identical to memalign */
+#define aligned_alloc(a,n) MANAGED_STACK_ADDRESS_BOEHM_GC_memalign(a,n) /* identical to memalign */
 #undef memalign
-#define memalign(a,n) GC_memalign(a,n)
+#define memalign(a,n) MANAGED_STACK_ADDRESS_BOEHM_GC_memalign(a,n)
 #undef posix_memalign
-#define posix_memalign(p,a,n) GC_posix_memalign(p,a,n)
+#define posix_memalign(p,a,n) MANAGED_STACK_ADDRESS_BOEHM_GC_posix_memalign(p,a,n)
 
 #undef _aligned_malloc
-#define _aligned_malloc(n,a) GC_memalign(a,n) /* reverse args order */
+#define _aligned_malloc(n,a) MANAGED_STACK_ADDRESS_BOEHM_GC_memalign(a,n) /* reverse args order */
 #undef _aligned_free
-#define _aligned_free(p) GC_free(GC_base(p)) /* non-debug */
+#define _aligned_free(p) MANAGED_STACK_ADDRESS_BOEHM_GC_free(MANAGED_STACK_ADDRESS_BOEHM_GC_base(p)) /* non-debug */
 
-#ifndef GC_NO_VALLOC
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VALLOC
 # undef valloc
-# define valloc(n) GC_valloc(n)
+# define valloc(n) MANAGED_STACK_ADDRESS_BOEHM_GC_valloc(n)
 # undef pvalloc
-# define pvalloc(n) GC_pvalloc(n) /* obsolete */
-#endif /* !GC_NO_VALLOC */
+# define pvalloc(n) MANAGED_STACK_ADDRESS_BOEHM_GC_pvalloc(n) /* obsolete */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VALLOC */
 
 #ifndef CHECK_LEAKS
-# define CHECK_LEAKS() GC_gcollect()
+# define CHECK_LEAKS() MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect()
   /* Note 1: CHECK_LEAKS does not have GC prefix (preserved for */
   /* backward compatibility).                                   */
-  /* Note 2: GC_gcollect() is also called automatically in the  */
+  /* Note 2: MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect() is also called automatically in the  */
   /* leak-finding mode at program exit.                         */
 #endif
 
-#endif /* GC_LEAK_DETECTOR_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_LEAK_DETECTOR_H */

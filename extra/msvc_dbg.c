@@ -24,12 +24,12 @@
     && !defined(_M_X64) && defined(_MSC_VER)
 
 /* TODO: arm[64], x64 currently miss some machine-dependent code below.     */
-/* See also GC_HAVE_BUILTIN_BACKTRACE in gc_config_macros.h.                */
+/* See also MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_BUILTIN_BACKTRACE in gc_config_macros.h.                */
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define GC_BUILD
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 #include "gc/gc.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -61,11 +61,11 @@ char** backtrace_symbols(void* const addresses[], int count);
 /* variables from local buffer overrun because optimizations are off.   */
 #pragma warning(disable:4748)
 
-typedef GC_word word;
-#define GC_ULONG_PTR word
+typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word word;
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR word
 
 #ifdef _WIN64
-        typedef GC_ULONG_PTR ULONG_ADDR;
+        typedef MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR ULONG_ADDR;
 #else
         typedef ULONG        ULONG_ADDR;
 #endif
@@ -100,7 +100,7 @@ static ULONG_ADDR CALLBACK GetModuleBase(HANDLE hProcess, ULONG_ADDR dwAddress)
   if (dwAddrBase != 0) {
     return dwAddrBase;
   }
-  if (VirtualQueryEx(hProcess, (void*)(GC_ULONG_PTR)dwAddress, &memoryInfo,
+  if (VirtualQueryEx(hProcess, (void*)(MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)dwAddress, &memoryInfo,
                      sizeof(memoryInfo))) {
     char filePath[_MAX_PATH];
     char curDir[_MAX_PATH];
@@ -122,15 +122,15 @@ static ULONG_ADDR CALLBACK GetModuleBase(HANDLE hProcess, ULONG_ADDR dwAddress)
     GetCurrentDirectoryA(sizeof(exePath), exePath);
 #endif
     SymLoadModule(hProcess, NULL, size ? filePath : NULL, NULL,
-                  (ULONG_ADDR)(GC_ULONG_PTR)memoryInfo.AllocationBase, 0);
+                  (ULONG_ADDR)(MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)memoryInfo.AllocationBase, 0);
     SetCurrentDirectoryA(curDir);
   }
-  return (ULONG_ADDR)(GC_ULONG_PTR)memoryInfo.AllocationBase;
+  return (ULONG_ADDR)(MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)memoryInfo.AllocationBase;
 }
 
 static ULONG_ADDR CheckAddress(void* address)
 {
-  ULONG_ADDR dwAddress = (ULONG_ADDR)(GC_ULONG_PTR)address;
+  ULONG_ADDR dwAddress = (ULONG_ADDR)(MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)address;
   GetModuleBase(GetSymHandle(), dwAddress);
   return dwAddress;
 }
@@ -198,7 +198,7 @@ static size_t GetStackFramesFromContext(HANDLE hProcess, HANDLE hThread,
     if (skip) {
       skip--;
     } else {
-      frames[frameIndex++] = (void*)(GC_ULONG_PTR)stackFrame.AddrPC.Offset;
+      frames[frameIndex++] = (void*)(MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)stackFrame.AddrPC.Offset;
     }
   }
   return frameIndex;
@@ -275,7 +275,7 @@ static size_t GetFileLineFromAddress(void* address, char* fileName,
 {
   char* sourceName;
   IMAGEHLP_LINE line = { sizeof(line) };
-  GC_ULONG_PTR dwOffset = 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR dwOffset = 0;
 
   if (size) *fileName = 0;
   if (lineNumber) *lineNumber = 0;
@@ -299,7 +299,7 @@ static size_t GetFileLineFromAddress(void* address, char* fileName,
   return strlen(sourceName);
 }
 
-#define GC_SNPRINTF _snprintf
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF _snprintf
 
 static size_t GetDescriptionFromAddress(void* address, const char* format,
                                         char* buffer, size_t size)
@@ -313,34 +313,34 @@ static size_t GetDescriptionFromAddress(void* address, const char* format,
     *buffer = 0;
   }
   buffer += GetFileLineFromAddress(address, buffer, size, &line_number, NULL);
-  size = (GC_ULONG_PTR)end < (GC_ULONG_PTR)buffer ? 0 : end - buffer;
+  size = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)end < (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)buffer ? 0 : end - buffer;
 
   if (line_number) {
     char str[20];
 
-    (void)GC_SNPRINTF(str, sizeof(str), "(%d) : ", (int)line_number);
+    (void)MANAGED_STACK_ADDRESS_BOEHM_GC_SNPRINTF(str, sizeof(str), "(%d) : ", (int)line_number);
     str[sizeof(str) - 1] = '\0';
     if (size) {
       strncpy(buffer, str, size)[size - 1] = 0;
     }
     buffer += strlen(str);
-    size = (GC_ULONG_PTR)end < (GC_ULONG_PTR)buffer ? 0 : end - buffer;
+    size = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)end < (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)buffer ? 0 : end - buffer;
   }
 
   if (size) {
     strncpy(buffer, "at ", size)[size - 1] = 0;
   }
   buffer += sizeof("at ") - 1;
-  size = (GC_ULONG_PTR)end < (GC_ULONG_PTR)buffer ? 0 : end - buffer;
+  size = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)end < (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)buffer ? 0 : end - buffer;
 
   buffer += GetSymbolNameFromAddress(address, buffer, size, NULL);
-  size = (GC_ULONG_PTR)end < (GC_ULONG_PTR)buffer ? 0 : end - buffer;
+  size = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)end < (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)buffer ? 0 : end - buffer;
 
   if (size) {
     strncpy(buffer, " in ", size)[size - 1] = 0;
   }
   buffer += sizeof(" in ") - 1;
-  size = (GC_ULONG_PTR)end < (GC_ULONG_PTR)buffer ? 0 : end - buffer;
+  size = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)end < (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)buffer ? 0 : end - buffer;
 
   buffer += GetModuleNameFromAddress(address, buffer, size);
   return buffer - begin;
@@ -350,9 +350,9 @@ static size_t GetDescriptionFromStack(void* const frames[], size_t count,
                                       const char* format, char* description[],
                                       size_t size)
 {
-  const GC_ULONG_PTR begin = (GC_ULONG_PTR)description;
-  const GC_ULONG_PTR end = begin + size;
-  GC_ULONG_PTR buffer = begin + (count + 1) * sizeof(char*);
+  const MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR begin = (MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR)description;
+  const MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR end = begin + size;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ULONG_PTR buffer = begin + (count + 1) * sizeof(char*);
   size_t i;
 
   for (i = 0; i < count; ++i) {
@@ -384,7 +384,7 @@ char** backtrace_symbols(void* const addresses[], int count)
 
 #else
 
-  extern int GC_quiet;
+  extern int MANAGED_STACK_ADDRESS_BOEHM_GC_quiet;
         /* ANSI C does not allow translation units to be empty. */
 
 #endif

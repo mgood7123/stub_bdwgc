@@ -15,11 +15,11 @@
 /* in order to protect objects from collection.                         */
 
 #ifdef HAVE_CONFIG_H
-  /* For GC_[P]THREADS */
+  /* For MANAGED_STACK_ADDRESS_BOEHM_GC_[P]THREADS */
 # include "config.h"
 #endif
 
-#undef GC_NO_THREAD_REDIRECTS
+#undef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS
 #include "gc/gc_disclaim.h" /* includes gc.h */
 
 #define NOT_GCBUILD
@@ -28,12 +28,12 @@
 #include <string.h>
 
 #undef rand
-static GC_RAND_STATE_T seed; /* concurrent update does not hurt the test */
-#define rand() GC_RAND_NEXT(&seed)
+static MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T seed; /* concurrent update does not hurt the test */
+#define rand() MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_NEXT(&seed)
 
 #include "gc/gc_mark.h" /* should not precede include gc_priv.h */
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
 # ifndef NTHREADS
 #   define NTHREADS 5 /* Excludes main thread, which also runs a test. */
 # endif
@@ -44,7 +44,7 @@ static GC_RAND_STATE_T seed; /* concurrent update does not hurt the test */
 # undef NTHREADS
 # define NTHREADS 0
 # ifndef AO_HAVE_compiler_barrier
-#   define AO_t GC_word
+#   define AO_t MANAGED_STACK_ADDRESS_BOEHM_GC_word
 # endif
 #endif
 
@@ -91,9 +91,9 @@ static unsigned memhash(void *src, size_t len)
   unsigned acc = 0;
   size_t i;
 
-  my_assert(len % sizeof(GC_word) == 0);
-  for (i = 0; i < len / sizeof(GC_word); ++i) {
-    acc = (unsigned)((2003 * (GC_word)acc + ((GC_word *)src)[i]) / 3);
+  my_assert(len % sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word) == 0);
+  for (i = 0; i < len / sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word); ++i) {
+    acc = (unsigned)((2003 * (MANAGED_STACK_ADDRESS_BOEHM_GC_word)acc + ((MANAGED_STACK_ADDRESS_BOEHM_GC_word *)src)[i]) / 3);
   }
   return acc;
 }
@@ -105,12 +105,12 @@ static volatile AO_t stat_skip_locked;
 static volatile AO_t stat_skip_marked;
 
 struct weakmap_link {
-  GC_hidden_pointer obj;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_hidden_pointer obj;
   struct weakmap_link *next;
 };
 
 struct weakmap {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     pthread_mutex_t mutex[WEAKMAP_MUTEX_COUNT];
 # endif
   size_t key_size;
@@ -122,7 +122,7 @@ struct weakmap {
 
 static void weakmap_lock(struct weakmap *wm, unsigned h)
 {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int err = pthread_mutex_lock(&wm->mutex[h % WEAKMAP_MUTEX_COUNT]);
     my_assert(0 == err);
 # else
@@ -132,7 +132,7 @@ static void weakmap_lock(struct weakmap *wm, unsigned h)
 
 static int weakmap_trylock(struct weakmap *wm, unsigned h)
 {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int err = pthread_mutex_trylock(&wm->mutex[h % WEAKMAP_MUTEX_COUNT]);
     if (err != 0 && err != EBUSY) {
       fprintf(stderr, "pthread_mutex_trylock: %s\n", strerror(err));
@@ -147,7 +147,7 @@ static int weakmap_trylock(struct weakmap *wm, unsigned h)
 
 static void weakmap_unlock(struct weakmap *wm, unsigned h)
 {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int err = pthread_mutex_unlock(&wm->mutex[h % WEAKMAP_MUTEX_COUNT]);
     my_assert(0 == err);
 # else
@@ -155,16 +155,16 @@ static void weakmap_unlock(struct weakmap *wm, unsigned h)
 # endif
 }
 
-static void *GC_CALLBACK set_mark_bit(void *obj)
+static void *MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK set_mark_bit(void *obj)
 {
-  GC_set_mark_bit(obj);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_set_mark_bit(obj);
   return NULL;
 }
 
 static void *weakmap_add(struct weakmap *wm, void *obj, size_t obj_size)
 {
   struct weakmap_link *link, *new_link, **first;
-  GC_word *new_base;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_word *new_base;
   void *new_obj;
   unsigned h;
   size_t key_size = wm->key_size;
@@ -176,11 +176,11 @@ static void *weakmap_add(struct weakmap *wm, void *obj, size_t obj_size)
   weakmap_lock(wm, h);
 
   for (link = *first; link != NULL; link = link->next) {
-    void *old_obj = GC_get_find_leak() ? (void *)link->obj
-                        : GC_REVEAL_POINTER(link->obj);
+    void *old_obj = MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak() ? (void *)link->obj
+                        : MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_POINTER(link->obj);
 
     if (memcmp(old_obj, obj, key_size) == 0) {
-      GC_call_with_alloc_lock(set_mark_bit, (GC_word *)old_obj - 1);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_alloc_lock(set_mark_bit, (MANAGED_STACK_ADDRESS_BOEHM_GC_word *)old_obj - 1);
       /* Pointers in the key part may have been freed and reused,   */
       /* changing the keys without memcmp noticing.  This is okay   */
       /* as long as we update the mapped value.                     */
@@ -188,75 +188,75 @@ static void *weakmap_add(struct weakmap *wm, void *obj, size_t obj_size)
                  wm->obj_size - key_size) != 0) {
         memcpy((char *)old_obj + key_size, (char *)obj + key_size,
                wm->obj_size - key_size);
-        GC_end_stubborn_change((char *)old_obj + key_size);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change((char *)old_obj + key_size);
       }
       weakmap_unlock(wm, h);
       AO_fetch_and_add1(&stat_found);
 #     ifdef DEBUG_DISCLAIM_WEAKMAP
-        printf("Found %p, hash= %p\n", old_obj, (void *)(GC_word)h);
+        printf("Found %p, hash= %p\n", old_obj, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)h);
 #     endif
       return old_obj;
     }
   }
 
   /* Create new object. */
-  new_base = (GC_word *)GC_generic_malloc(sizeof(GC_word) + wm->obj_size,
+  new_base = (MANAGED_STACK_ADDRESS_BOEHM_GC_word *)MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc(sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word) + wm->obj_size,
                                           (int)wm->weakobj_kind);
   CHECK_OUT_OF_MEMORY(new_base);
-  *new_base = (GC_word)wm | FINALIZER_CLOSURE_FLAG;
+  *new_base = (MANAGED_STACK_ADDRESS_BOEHM_GC_word)wm | FINALIZER_CLOSURE_FLAG;
   new_obj = (void *)(new_base + 1);
   memcpy(new_obj, obj, wm->obj_size);
-  GC_end_stubborn_change(new_base);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change(new_base);
 
   /* Add the object to the map. */
-  new_link = (struct weakmap_link *)GC_malloc(sizeof(struct weakmap_link));
+  new_link = (struct weakmap_link *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct weakmap_link));
   CHECK_OUT_OF_MEMORY(new_link);
-  new_link->obj = GC_get_find_leak() ? (GC_word)new_obj
-                        : GC_HIDE_POINTER(new_obj);
+  new_link->obj = MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak() ? (MANAGED_STACK_ADDRESS_BOEHM_GC_word)new_obj
+                        : MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_POINTER(new_obj);
   new_link->next = *first;
-  GC_END_STUBBORN_CHANGE(new_link);
-  GC_ptr_store_and_dirty(first, new_link);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(new_link);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ptr_store_and_dirty(first, new_link);
   weakmap_unlock(wm, h);
   AO_fetch_and_add1(&stat_added);
 # ifdef DEBUG_DISCLAIM_WEAKMAP
-    printf("Added %p, hash= %p\n", new_obj, (void *)(GC_word)h);
+    printf("Added %p, hash= %p\n", new_obj, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)h);
 # endif
   return new_obj;
 }
 
-static int GC_CALLBACK weakmap_disclaim(void *obj_base)
+static int MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK weakmap_disclaim(void *obj_base)
 {
   struct weakmap *wm;
   struct weakmap_link **link;
-  GC_word hdr;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_word hdr;
   void *obj;
   unsigned h;
 
   /* Decode header word.    */
-  hdr = *(GC_word *)obj_base;
+  hdr = *(MANAGED_STACK_ADDRESS_BOEHM_GC_word *)obj_base;
   if ((hdr & FINALIZER_CLOSURE_FLAG) == 0)
     return 0;   /* on GC free list, ignore it.  */
 
   my_assert((hdr & INVALIDATE_FLAG) == 0);
-  wm = (struct weakmap *)(hdr & ~(GC_word)FINALIZER_CLOSURE_FLAG);
+  wm = (struct weakmap *)(hdr & ~(MANAGED_STACK_ADDRESS_BOEHM_GC_word)FINALIZER_CLOSURE_FLAG);
   if (NULL == wm->links)
     return 0;   /* weakmap has been already destroyed */
-  obj = (GC_word *)obj_base + 1;
+  obj = (MANAGED_STACK_ADDRESS_BOEHM_GC_word *)obj_base + 1;
 
   /* Lock and check for mark.   */
   h = memhash(obj, wm->key_size);
   if (weakmap_trylock(wm, h) != 0) {
     AO_fetch_and_add1(&stat_skip_locked);
 #   ifdef DEBUG_DISCLAIM_WEAKMAP
-      printf("Skipping locked %p, hash= %p\n", obj, (void *)(GC_word)h);
+      printf("Skipping locked %p, hash= %p\n", obj, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)h);
 #   endif
     return 1;
   }
-  if (GC_is_marked(obj_base)) {
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(obj_base)) {
     weakmap_unlock(wm, h);
     AO_fetch_and_add1(&stat_skip_marked);
 #   ifdef DEBUG_DISCLAIM_WEAKMAP
-      printf("Skipping marked %p, hash= %p\n", obj, (void *)(GC_word)h);
+      printf("Skipping marked %p, hash= %p\n", obj, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)h);
 #   endif
     return 1;
   }
@@ -264,9 +264,9 @@ static int GC_CALLBACK weakmap_disclaim(void *obj_base)
   /* Remove obj from wm.        */
   AO_fetch_and_add1(&stat_removed);
 # ifdef DEBUG_DISCLAIM_WEAKMAP
-    printf("Removing %p, hash= %p\n", obj, (void *)(GC_word)h);
+    printf("Removing %p, hash= %p\n", obj, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)h);
 # endif
-  *(GC_word *)obj_base |= INVALIDATE_FLAG;
+  *(MANAGED_STACK_ADDRESS_BOEHM_GC_word *)obj_base |= INVALIDATE_FLAG;
   for (link = &wm->links[h % wm->capacity];; link = &(*link)->next) {
     void *old_obj;
 
@@ -274,13 +274,13 @@ static int GC_CALLBACK weakmap_disclaim(void *obj_base)
       fprintf(stderr, "Did not find %p\n", obj);
       exit(70);
     }
-    old_obj = GC_get_find_leak() ? (void *)(*link)->obj
-                : GC_REVEAL_POINTER((*link)->obj);
+    old_obj = MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak() ? (void *)(*link)->obj
+                : MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_POINTER((*link)->obj);
     if (old_obj == obj)
       break;
     my_assert(memcmp(old_obj, obj, wm->key_size) != 0);
   }
-  GC_ptr_store_and_dirty(link, (*link)->next);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ptr_store_and_dirty(link, (*link)->next);
   weakmap_unlock(wm, h);
   return 0;
 }
@@ -288,10 +288,10 @@ static int GC_CALLBACK weakmap_disclaim(void *obj_base)
 static struct weakmap *weakmap_new(size_t capacity, size_t key_size,
                                    size_t obj_size, unsigned weakobj_kind)
 {
-  struct weakmap *wm = (struct weakmap *)GC_malloc(sizeof(struct weakmap));
+  struct weakmap *wm = (struct weakmap *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct weakmap));
 
   CHECK_OUT_OF_MEMORY(wm);
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     {
       int i;
       for (i = 0; i < WEAKMAP_MUTEX_COUNT; ++i) {
@@ -304,15 +304,15 @@ static struct weakmap *weakmap_new(size_t capacity, size_t key_size,
   wm->obj_size = obj_size;
   wm->capacity = capacity;
   wm->weakobj_kind = weakobj_kind;
-  GC_ptr_store_and_dirty(&wm->links,
-                         GC_malloc(sizeof(struct weakmap_link *) * capacity));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ptr_store_and_dirty(&wm->links,
+                         MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct weakmap_link *) * capacity));
   CHECK_OUT_OF_MEMORY(wm->links);
   return wm;
 }
 
 static void weakmap_destroy(struct weakmap *wm)
 {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int i;
 
     for (i = 0; i < WEAKMAP_MUTEX_COUNT; ++i) {
@@ -421,20 +421,20 @@ int main(void)
     pthread_t th[NTHREADS];
 # endif
 
-  GC_set_all_interior_pointers(0); /* for a stricter test */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_set_all_interior_pointers(0); /* for a stricter test */
 # ifdef TEST_MANUAL_VDB
-    GC_set_manual_vdb_allowed(1);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_manual_vdb_allowed(1);
 # endif
-  GC_INIT();
-  GC_init_finalized_malloc(); /* to register the displacements */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_init_finalized_malloc(); /* to register the displacements */
 # ifndef NO_INCREMENTAL
-    GC_enable_incremental();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental();
 # endif
-  if (GC_get_find_leak())
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
     printf("This test program is not designed for leak detection mode\n");
-  weakobj_kind = GC_new_kind(GC_new_free_list(), /* 0 | */ GC_DS_LENGTH,
+  weakobj_kind = MANAGED_STACK_ADDRESS_BOEHM_GC_new_kind(MANAGED_STACK_ADDRESS_BOEHM_GC_new_free_list(), /* 0 | */ MANAGED_STACK_ADDRESS_BOEHM_GC_DS_LENGTH,
                              1 /* adjust */, 1 /* clear */);
-  GC_register_disclaim_proc((int)weakobj_kind, weakmap_disclaim,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_register_disclaim_proc((int)weakobj_kind, weakmap_disclaim,
                             1 /* mark_unconditionally */);
   pair_hcset = weakmap_new(WEAKMAP_CAPACITY, sizeof(struct pair_key),
                            sizeof(struct pair), weakobj_kind);

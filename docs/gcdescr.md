@@ -76,10 +76,10 @@ from the system in a platform-dependent way. Under UNIX, it uses either
 `malloc`, `sbrk`, or `mmap`.
 
 Most static data used by the allocator, as well as that needed by the rest
-of the garbage collector is stored inside the `_GC_arrays` structure. This
+of the garbage collector is stored inside the `_MANAGED_STACK_ADDRESS_BOEHM_GC_arrays` structure. This
 allows the garbage collector to easily ignore the collectors own data
 structures when it searches for root pointers. Other allocator and collector
-internal data structures are allocated dynamically with `GC_scratch_alloc`.
+internal data structures are allocated dynamically with `MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc`.
 The latter does not allow for deallocation, and is therefore used only for
 permanent data structures.
 
@@ -91,7 +91,7 @@ kind may correspond to one specific object layout. Two built-in kinds are
 uncollectible. In spite of that, it is very likely that most C clients of the
 collector currently use at most two kinds: `NORMAL` and `PTRFREE` objects. The
 [GCJ](https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcj/) runtime also makes heavy
-use of a kind (allocated with `GC_gcj_malloc`) that stores type information
+use of a kind (allocated with `MANAGED_STACK_ADDRESS_BOEHM_GC_gcj_malloc`) that stores type information
 at a known offset in method tables.
 
 The collector uses a two level allocator. A large block is defined to be one
@@ -99,9 +99,9 @@ larger than half of `HBLKSIZE`, which is a power of 2, typically on the order
 of the page size.
 
 Large block sizes are rounded up to the next multiple of `HBLKSIZE` and then
-allocated by `GC_allochblk`. The collector use an approximate best fit
+allocated by `MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk`. The collector use an approximate best fit
 algorithm by keeping free lists for several large block sizes. The actual
-implementation of `GC_allochblk` is significantly complicated by black-listing
+implementation of `MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk` is significantly complicated by black-listing
 issues (see below).
 
 Small blocks are allocated in chunks of size `HBLKSIZE`. Each chunk
@@ -126,24 +126,24 @@ of allocated sizes, for which free lists are maintained. The exact allocated
 sizes are computed on demand, but subject to the constraint that they increase
 roughly in geometric progression. Thus objects requested early in the
 execution are likely to be allocated with exactly the requested size, subject
-to alignment constraints. See `GC_init_size_map` for details.
+to alignment constraints. See `MANAGED_STACK_ADDRESS_BOEHM_GC_init_size_map` for details.
 
 The actual size rounding operation during small object allocation
-is implemented as a table lookup in `GC_size_map` which maps a requested
+is implemented as a table lookup in `MANAGED_STACK_ADDRESS_BOEHM_GC_size_map` which maps a requested
 allocation size in bytes to a number of granules.
 
 Both collector initialization and computation of allocated sizes are handled
 carefully so that they do not slow down the small object fast allocation path.
 An attempt to allocate before the collector is initialized, or before the
-appropriate `GC_size_map` entry is computed, will take the same path as an
+appropriate `MANAGED_STACK_ADDRESS_BOEHM_GC_size_map` entry is computed, will take the same path as an
 allocation attempt with an empty free list. This results in a call to the slow
-path code (`GC_generic_malloc_inner`) which performs the appropriate
+path code (`MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner`) which performs the appropriate
 initialization checks.
 
 In non-incremental mode, we make a decision about whether to garbage collect
 whenever an allocation would otherwise have failed with the current heap size.
 If the total amount of allocation since the last collection is less than the
-heap size divided by `GC_free_space_divisor`, we try to expand the heap.
+heap size divided by `MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor`, we try to expand the heap.
 Otherwise, we initiate a garbage collection. This ensures that the amount
 of garbage collection work per allocated byte remains constant.
 
@@ -182,8 +182,8 @@ variables are located, it scans the following _root segments_ for pointers:
   contents on the stack.
   * The stack(s). In the case of a single-threaded application, on most
   platforms this is done by scanning the memory between (an approximation of)
-  the current stack pointer and `GC_stackbottom`. (For Intel Itanium, the
-  register stack scanned separately.) The `GC_stackbottom` variable is set in
+  the current stack pointer and `MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom`. (For Intel Itanium, the
+  register stack scanned separately.) The `MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom` variable is set in
   a highly platform-specific way depending on the appropriate configuration
   information in `gcconfig.h`. Note that the currently active stack needs
   to be scanned carefully, since callee-save registers of client code may
@@ -202,35 +202,35 @@ variables are located, it scans the following _root segments_ for pointers:
   a length. (For other possibilities, see `gc_mark.h`.)
 
 At the beginning of the mark phase, all root segments (as described above) are
-pushed on the stack by `GC_push_roots`. (Registers and eagerly scanned stack
+pushed on the stack by `MANAGED_STACK_ADDRESS_BOEHM_GC_push_roots`. (Registers and eagerly scanned stack
 sections are processed by pushing the referenced objects instead of the stack
 section itself.) If `ALL_INTERIOR_POINTERS` is not defined, then stack roots
 require special treatment. In this case, the normal marking code ignores
-interior pointers, but `GC_push_all_stack` explicitly checks for interior
+interior pointers, but `MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack` explicitly checks for interior
 pointers and pushes descriptors for target objects.
 
 The marker is structured to allow incremental marking. Each call
-to `GC_mark_some` performs a small amount of work towards marking the heap.
-It maintains explicit state in the form of `GC_mark_state`, which identifies
+to `MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some` performs a small amount of work towards marking the heap.
+It maintains explicit state in the form of `MANAGED_STACK_ADDRESS_BOEHM_GC_mark_state`, which identifies
 a particular sub-phase. Some other pieces of state, most notably the mark
 stack, identify how much work remains to be done in each sub-phase. The normal
 progression of mark states for a stop-the-world collection is:
 
   1. `MS_INVALID` indicating that there may be accessible unmarked objects.
-  In this case `GC_objects_are_marked` will simultaneously be false, so the
+  In this case `MANAGED_STACK_ADDRESS_BOEHM_GC_objects_are_marked` will simultaneously be false, so the
   mark state is advanced to
   2. `MS_PUSH_UNCOLLECTABLE` indicating that it suffices to push uncollectible
-  objects, roots, and then mark everything reachable from them. `GC_scan_ptr`
+  objects, roots, and then mark everything reachable from them. `MANAGED_STACK_ADDRESS_BOEHM_GC_scan_ptr`
   is advanced through the heap until all uncollectible objects are pushed, and
   objects reachable from them are marked. At that point, the next call
-  to `GC_mark_some` calls `GC_push_roots` to push the roots. It, then,
+  to `MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some` calls `MANAGED_STACK_ADDRESS_BOEHM_GC_push_roots` to push the roots. It, then,
   advances the mark state to
   3. `MS_ROOTS_PUSHED` asserting that once the mark stack is empty, all
   reachable objects are marked. Once in this state, we work only on emptying
   the mark stack. Once this is completed, the state changes to
   4. `MS_NONE` indicating that reachable objects are marked.
 
-The core mark routine `GC_mark_from`, is called repeatedly by several of the
+The core mark routine `MANAGED_STACK_ADDRESS_BOEHM_GC_mark_from`, is called repeatedly by several of the
 sub-phases when the mark stack starts to fill up. It is also called repeatedly
 in `MS_ROOTS_PUSHED` state to empty the mark stack. The routine is designed
 to only perform a limited amount of marking at each call, so that it can
@@ -292,7 +292,7 @@ block. This is done in the following steps:
   * The mark bit for the target object is checked and set. If the object was
   previously unmarked, the object is pushed on the mark stack. The descriptor
   is read from the page descriptor. (This is computed from information stored
-  in `GC_obj_kinds` when the page is first allocated.)
+  in `MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds` when the page is first allocated.)
 
 At the end of the mark phase, mark bits for left-over free lists are cleared,
 in case a free list was accidentally marked due to a stray pointer.
@@ -343,7 +343,7 @@ allows useful optimizations in the sweeper.
 
 ## Finalization
 
-Both `GC_register_disappearing_link` and `GC_register_finalizer` add the
+Both `MANAGED_STACK_ADDRESS_BOEHM_GC_register_disappearing_link` and `MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer` add the
 request to a corresponding hash table. The hash table is allocated out of
 collected memory, but the reference to the finalizable object is hidden from
 the collector. Currently finalization requests are processed non-incrementally
@@ -395,8 +395,8 @@ collector, and hence provoking unneeded heap growth.
 
 In incremental mode, the heap is always expanded when we encounter
 insufficient space for an allocation. Garbage collection is triggered whenever
-we notice that more than `GC_heap_size / 2 * GC_free_space_divisor` bytes
-of allocation have taken place. After `GC_full_freq` minor collections a major
+we notice that more than `MANAGED_STACK_ADDRESS_BOEHM_GC_heap_size / 2 * MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor` bytes
+of allocation have taken place. After `MANAGED_STACK_ADDRESS_BOEHM_GC_full_freq` minor collections a major
 collection is started.
 
 All collections initially run uninterrupted until a predetermined amount
@@ -422,9 +422,9 @@ We keep track of modified pages using one of several distinct mechanisms:
   * (`PCR_VDB`) By relying on an external dirty bit implementation, in this
   case the one in Xerox PCR.
   * Through explicit mutator cooperation. This enabled by
-  `GC_set_manual_vdb_allowed(1)` call, and requires the client code to call
-  `GC_ptr_store_and_dirty` or `GC_end_stubborn_change` (followed by a number
-  of `GC_reachable_here` calls), and is rarely used.
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_set_manual_vdb_allowed(1)` call, and requires the client code to call
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_ptr_store_and_dirty` or `MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change` (followed by a number
+  of `MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here` calls), and is rarely used.
   * (`DEFAULT_VDB`) By treating all pages as dirty. This is the default
   if none of the other techniques is known to be usable. (Practical only for
   testing.)
@@ -444,18 +444,18 @@ in the future. To minimize the future damage caused by such misidentification,
 they will be allocated only to small pointer-free objects.
 
 The collector understands two different kinds of black-listing. A page may be
-black listed for interior pointer references (`GC_add_to_black_list_stack`),
+black listed for interior pointer references (`MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack`),
 if it was the target of a near miss from a location that requires interior
-pointer recognition, e.g. the stack, or the heap if `GC_all_interior_pointers`
+pointer recognition, e.g. the stack, or the heap if `MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers`
 is set. In this case, we also avoid allocating large blocks that include this
 page.
 
 If the near miss came from a source that did not require interior pointer
-recognition, it is black-listed with `GC_add_to_black_list_normal`. A page
+recognition, it is black-listed with `MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal`. A page
 black-listed in this way may appear inside a large object, so long as it is
 not the first page of a large object.
 
-The `GC_allochblk` routine respects black-listing when assigning a block to
+The `MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk` routine respects black-listing when assigning a block to
 a particular object kind and size. It occasionally drops (i.e. allocates and
 forgets) blocks that are completely black-listed in order to avoid excessively
 long large block free lists containing only unusable blocks. This would
@@ -522,7 +522,7 @@ A thread that only allocates a handful of objects of a given size will not
 build up its own free list for that size. This avoids wasting space for
 unpopular objects sizes or kinds.
 
-Once the counter passes a threshold, `GC_malloc_many` is called to allocate
+Once the counter passes a threshold, `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_many` is called to allocate
 roughly `HBLKSIZE` space and put it on the corresponding local free list.
 Further allocations of that size and kind then use this free list, and no
 longer need to acquire the allocation lock. The allocation procedure
@@ -539,7 +539,7 @@ On thread exit, any remaining thread-local free list entries are transferred
 back to the global free list.
 
 Note that if the collector is configured for thread-local allocation (the
-default for most platforms), `GC_malloc` and friends only use thread-local
+default for most platforms), `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` and friends only use thread-local
 allocation.
 
 For some more details see [here](scale.md), and the technical report entitled

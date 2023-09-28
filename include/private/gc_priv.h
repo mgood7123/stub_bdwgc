@@ -15,20 +15,20 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_PRIVATE_H
-#define GC_PRIVATE_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#if !defined(GC_BUILD) && !defined(NOT_GCBUILD)
-# define GC_BUILD
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD) && !defined(NOT_GCBUILD)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 #endif
 
 #if (defined(__linux__) || defined(__GLIBC__) || defined(__GNU__) \
      || defined(__CYGWIN__) || defined(HAVE_DLADDR) \
-     || defined(GC_HAVE_PTHREAD_SIGMASK) \
+     || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_PTHREAD_SIGMASK) \
      || defined(HAVE_PTHREAD_SETNAME_NP_WITHOUT_TID) \
      || defined(HAVE_PTHREAD_SETNAME_NP_WITH_TID_AND_ARG) \
      || defined(HAVE_PTHREAD_SETNAME_NP_WITH_TID)) && !defined(_GNU_SOURCE)
@@ -40,23 +40,23 @@
 # define _ALL_SOURCE 1
 #endif
 
-#if (defined(DGUX) && defined(GC_THREADS) || defined(DGUX386_THREADS) \
-     || defined(GC_DGUX386_THREADS)) && !defined(_USING_POSIX4A_DRAFT10)
+#if (defined(DGUX) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS) || defined(DGUX386_THREADS) \
+     || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DGUX386_THREADS)) && !defined(_USING_POSIX4A_DRAFT10)
 # define _USING_POSIX4A_DRAFT10 1
 #endif
 
 #if defined(__MINGW32__) && !defined(__MINGW_EXCPT_DEFINE_PSDK) \
-    && defined(__i386__) && defined(GC_EXTERN) /* defined in gc.c */
+    && defined(__i386__) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN) /* defined in gc.c */
   /* See the description in mark.c.     */
 # define __MINGW_EXCPT_DEFINE_PSDK 1
 #endif
 
-# if defined(NO_DEBUGGING) && !defined(GC_ASSERTIONS) && !defined(NDEBUG)
+# if defined(NO_DEBUGGING) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) && !defined(NDEBUG)
     /* To turn off assertion checking (in atomic_ops.h). */
 #   define NDEBUG 1
 # endif
 
-#ifndef GC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_H
 # include "gc/gc.h"
 #endif
 
@@ -85,10 +85,10 @@
 #include "gc/gc_tiny_fl.h"
 #include "gc/gc_mark.h"
 
-typedef GC_word word;
-typedef GC_signed_word signed_word;
+typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word word;
+typedef MANAGED_STACK_ADDRESS_BOEHM_GC_signed_word signed_word;
 
-typedef int GC_bool;
+typedef int MANAGED_STACK_ADDRESS_BOEHM_GC_bool;
 #define TRUE 1
 #define FALSE 0
 
@@ -103,13 +103,13 @@ typedef int GC_bool;
 # include <limits.h>
 #endif
 #if defined(SIZE_MAX) && !defined(CPPCHECK)
-# define GC_SIZE_MAX ((size_t)SIZE_MAX)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX ((size_t)SIZE_MAX)
             /* Extra cast to workaround some buggy SIZE_MAX definitions. */
 #else
-# define GC_SIZE_MAX (~(size_t)0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX (~(size_t)0)
 #endif
 
-#if GC_GNUC_PREREQ(3, 0) && !defined(LINT2)
+#if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 0) && !defined(LINT2)
 # define EXPECT(expr, outcome) __builtin_expect(expr,outcome)
   /* Equivalent to (expr), but predict that usually (expr)==outcome. */
 #else
@@ -119,43 +119,43 @@ typedef int GC_bool;
 /* Saturated addition of size_t values.  Used to avoid value wrap       */
 /* around on overflow.  The arguments should have no side effects.      */
 #define SIZET_SAT_ADD(a, b) \
-            (EXPECT((a) < GC_SIZE_MAX - (b), TRUE) ? (a) + (b) : GC_SIZE_MAX)
+            (EXPECT((a) < MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX - (b), TRUE) ? (a) + (b) : MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX)
 
 #include "gcconfig.h"
 
-#if !defined(GC_ATOMIC_UNCOLLECTABLE) && defined(ATOMIC_UNCOLLECTABLE)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE) && defined(ATOMIC_UNCOLLECTABLE)
   /* For compatibility with old-style naming. */
-# define GC_ATOMIC_UNCOLLECTABLE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
 #endif
 
-#ifndef GC_INNER
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_INNER
   /* This tagging macro must be used at the start of every variable     */
-  /* definition which is declared with GC_EXTERN.  Should be also used  */
+  /* definition which is declared with MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN.  Should be also used  */
   /* for the GC-scope function definitions and prototypes.  Must not be */
   /* used in gcconfig.h.  Shouldn't be used for the debugging-only      */
   /* functions.  Currently, not used for the functions declared in or   */
   /* called from the "dated" source files (located in "extra" folder).  */
-# if defined(GC_DLL) && defined(__GNUC__) && !defined(ANY_MSWIN)
-#   if GC_GNUC_PREREQ(4, 0) && !defined(GC_NO_VISIBILITY)
-      /* See the corresponding GC_API definition. */
-#     define GC_INNER __attribute__((__visibility__("hidden")))
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DLL) && defined(__GNUC__) && !defined(ANY_MSWIN)
+#   if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 0) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VISIBILITY)
+      /* See the corresponding MANAGED_STACK_ADDRESS_BOEHM_GC_API definition. */
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_INNER __attribute__((__visibility__("hidden")))
 #   else
       /* The attribute is unsupported. */
-#     define GC_INNER /* empty */
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_INNER /* empty */
 #   endif
 # else
-#   define GC_INNER /* empty */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INNER /* empty */
 # endif
 
-# define GC_EXTERN extern GC_INNER
-  /* Used only for the GC-scope variables (prefixed with "GC_")         */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN extern MANAGED_STACK_ADDRESS_BOEHM_GC_INNER
+  /* Used only for the GC-scope variables (prefixed with "MANAGED_STACK_ADDRESS_BOEHM_GC_")         */
   /* declared in the header files.  Must not be used for thread-local   */
   /* variables.  Must not be used in gcconfig.h.  Shouldn't be used for */
   /* the debugging-only or profiling-only variables.  Currently, not    */
   /* used for the variables accessed from the "dated" source files      */
   /* (specific.c/h, and in the "extra" folder).                         */
-  /* The corresponding variable definition must start with GC_INNER.    */
-#endif /* !GC_INNER */
+  /* The corresponding variable definition must start with MANAGED_STACK_ADDRESS_BOEHM_GC_INNER.    */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_INNER */
 
 #ifdef __cplusplus
   /* Register storage specifier is deprecated in C++11. */
@@ -179,50 +179,50 @@ typedef int GC_bool;
 #if defined(M68K) && defined(__GNUC__)
   /* By default, __alignof__(word) is 2 on m68k.  Use this attribute to */
   /* have proper word alignment (i.e. 4-byte on a 32-bit arch).         */
-# define GC_ATTR_WORD_ALIGNED __attribute__((__aligned__(sizeof(word))))
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_WORD_ALIGNED __attribute__((__aligned__(sizeof(word))))
 #else
-# define GC_ATTR_WORD_ALIGNED /* empty */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_WORD_ALIGNED /* empty */
 #endif
 
-  typedef GC_word GC_funcptr_uint;
+  typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word MANAGED_STACK_ADDRESS_BOEHM_GC_funcptr_uint;
 # define FUNCPTR_IS_WORD
 
 typedef unsigned int unsigned32;
 
 #include "gc_hdrs.h"
 
-#ifndef GC_ATTR_NO_SANITIZE_ADDR
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR
 # ifndef ADDRESS_SANITIZER
-#   define GC_ATTR_NO_SANITIZE_ADDR /* empty */
-# elif GC_CLANG_PREREQ(3, 8)
-#   define GC_ATTR_NO_SANITIZE_ADDR __attribute__((no_sanitize("address")))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR /* empty */
+# elif MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(3, 8)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR __attribute__((no_sanitize("address")))
 # else
-#   define GC_ATTR_NO_SANITIZE_ADDR __attribute__((no_sanitize_address))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR __attribute__((no_sanitize_address))
 # endif
-#endif /* !GC_ATTR_NO_SANITIZE_ADDR */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR */
 
-#ifndef GC_ATTR_NO_SANITIZE_MEMORY
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_MEMORY
 # ifndef MEMORY_SANITIZER
-#   define GC_ATTR_NO_SANITIZE_MEMORY /* empty */
-# elif GC_CLANG_PREREQ(3, 8)
-#   define GC_ATTR_NO_SANITIZE_MEMORY __attribute__((no_sanitize("memory")))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_MEMORY /* empty */
+# elif MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(3, 8)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_MEMORY __attribute__((no_sanitize("memory")))
 # else
-#   define GC_ATTR_NO_SANITIZE_MEMORY __attribute__((no_sanitize_memory))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_MEMORY __attribute__((no_sanitize_memory))
 # endif
-#endif /* !GC_ATTR_NO_SANITIZE_MEMORY */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_MEMORY */
 
-#ifndef GC_ATTR_NO_SANITIZE_THREAD
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD
 # ifndef THREAD_SANITIZER
-#   define GC_ATTR_NO_SANITIZE_THREAD /* empty */
-# elif GC_CLANG_PREREQ(3, 8)
-#   define GC_ATTR_NO_SANITIZE_THREAD __attribute__((no_sanitize("thread")))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD /* empty */
+# elif MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(3, 8)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD __attribute__((no_sanitize("thread")))
 # else
     /* It seems that no_sanitize_thread attribute has no effect if the  */
     /* function is inlined (as of gcc 11.1.0, at least).                */
-#   define GC_ATTR_NO_SANITIZE_THREAD \
-                GC_ATTR_NOINLINE __attribute__((no_sanitize_thread))
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD \
+                MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NOINLINE __attribute__((no_sanitize_thread))
 # endif
-#endif /* !GC_ATTR_NO_SANITIZE_THREAD */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD */
 
 #ifndef UNUSED_ARG
 # define UNUSED_ARG(arg) ((void)(arg))
@@ -230,44 +230,44 @@ typedef unsigned int unsigned32;
 
 #ifdef HAVE_CONFIG_H
   /* The "inline" keyword is determined by Autoconf AC_C_INLINE.    */
-# define GC_INLINE static inline
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE static inline
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__DMC__) \
-        || (GC_GNUC_PREREQ(3, 0) && defined(__STRICT_ANSI__)) \
+        || (MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 0) && defined(__STRICT_ANSI__)) \
         || defined(__BORLANDC__) || defined(__WATCOMC__)
-# define GC_INLINE static __inline
-#elif GC_GNUC_PREREQ(3, 0) || defined(__sun)
-# define GC_INLINE static inline
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE static __inline
+#elif MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 0) || defined(__sun)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE static inline
 #else
-# define GC_INLINE static
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE static
 #endif
 
-#ifndef GC_ATTR_NOINLINE
-# if GC_GNUC_PREREQ(4, 0)
-#   define GC_ATTR_NOINLINE __attribute__((__noinline__))
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NOINLINE
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 0)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NOINLINE __attribute__((__noinline__))
 # elif _MSC_VER >= 1400
-#   define GC_ATTR_NOINLINE __declspec(noinline)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NOINLINE __declspec(noinline)
 # else
-#   define GC_ATTR_NOINLINE /* empty */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NOINLINE /* empty */
 # endif
 #endif
 
-#ifndef GC_API_OSCALL
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL
   /* This is used to identify GC routines called by name from OS.       */
 # if defined(__GNUC__)
-#   if GC_GNUC_PREREQ(4, 0) && !defined(GC_NO_VISIBILITY)
-      /* Same as GC_API if GC_DLL.      */
-#     define GC_API_OSCALL extern __attribute__((__visibility__("default")))
+#   if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 0) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VISIBILITY)
+      /* Same as MANAGED_STACK_ADDRESS_BOEHM_GC_API if MANAGED_STACK_ADDRESS_BOEHM_GC_DLL.      */
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL extern __attribute__((__visibility__("default")))
 #   else
       /* The attribute is unsupported.  */
-#     define GC_API_OSCALL extern
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL extern
 #   endif
 # else
-#   define GC_API_OSCALL GC_API
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL MANAGED_STACK_ADDRESS_BOEHM_GC_API
 # endif
 #endif
 
-#ifndef GC_API_PRIV
-# define GC_API_PRIV GC_API
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV MANAGED_STACK_ADDRESS_BOEHM_GC_API
 #endif
 
 #if defined(THREADS) && !defined(NN_PLATFORM_CTR)
@@ -288,7 +288,7 @@ typedef unsigned int unsigned32;
 
 #include "gc_locks.h"
 
-#define GC_WORD_MAX (~(word)0)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX (~(word)0)
 
 #ifdef STACK_GROWS_UP
 #   define COOLER_THAN <
@@ -300,26 +300,26 @@ typedef unsigned int unsigned32;
 #   define COOLER_THAN >
 #   define HOTTER_THAN <
 #   define MAKE_COOLER(x,y) if ((word)((x) + (y)) > (word)(x)) {(x) += (y);} \
-                            else (x) = (ptr_t)GC_WORD_MAX
+                            else (x) = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX
 #   define MAKE_HOTTER(x,y) (void)((x) -= (y))
 #endif
 
 #if defined(AMIGA) && defined(__SASC)
-#   define GC_FAR __far
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_FAR __far
 #else
-#   define GC_FAR
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_FAR
 #endif
 
-#ifdef GC_ASSERTIONS
-# define GC_ASSERT(expr) \
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(expr) \
         do { \
           if (EXPECT(!(expr), FALSE)) { \
-            GC_err_printf("Assertion failure: %s:%d\n", __FILE__, __LINE__); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Assertion failure: %s:%d\n", __FILE__, __LINE__); \
             ABORT("assertion failure"); \
           } \
         } while (0)
 #else
-# define GC_ASSERT(expr)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(expr)
 #endif
 
 #include "gc/gc_inline.h"
@@ -346,7 +346,7 @@ typedef unsigned int unsigned32;
                     /* not perform garbage-collector-unsafe             */
                     /* optimizations, all portable, strictly ANSI       */
                     /* conforming C programs should be safely usable    */
-                    /* with malloc replaced by GC_malloc and free       */
+                    /* with malloc replaced by MANAGED_STACK_ADDRESS_BOEHM_GC_malloc and free       */
                     /* calls removed.  There are several disadvantages: */
                     /* 1. There are probably no interesting, portable,  */
                     /*    strictly ANSI conforming C programs.          */
@@ -363,44 +363,44 @@ typedef unsigned int unsigned32;
                     /* If you can easily avoid using this option, do.   */
                     /* If not, try to keep individual objects small.    */
                     /* This is now really controlled at startup,        */
-                    /* through GC_all_interior_pointers.                */
+                    /* through MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers.                */
 
 EXTERN_C_BEGIN
 
-#ifndef GC_NO_FINALIZATION
-# define GC_INVOKE_FINALIZERS() GC_notify_or_invoke_finalizers()
-  GC_INNER void GC_notify_or_invoke_finalizers(void);
-                        /* If GC_finalize_on_demand is not set, invoke  */
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INVOKE_FINALIZERS() MANAGED_STACK_ADDRESS_BOEHM_GC_notify_or_invoke_finalizers()
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_notify_or_invoke_finalizers(void);
+                        /* If MANAGED_STACK_ADDRESS_BOEHM_GC_finalize_on_demand is not set, invoke  */
                         /* eligible finalizers. Otherwise:              */
-                        /* Call *GC_finalizer_notifier if there are     */
+                        /* Call *MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_notifier if there are     */
                         /* finalizers to be run, and we haven't called  */
                         /* this procedure yet this GC cycle.            */
 
-  GC_INNER void GC_finalize(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_finalize(void);
                         /* Perform all indicated finalization actions   */
                         /* on unmarked objects.                         */
                         /* Unreachable finalizable objects are enqueued */
-                        /* for processing by GC_invoke_finalizers.      */
+                        /* for processing by MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers.      */
                         /* Invoked with lock.                           */
 
-# ifndef GC_TOGGLE_REFS_NOT_NEEDED
-    GC_INNER void GC_process_togglerefs(void);
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TOGGLE_REFS_NOT_NEEDED
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_process_togglerefs(void);
                         /* Process the toggle-refs before GC starts.    */
 # endif
 # ifndef SMALL_CONFIG
-    GC_INNER void GC_print_finalization_stats(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_finalization_stats(void);
 # endif
 #else
-# define GC_INVOKE_FINALIZERS() (void)0
-#endif /* GC_NO_FINALIZATION */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INVOKE_FINALIZERS() (void)0
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION */
 
 #if !defined(DONT_ADD_BYTE_AT_END)
 # ifdef LINT2
     /* Explicitly instruct the code analysis tool that                  */
-    /* GC_all_interior_pointers is assumed to have only 0 or 1 value.   */
-#   define EXTRA_BYTES ((size_t)(GC_all_interior_pointers? 1 : 0))
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers is assumed to have only 0 or 1 value.   */
+#   define EXTRA_BYTES ((size_t)(MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers? 1 : 0))
 # else
-#   define EXTRA_BYTES (size_t)GC_all_interior_pointers
+#   define EXTRA_BYTES (size_t)MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers
 # endif
 # define MAX_EXTRA_BYTES 1
 #else
@@ -417,7 +417,7 @@ EXTERN_C_BEGIN
 #   define MAXHINCR 2048 /* Maximum heap increment, in blocks.  */
 # endif /* !LARGE_CONFIG */
 
-# define BL_LIMIT GC_black_list_spacing
+# define BL_LIMIT MANAGED_STACK_ADDRESS_BOEHM_GC_black_list_spacing
                            /* If we need a block of N bytes, and we have */
                            /* a block of N + BL_LIMIT bytes available,   */
                            /* and N > BL_LIMIT,                          */
@@ -436,25 +436,24 @@ EXTERN_C_BEGIN
 /*********************************/
 
 #ifdef NEED_CALLINFO
-  struct callinfo {
-    word ci_pc; /* pc of caller, not callee */
-#   if NARGS > 0
-      GC_hidden_pointer ci_arg[NARGS]; /* hide to avoid retention */
-#   endif
-#   if (NFRAMES * (NARGS + 1)) % 2 == 1
-      /* Likely alignment problem. */
-      word ci_dummy;
-#   endif
-  };
+    struct callinfo {
+        word ci_pc;     /* Caller, not callee, pc       */
+#       if NARGS > 0
+            word ci_arg[NARGS]; /* bit-wise complement to avoid retention */
+#       endif
+#       if (NFRAMES * (NARGS + 1)) % 2 == 1
+            /* Likely alignment problem. */
+            word ci_dummy;
+#       endif
+    };
+#endif
 
-# ifdef SAVE_CALL_CHAIN
-    /* Fill in the pc and argument information for up to NFRAMES of my  */
-    /* callers.  Ignore my frame and my callers frame.                  */
-    GC_INNER void GC_save_callers(struct callinfo info[NFRAMES]);
-# endif
-
-  GC_INNER void GC_print_callers(struct callinfo info[NFRAMES]);
-#endif /* NEED_CALLINFO */
+#ifdef SAVE_CALL_CHAIN
+  /* Fill in the pc and argument information for up to NFRAMES of my    */
+  /* callers.  Ignore my frame and my callers frame.                    */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(struct callinfo info[NFRAMES]);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers(struct callinfo info[NFRAMES]);
+#endif
 
 EXTERN_C_END
 
@@ -641,26 +640,26 @@ EXTERN_C_BEGIN
                                    PCR_waitForever)
 # else
 #   if defined(NN_PLATFORM_CTR) || defined(NINTENDO_SWITCH) \
-       || defined(GC_WIN32_THREADS) || defined(GC_PTHREADS)
-      GC_INNER void GC_stop_world(void);
-      GC_INNER void GC_start_world(void);
-#     define STOP_WORLD() GC_stop_world()
-#     define START_WORLD() GC_start_world()
+       || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world(void);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_world(void);
+#     define STOP_WORLD() MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world()
+#     define START_WORLD() MANAGED_STACK_ADDRESS_BOEHM_GC_start_world()
 #   else
-        /* Just do a sanity check: we are not inside GC_do_blocking().  */
-#     define STOP_WORLD() GC_ASSERT(GC_blocked_sp == NULL)
+        /* Just do a sanity check: we are not inside MANAGED_STACK_ADDRESS_BOEHM_GC_do_blocking().  */
+#     define STOP_WORLD() MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_blocked_sp == NULL)
 #     define START_WORLD()
 #   endif
 # endif
 
 /* Abandon ship */
 # if defined(SMALL_CONFIG) || defined(PCR)
-#   define GC_on_abort(msg) (void)0 /* be silent on abort */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg) (void)0 /* be silent on abort */
 # else
-    GC_API_PRIV GC_abort_func GC_on_abort;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV MANAGED_STACK_ADDRESS_BOEHM_GC_abort_func MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort;
 # endif
 # if defined(CPPCHECK)
-#   define ABORT(msg) { GC_on_abort(msg); abort(); }
+#   define ABORT(msg) { MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg); abort(); }
 # elif defined(PCR)
 #   define ABORT(s) PCR_Base_Panic(s)
 # else
@@ -677,22 +676,22 @@ EXTERN_C_BEGIN
 #   endif
 #   if defined(MSWIN32) && (defined(NO_DEBUGGING) || defined(LINT2))
       /* A more user-friendly abort after showing fatal message.        */
-#     define ABORT(msg) (GC_on_abort(msg), _exit(-1))
+#     define ABORT(msg) (MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg), _exit(-1))
                 /* Exit on error without running "at-exit" callbacks.   */
 #   elif defined(MSWINCE) && defined(NO_DEBUGGING)
-#     define ABORT(msg) (GC_on_abort(msg), ExitProcess(-1))
+#     define ABORT(msg) (MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg), ExitProcess(-1))
 #   elif defined(MSWIN32) || defined(MSWINCE)
 #     if defined(_CrtDbgBreak) && defined(_DEBUG) && defined(_MSC_VER)
-#       define ABORT(msg) { GC_on_abort(msg); \
+#       define ABORT(msg) { MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg); \
                             _CrtDbgBreak() /* __debugbreak() */; }
 #     else
-#       define ABORT(msg) { GC_on_abort(msg); DebugBreak(); }
+#       define ABORT(msg) { MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg); DebugBreak(); }
                 /* Note that: on a WinCE box, this could be silently    */
                 /* ignored (i.e., the program is not aborted);          */
                 /* DebugBreak is a statement in some toolchains.        */
 #     endif
 #   else
-#     define ABORT(msg) (GC_on_abort(msg), abort())
+#     define ABORT(msg) (MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(msg), abort())
 #   endif /* !MSWIN32 */
 # endif /* !PCR */
 
@@ -701,17 +700,17 @@ EXTERN_C_BEGIN
 /* should match their format specifiers.                                */
 #define ABORT_ARG1(C_msg, C_fmt, arg1) \
                 MACRO_BLKSTMT_BEGIN \
-                  GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", arg1); \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", arg1); \
                   ABORT(C_msg); \
                 MACRO_BLKSTMT_END
 #define ABORT_ARG2(C_msg, C_fmt, arg1, arg2) \
                 MACRO_BLKSTMT_BEGIN \
-                  GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", arg1, arg2); \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", arg1, arg2); \
                   ABORT(C_msg); \
                 MACRO_BLKSTMT_END
 #define ABORT_ARG3(C_msg, C_fmt, arg1, arg2, arg3) \
                 MACRO_BLKSTMT_BEGIN \
-                  GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_ERRINFO_PRINTF(C_msg /* + */ C_fmt "\n", \
                                     arg1, arg2, arg3); \
                   ABORT(C_msg); \
                 MACRO_BLKSTMT_END
@@ -719,24 +718,24 @@ EXTERN_C_BEGIN
 /* Same as ABORT but does not have 'no-return' attribute.       */
 /* ABORT on a dummy condition (which is always true).           */
 #define ABORT_RET(msg) \
-    if ((GC_funcptr_uint)GC_current_warn_proc == ~(GC_funcptr_uint)0) {} \
+    if ((MANAGED_STACK_ADDRESS_BOEHM_GC_funcptr_uint)MANAGED_STACK_ADDRESS_BOEHM_GC_current_warn_proc == ~(MANAGED_STACK_ADDRESS_BOEHM_GC_funcptr_uint)0) {} \
     else ABORT(msg)
 
 /* Exit abnormally, but without making a mess (e.g. out of memory) */
 # ifdef PCR
 #   define EXIT() PCR_Base_Exit(1,PCR_waitForever)
 # else
-#   define EXIT() (GC_on_abort(NULL), exit(1 /* EXIT_FAILURE */))
+#   define EXIT() (MANAGED_STACK_ADDRESS_BOEHM_GC_on_abort(NULL), exit(1 /* EXIT_FAILURE */))
 # endif
 
 /* Print warning message, e.g. almost out of memory.    */
 /* The argument (if any) format specifier should be:    */
 /* "%s", "%p", "%"WARN_PRIdPTR or "%"WARN_PRIuPTR.      */
 #define WARN(msg, arg) \
-    (*GC_current_warn_proc)((/* no const */ char *) \
+    (*MANAGED_STACK_ADDRESS_BOEHM_GC_current_warn_proc)((/* no const */ char *) \
                                 (word)("GC Warning: " msg), \
                             (word)(arg))
-GC_EXTERN GC_warn_proc GC_current_warn_proc;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_warn_proc MANAGED_STACK_ADDRESS_BOEHM_GC_current_warn_proc;
 
 /* Print format type macro for decimal signed_word value passed WARN(). */
 /* This could be redefined for Win64 or LLP64, but typically should     */
@@ -755,14 +754,14 @@ GC_EXTERN GC_warn_proc GC_current_warn_proc;
 #define TRUSTED_STRING(s) (char*)COVERT_DATAFLOW(s)
 
 /* Get environment entry */
-#ifdef GC_READ_ENV_FILE
-  GC_INNER char * GC_envfile_getenv(const char *name);
-# define GETENV(name) GC_envfile_getenv(name)
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_READ_ENV_FILE
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER char * MANAGED_STACK_ADDRESS_BOEHM_GC_envfile_getenv(const char *name);
+# define GETENV(name) MANAGED_STACK_ADDRESS_BOEHM_GC_envfile_getenv(name)
 #elif defined(NO_GETENV) && !defined(CPPCHECK)
 # define GETENV(name) NULL
 #elif defined(EMPTY_GETENV_RESULTS)
   /* Workaround for a reputed Wine bug.   */
-  GC_INLINE char * fixed_getenv(const char *name)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE char * fixed_getenv(const char *name)
   {
     char *value = getenv(name);
     return value != NULL && *value != '\0' ? value : NULL;
@@ -782,60 +781,60 @@ EXTERN_C_END
 # endif
 # if defined(POWERPC)
 #   if CPP_WORDSZ == 32
-#     define GC_THREAD_STATE_T          ppc_thread_state_t
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T          ppc_thread_state_t
 #   else
-#     define GC_THREAD_STATE_T          ppc_thread_state64_t
-#     define GC_MACH_THREAD_STATE       PPC_THREAD_STATE64
-#     define GC_MACH_THREAD_STATE_COUNT PPC_THREAD_STATE64_COUNT
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T          ppc_thread_state64_t
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE       PPC_THREAD_STATE64
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT PPC_THREAD_STATE64_COUNT
 #   endif
 # elif defined(I386) || defined(X86_64)
 #   if CPP_WORDSZ == 32
 #     if defined(i386_THREAD_STATE_COUNT) && !defined(x86_THREAD_STATE32_COUNT)
         /* Use old naming convention for 32-bit x86.    */
-#       define GC_THREAD_STATE_T                i386_thread_state_t
-#       define GC_MACH_THREAD_STATE             i386_THREAD_STATE
-#       define GC_MACH_THREAD_STATE_COUNT       i386_THREAD_STATE_COUNT
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T                i386_thread_state_t
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE             i386_THREAD_STATE
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT       i386_THREAD_STATE_COUNT
 #     else
-#       define GC_THREAD_STATE_T                x86_thread_state32_t
-#       define GC_MACH_THREAD_STATE             x86_THREAD_STATE32
-#       define GC_MACH_THREAD_STATE_COUNT       x86_THREAD_STATE32_COUNT
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T                x86_thread_state32_t
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE             x86_THREAD_STATE32
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT       x86_THREAD_STATE32_COUNT
 #     endif
 #   else
-#     define GC_THREAD_STATE_T          x86_thread_state64_t
-#     define GC_MACH_THREAD_STATE       x86_THREAD_STATE64
-#     define GC_MACH_THREAD_STATE_COUNT x86_THREAD_STATE64_COUNT
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T          x86_thread_state64_t
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE       x86_THREAD_STATE64
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT x86_THREAD_STATE64_COUNT
 #   endif
 # elif defined(ARM32) && defined(ARM_UNIFIED_THREAD_STATE) \
        && !defined(CPPCHECK)
-#   define GC_THREAD_STATE_T            arm_unified_thread_state_t
-#   define GC_MACH_THREAD_STATE         ARM_UNIFIED_THREAD_STATE
-#   define GC_MACH_THREAD_STATE_COUNT   ARM_UNIFIED_THREAD_STATE_COUNT
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T            arm_unified_thread_state_t
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE         ARM_UNIFIED_THREAD_STATE
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT   ARM_UNIFIED_THREAD_STATE_COUNT
 # elif defined(ARM32)
-#   define GC_THREAD_STATE_T            arm_thread_state_t
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T            arm_thread_state_t
 #   ifdef ARM_MACHINE_THREAD_STATE_COUNT
-#     define GC_MACH_THREAD_STATE       ARM_MACHINE_THREAD_STATE
-#     define GC_MACH_THREAD_STATE_COUNT ARM_MACHINE_THREAD_STATE_COUNT
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE       ARM_MACHINE_THREAD_STATE
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT ARM_MACHINE_THREAD_STATE_COUNT
 #   endif
 # elif defined(AARCH64)
-#   define GC_THREAD_STATE_T            arm_thread_state64_t
-#   define GC_MACH_THREAD_STATE         ARM_THREAD_STATE64
-#   define GC_MACH_THREAD_STATE_COUNT   ARM_THREAD_STATE64_COUNT
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T            arm_thread_state64_t
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE         ARM_THREAD_STATE64
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT   ARM_THREAD_STATE64_COUNT
 # elif !defined(CPPCHECK)
-#   error define GC_THREAD_STATE_T
+#   error define MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_STATE_T
 # endif
-# ifndef GC_MACH_THREAD_STATE
-#   define GC_MACH_THREAD_STATE         MACHINE_THREAD_STATE
-#   define GC_MACH_THREAD_STATE_COUNT   MACHINE_THREAD_STATE_COUNT
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE         MACHINE_THREAD_STATE
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_THREAD_STATE_COUNT   MACHINE_THREAD_STATE_COUNT
 # endif
 
 # if CPP_WORDSZ == 32
-#   define GC_MACH_HEADER   mach_header
-#   define GC_MACH_SECTION  section
-#   define GC_GETSECTBYNAME getsectbynamefromheader
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER   mach_header
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_SECTION  section
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME getsectbynamefromheader
 # else
-#   define GC_MACH_HEADER   mach_header_64
-#   define GC_MACH_SECTION  section_64
-#   define GC_GETSECTBYNAME getsectbynamefromheader_64
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_HEADER   mach_header_64
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_MACH_SECTION  section_64
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_GETSECTBYNAME getsectbynamefromheader_64
 # endif
 
   /* Try to work out the right way to access thread state structure     */
@@ -892,11 +891,11 @@ EXTERN_C_BEGIN
 # define UNALIGNED_PTRS
 #endif
 
-#if GC_GRANULE_BYTES == 4
+#if MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES == 4
 # define BYTES_TO_GRANULES(n) ((n)>>2)
 # define GRANULES_TO_BYTES(n) ((n)<<2)
 # define GRANULES_TO_WORDS(n) BYTES_TO_WORDS(GRANULES_TO_BYTES(n))
-#elif GC_GRANULE_BYTES == 8
+#elif MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES == 8
 # define BYTES_TO_GRANULES(n) ((n)>>3)
 # define GRANULES_TO_BYTES(n) ((n)<<3)
 # if CPP_WORDSZ == 64
@@ -906,7 +905,7 @@ EXTERN_C_BEGIN
 # else
 #   define GRANULES_TO_WORDS(n) BYTES_TO_WORDS(GRANULES_TO_BYTES(n))
 # endif
-#elif GC_GRANULE_BYTES == 16
+#elif MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES == 16
 # define BYTES_TO_GRANULES(n) ((n)>>4)
 # define GRANULES_TO_BYTES(n) ((n)<<4)
 # if CPP_WORDSZ == 64
@@ -917,7 +916,7 @@ EXTERN_C_BEGIN
 #   define GRANULES_TO_WORDS(n) BYTES_TO_WORDS(GRANULES_TO_BYTES(n))
 # endif
 #else
-# error Bad GC_GRANULE_BYTES value
+# error Bad MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES value
 #endif
 
 /*********************/
@@ -968,7 +967,7 @@ EXTERN_C_BEGIN
 # define LOG_HBLKSIZE ((size_t)CPP_LOG_HBLKSIZE)
 # define HBLKSIZE ((size_t)CPP_HBLKSIZE)
 
-#define GC_SQRT_SIZE_MAX ((((size_t)1) << (CPP_WORDSZ / 2)) - 1)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_SQRT_SIZE_MAX ((((size_t)1) << (CPP_WORDSZ / 2)) - 1)
 
 /*  Max size objects supported by freelist (larger objects are  */
 /*  allocated directly with allchblk(), by rounding to the next */
@@ -998,13 +997,13 @@ EXTERN_C_BEGIN
 
 /* Round up allocation size (in bytes) to a multiple of a granule.      */
 #define ROUNDUP_GRANULE_SIZE(lb) /* lb should have no side-effect */ \
-        (SIZET_SAT_ADD(lb, GC_GRANULE_BYTES-1) \
-         & ~(size_t)(GC_GRANULE_BYTES-1))
+        (SIZET_SAT_ADD(lb, MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1) \
+         & ~(size_t)(MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1))
 
 /* Round up byte allocation request (after adding EXTRA_BYTES) to   */
 /* a multiple of a granule, then convert it to granules.            */
 #define ALLOC_REQUEST_GRANS(lb) /* lb should have no side-effect */ \
-        BYTES_TO_GRANULES(SIZET_SAT_ADD(lb, GC_GRANULE_BYTES-1 + EXTRA_BYTES))
+        BYTES_TO_GRANULES(SIZET_SAT_ADD(lb, MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1 + EXTRA_BYTES))
 
 #if MAX_EXTRA_BYTES == 0
 # define ADD_EXTRA_BYTES(lb) (lb)
@@ -1064,9 +1063,9 @@ typedef word page_hash_table[PHT_SIZE];
                 (void)((bl)[divWORDSZ(index)] |= (word)1 << modWORDSZ(index))
 
 #if defined(THREADS) && defined(AO_HAVE_or)
-  /* And, one more version for GC_add_to_black_list_normal/stack        */
-  /* (invoked indirectly by GC_do_local_mark) and                       */
-  /* async_set_pht_entry_from_index (invoked by GC_dirty or the write   */
+  /* And, one more version for MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal/stack        */
+  /* (invoked indirectly by MANAGED_STACK_ADDRESS_BOEHM_GC_do_local_mark) and                       */
+  /* async_set_pht_entry_from_index (invoked by MANAGED_STACK_ADDRESS_BOEHM_GC_dirty or the write   */
   /* fault handler).                                                    */
 # define set_pht_entry_from_index_concurrent(bl, index) \
                 AO_or((volatile AO_t *)&(bl)[divWORDSZ(index)], \
@@ -1083,7 +1082,7 @@ typedef word page_hash_table[PHT_SIZE];
 /*                                          */
 /********************************************/
 
-#define MARK_BITS_PER_HBLK (HBLKSIZE/GC_GRANULE_BYTES)
+#define MARK_BITS_PER_HBLK (HBLKSIZE/MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES)
                 /* The upper bound.  We allocate 1 bit per allocation   */
                 /* granule.  If MARK_BIT_PER_OBJ is not defined, we use */
                 /* every n-th bit, where n is the number of allocation  */
@@ -1120,7 +1119,7 @@ struct hblkhdr {
 #       define WAS_UNMAPPED 2   /* This is a free block, which has      */
                                 /* been unmapped from the address       */
                                 /* space.                               */
-                                /* GC_remap must be invoked on it       */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_remap must be invoked on it       */
                                 /* before it can be reallocated.        */
                                 /* Only set with USE_MUNMAP.            */
 #       define FREE_BLK 4       /* Block is free, i.e. not in use.      */
@@ -1136,7 +1135,7 @@ struct hblkhdr {
 #         define LARGE_BLOCK 0x20
 #       endif
     unsigned short hb_last_reclaimed;
-                                /* Value of GC_gc_no when block was     */
+                                /* Value of MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no when block was     */
                                 /* last allocated or swept. May wrap.   */
                                 /* For a free block, this is maintained */
                                 /* only for USE_MUNMAP, and indicates   */
@@ -1159,7 +1158,7 @@ struct hblkhdr {
 #   ifndef MARK_BIT_PER_OBJ
       unsigned short * hb_map;  /* Essentially a table of remainders    */
                                 /* mod BYTES_TO_GRANULES(hb_sz), except */
-                                /* for large blocks.  See GC_obj_map.   */
+                                /* for large blocks.  See MANAGED_STACK_ADDRESS_BOEHM_GC_obj_map.   */
 #   endif
 #   ifdef PARALLEL_MARK
       volatile AO_t hb_n_marks; /* Number of set mark bits, excluding   */
@@ -1213,7 +1212,7 @@ struct hblkhdr {
 /*  heap block body */
 
 # define HBLK_WORDS (HBLKSIZE/sizeof(word))
-# define HBLK_GRANULES (HBLKSIZE/GC_GRANULE_BYTES)
+# define HBLK_GRANULES (HBLKSIZE/MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES)
 
 /* The number of objects in a block dedicated to a certain size.        */
 /* may erroneously yield zero (instead of one) for large objects.       */
@@ -1270,7 +1269,7 @@ struct roots {
 #       ifndef ANY_MSWIN
           struct roots * r_next;
 #       endif
-        GC_bool r_tmp;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bool r_tmp;
                 /* Delete before registering new dynamic libraries */
 };
 
@@ -1301,7 +1300,7 @@ struct roots {
 # endif
 #endif /* !MAX_HEAP_SECTS */
 
-typedef struct GC_ms_entry {
+typedef struct MANAGED_STACK_ADDRESS_BOEHM_GC_ms_entry {
     ptr_t mse_start;    /* First word of object, word aligned.  */
     union word_ptr_ao_u mse_descr;
                         /* Descriptor; low order two bits are tags,     */
@@ -1330,15 +1329,15 @@ struct fnlz_roots_s {
 union toggle_ref_u {
   /* The least significant bit is used to distinguish between choices.  */
   void *strong_ref;
-  GC_hidden_pointer weak_ref;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_hidden_pointer weak_ref;
 };
 
-/* Extended descriptors.  GC_typed_mark_proc understands these. */
+/* Extended descriptors.  MANAGED_STACK_ADDRESS_BOEHM_GC_typed_mark_proc understands these. */
 /* These are used for simple objects that are larger than what  */
 /* can be described by a BITMAP_BITS sized bitmap.              */
 typedef struct {
     word ed_bitmap; /* the least significant bit corresponds to first word. */
-    GC_bool ed_continued;       /* next entry is continuation.  */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool ed_continued;       /* next entry is continuation.  */
 } typed_ext_descr_t;
 
 struct HeapSect {
@@ -1352,8 +1351,8 @@ struct HeapSect {
 /* collector.                                   */
 /* These are grouped together in a struct       */
 /* so that they can be easily skipped by the    */
-/* GC_mark routine.                             */
-/* The ordering is weird to make GC_malloc      */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_mark routine.                             */
+/* The ordering is weird to make MANAGED_STACK_ADDRESS_BOEHM_GC_malloc      */
 /* faster by keeping the important fields       */
 /* sufficiently close together that a           */
 /* single load of a base register will do.      */
@@ -1365,10 +1364,10 @@ struct HeapSect {
 /* set of macros is defined when the client is  */
 /* compiled.                                    */
 
-struct _GC_arrays {
+struct _MANAGED_STACK_ADDRESS_BOEHM_GC_arrays {
   word _heapsize;       /* Heap size in bytes (value never goes down).  */
   word _requested_heapsize;     /* Heap size due to explicit expansion. */
-# define GC_heapsize_on_gc_disable GC_arrays._heapsize_on_gc_disable
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize_on_gc_disable MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._heapsize_on_gc_disable
   word _heapsize_on_gc_disable;
   ptr_t _last_heap_addr;
   word _large_free_bytes;
@@ -1386,10 +1385,10 @@ struct _GC_arrays {
   word _bytes_allocd_before_gc;
                 /* Number of bytes allocated before this        */
                 /* collection cycle.                            */
-# define GC_our_mem_bytes GC_arrays._our_mem_bytes
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_our_mem_bytes MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._our_mem_bytes
   word _our_mem_bytes;
 # ifndef SEPARATE_GLOBALS
-#   define GC_bytes_allocd GC_arrays._bytes_allocd
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._bytes_allocd
     word _bytes_allocd;
         /* Number of bytes allocated during this collection cycle.      */
 # endif
@@ -1418,30 +1417,30 @@ struct _GC_arrays {
   ptr_t _scratch_free_ptr;
   hdr *_hdr_free_list;
   ptr_t _scratch_end_ptr;
-        /* GC_scratch_end_ptr is end point of the current scratch area. */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_end_ptr is end point of the current scratch area. */
 # if defined(IRIX5) || (defined(USE_PROC_FOR_LIBRARIES) && !defined(LINUX))
 #   define USE_SCRATCH_LAST_END_PTR
-#   define GC_scratch_last_end_ptr GC_arrays._scratch_last_end_ptr
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_last_end_ptr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._scratch_last_end_ptr
     ptr_t _scratch_last_end_ptr;
-        /* GC_scratch_last_end_ptr is the end point of the last */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_last_end_ptr is the end point of the last */
         /* obtained scratch area.                               */
-        /* Used by GC_register_dynamic_libraries().             */
+        /* Used by MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries().             */
 # endif
-# if defined(GC_ASSERTIONS) || defined(MAKE_BACK_GRAPH) \
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) || defined(MAKE_BACK_GRAPH) \
      || defined(INCLUDE_LINUX_THREAD_DESCR) \
      || (defined(KEEP_BACK_PTRS) && ALIGNMENT == 1)
 #   define SET_REAL_HEAP_BOUNDS
-#   define GC_least_real_heap_addr GC_arrays._least_real_heap_addr
-#   define GC_greatest_real_heap_addr GC_arrays._greatest_real_heap_addr
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._least_real_heap_addr
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._greatest_real_heap_addr
     word _least_real_heap_addr;
     word _greatest_real_heap_addr;
-        /* Similar to GC_least/greatest_plausible_heap_addr but */
+        /* Similar to MANAGED_STACK_ADDRESS_BOEHM_GC_least/greatest_plausible_heap_addr but */
         /* do not include future (potential) heap expansion.    */
         /* Both variables are zero initially.                   */
 # endif
   mse *_mark_stack;
-        /* Limits of stack for GC_mark routine.  All ranges     */
-        /* between GC_mark_stack (incl.) and GC_mark_stack_top  */
+        /* Limits of stack for MANAGED_STACK_ADDRESS_BOEHM_GC_mark routine.  All ranges     */
+        /* between MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack (incl.) and MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top  */
         /* (incl.) still need to be marked from.                */
   mse *_mark_stack_limit;
 # ifdef PARALLEL_MARK
@@ -1451,138 +1450,130 @@ struct _GC_arrays {
 # else
     mse *_mark_stack_top;
 # endif
-# ifdef DYNAMIC_POINTER_MASK
-#   define GC_pointer_mask GC_arrays._pointer_mask
-#   define GC_pointer_shift GC_arrays._pointer_shift
-    word _pointer_mask; /* Both mask and shift are zeros by default;    */
-                        /* if mask is zero then correct it to ~0 at GC  */
-                        /* initialization.                              */
-    unsigned char _pointer_shift;
-# endif
-# define GC_mark_stack_too_small GC_arrays._mark_stack_too_small
-  GC_bool _mark_stack_too_small;
-                /* We need a larger mark stack.  May be set by          */
-                /* client-supplied mark routines.                       */
-# define GC_objects_are_marked GC_arrays._objects_are_marked
-  GC_bool _objects_are_marked;
-                /* Are there collectible marked objects in the heap?    */
-# ifdef THREADS
-#   define GC_roots_were_cleared GC_arrays._roots_were_cleared
-    GC_bool _roots_were_cleared;
-# endif
-# define GC_explicit_typing_initialized GC_arrays._explicit_typing_initialized
-# ifdef AO_HAVE_load_acquire
-    volatile AO_t _explicit_typing_initialized;
-# else
-    GC_bool _explicit_typing_initialized;
-# endif
-  word _composite_in_use;
-                /* Number of bytes in the accessible composite objects. */
-  word _atomic_in_use;
-                /* Number of bytes in the accessible atomic objects.    */
-# define GC_last_heap_growth_gc_no GC_arrays._last_heap_growth_gc_no
+  word _composite_in_use; /* Number of bytes in the accessible  */
+                          /* composite objects.                 */
+  word _atomic_in_use;    /* Number of bytes in the accessible  */
+                          /* atomic objects.                    */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_growth_gc_no MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._last_heap_growth_gc_no
   word _last_heap_growth_gc_no;
-                /* GC number of latest successful GC_expand_hp_inner call. */
+                /* GC number of latest successful MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner call */
 # ifdef USE_MUNMAP
-#   define GC_unmapped_bytes GC_arrays._unmapped_bytes
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._unmapped_bytes
     word _unmapped_bytes;
 #   ifdef COUNT_UNMAPPED_REGIONS
-#     define GC_num_unmapped_regions GC_arrays._num_unmapped_regions
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._num_unmapped_regions
       signed_word _num_unmapped_regions;
 #   endif
 # else
-#   define GC_unmapped_bytes 0
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes 0
 # endif
   bottom_index * _all_nils;
-# define GC_scan_ptr GC_arrays._scan_ptr
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_scan_ptr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._scan_ptr
   struct hblk * _scan_ptr;
 # ifdef PARALLEL_MARK
-#   define GC_main_local_mark_stack GC_arrays._main_local_mark_stack
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_main_local_mark_stack MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._main_local_mark_stack
     mse *_main_local_mark_stack;
-#   define GC_first_nonempty GC_arrays._first_nonempty
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_first_nonempty MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._first_nonempty
     volatile AO_t _first_nonempty;
                         /* Lowest entry on mark stack that may be       */
                         /* nonempty. Updated only by initiating thread. */
 # endif
-# define GC_mark_stack_size GC_arrays._mark_stack_size
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_size MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_stack_size
   size_t _mark_stack_size;
-# define GC_mark_state GC_arrays._mark_state
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_state MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_state
   mark_state_t _mark_state; /* Initialized to MS_NONE (0). */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_too_small MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_stack_too_small
+  MANAGED_STACK_ADDRESS_BOEHM_GC_bool _mark_stack_too_small;
+                        /* We need a larger mark stack.  May be set by  */
+                        /* client supplied mark routines.               */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_objects_are_marked MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._objects_are_marked
+  MANAGED_STACK_ADDRESS_BOEHM_GC_bool _objects_are_marked;
+                /* Are there collectible marked objects in the heap?    */
 # ifdef ENABLE_TRACE
-#   define GC_trace_addr GC_arrays._trace_addr
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._trace_addr
     ptr_t _trace_addr;
 # endif
-# define GC_capacity_heap_sects GC_arrays._capacity_heap_sects
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_capacity_heap_sects MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._capacity_heap_sects
   size_t _capacity_heap_sects;
-# define GC_n_heap_sects GC_arrays._n_heap_sects
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._n_heap_sects
   word _n_heap_sects;   /* Number of separately added heap sections.    */
 # ifdef ANY_MSWIN
-#   define GC_n_heap_bases GC_arrays._n_heap_bases
-    word _n_heap_bases; /* See GC_heap_bases.   */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_bases MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._n_heap_bases
+    word _n_heap_bases; /* See MANAGED_STACK_ADDRESS_BOEHM_GC_heap_bases.   */
 # endif
 # ifdef USE_PROC_FOR_LIBRARIES
-#   define GC_n_memory GC_arrays._n_memory
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._n_memory
     word _n_memory;     /* Number of GET_MEM allocated memory sections. */
 # endif
-# ifdef GC_GCJ_SUPPORT
-#   define GC_gcjobjfreelist GC_arrays._gcjobjfreelist
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_gcjobjfreelist MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._gcjobjfreelist
     ptr_t *_gcjobjfreelist;
 # endif
-# define GC_fo_entries GC_arrays._fo_entries
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._fo_entries
   word _fo_entries;
-# ifndef GC_NO_FINALIZATION
-#   define GC_dl_hashtbl GC_arrays._dl_hashtbl
-#   define GC_fnlz_roots GC_arrays._fnlz_roots
-#   define GC_log_fo_table_size GC_arrays._log_fo_table_size
-#   ifndef GC_LONG_REFS_NOT_NEEDED
-#     define GC_ll_hashtbl GC_arrays._ll_hashtbl
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_dl_hashtbl MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._dl_hashtbl
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_fnlz_roots MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._fnlz_roots
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_log_fo_table_size MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._log_fo_table_size
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_LONG_REFS_NOT_NEEDED
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_ll_hashtbl MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._ll_hashtbl
       struct dl_hashtbl_s _ll_hashtbl;
 #   endif
     struct dl_hashtbl_s _dl_hashtbl;
     struct fnlz_roots_s _fnlz_roots;
     unsigned _log_fo_table_size;
-#   ifndef GC_TOGGLE_REFS_NOT_NEEDED
-#     define GC_toggleref_arr GC_arrays._toggleref_arr
-#     define GC_toggleref_array_size GC_arrays._toggleref_array_size
-#     define GC_toggleref_array_capacity GC_arrays._toggleref_array_capacity
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TOGGLE_REFS_NOT_NEEDED
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_toggleref_arr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._toggleref_arr
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_toggleref_array_size MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._toggleref_array_size
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_toggleref_array_capacity MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._toggleref_array_capacity
       union toggle_ref_u *_toggleref_arr;
       size_t _toggleref_array_size;
       size_t _toggleref_array_capacity;
 #   endif
 # endif
 # ifdef TRACE_BUF
-#   define GC_trace_buf_ptr GC_arrays._trace_buf_ptr
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_trace_buf_ptr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._trace_buf_ptr
     int _trace_buf_ptr;
 # endif
 # ifdef ENABLE_DISCLAIM
-#   define GC_finalized_kind GC_arrays._finalized_kind
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_kind MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._finalized_kind
     unsigned _finalized_kind;
 # endif
-# define n_root_sets GC_arrays._n_root_sets
-# define GC_excl_table_entries GC_arrays._excl_table_entries
-  int _n_root_sets;     /* GC_static_roots[0..n_root_sets) contains the */
+# define n_root_sets MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._n_root_sets
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_excl_table_entries MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._excl_table_entries
+  int _n_root_sets;     /* MANAGED_STACK_ADDRESS_BOEHM_GC_static_roots[0..n_root_sets) contains the */
                         /* valid root sets.                             */
   size_t _excl_table_entries;   /* Number of entries in use.    */
-# define GC_ed_size GC_arrays._ed_size
-# define GC_avail_descr GC_arrays._avail_descr
-# define GC_ext_descriptors GC_arrays._ext_descriptors
+# ifdef THREADS
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_roots_were_cleared MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._roots_were_cleared
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool _roots_were_cleared;
+# endif
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_explicit_typing_initialized MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._explicit_typing_initialized
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ed_size MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._ed_size
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_avail_descr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._avail_descr
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ext_descriptors MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._ext_descriptors
+# ifdef AO_HAVE_load_acquire
+    volatile AO_t _explicit_typing_initialized;
+# else
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool _explicit_typing_initialized;
+# endif
   size_t _ed_size;      /* Current size of above arrays.        */
   size_t _avail_descr;  /* Next available slot.                 */
   typed_ext_descr_t *_ext_descriptors;  /* Points to array of extended  */
                                         /* descriptors.                 */
-  GC_mark_proc _mark_procs[MAX_MARK_PROCS];
+  MANAGED_STACK_ADDRESS_BOEHM_GC_mark_proc _mark_procs[MAX_MARK_PROCS];
         /* Table of user-defined mark procedures.  There is     */
         /* a small number of these, which can be referenced     */
         /* by DS_PROC mark descriptors.  See gc_mark.h.         */
   char _modws_valid_offsets[sizeof(word)];
-                                /* GC_valid_offsets[i] ==>                */
-                                /* GC_modws_valid_offsets[i%sizeof(word)] */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_valid_offsets[i] ==>                */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_modws_valid_offsets[i%sizeof(word)] */
 # ifndef ANY_MSWIN
-#   define GC_root_index GC_arrays._root_index
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_root_index MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._root_index
     struct roots * _root_index[RT_SIZE];
 # endif
 # ifdef SAVE_CALL_CHAIN
-#   define GC_last_stack GC_arrays._last_stack
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_last_stack MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._last_stack
     struct callinfo _last_stack[NFRAMES];
                 /* Stack at last garbage collection.  Useful for        */
                 /* debugging mysterious object disappearances.  In the  */
@@ -1590,10 +1581,10 @@ struct _GC_arrays {
                 /* calling stack.                                       */
 # endif
 # ifndef SEPARATE_GLOBALS
-#   define GC_objfreelist GC_arrays._objfreelist
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._objfreelist
     void *_objfreelist[MAXOBJGRANULES+1];
                           /* free list for objects */
-#   define GC_aobjfreelist GC_arrays._aobjfreelist
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._aobjfreelist
     void *_aobjfreelist[MAXOBJGRANULES+1];
                           /* free list for atomic objects       */
 # endif
@@ -1602,8 +1593,8 @@ struct _GC_arrays {
                           /* Objects on this and _auobjfreelist */
                           /* are always marked, except during   */
                           /* garbage collections.               */
-# ifdef GC_ATOMIC_UNCOLLECTABLE
-#   define GC_auobjfreelist GC_arrays._auobjfreelist
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_auobjfreelist MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._auobjfreelist
     void *_auobjfreelist[MAXOBJGRANULES+1];
                 /* Atomic uncollectible but traced objects.     */
 # endif
@@ -1612,11 +1603,11 @@ struct _GC_arrays {
         /* number of bytes (plus EXTRA_BYTES).  Should be accessed with */
         /* the allocation lock held.                                    */
 # ifndef MARK_BIT_PER_OBJ
-#   define GC_obj_map GC_arrays._obj_map
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_obj_map MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._obj_map
     unsigned short * _obj_map[MAXOBJGRANULES + 1];
                        /* If not NULL, then a pointer to a map of valid */
                        /* object addresses.                             */
-                       /* GC_obj_map[sz_in_granules][i] is              */
+                       /* MANAGED_STACK_ADDRESS_BOEHM_GC_obj_map[sz_in_granules][i] is              */
                        /* i % sz_in_granules.                           */
                        /* This is now used purely to replace a          */
                        /* division in the marker by a table lookup.     */
@@ -1628,38 +1619,38 @@ struct _GC_arrays {
 # endif
 # define VALID_OFFSET_SZ HBLKSIZE
   char _valid_offsets[VALID_OFFSET_SZ];
-                                /* GC_valid_offsets[i] == TRUE ==> i    */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_valid_offsets[i] == TRUE ==> i    */
                                 /* is registered as a displacement.     */
-# ifndef GC_DISABLE_INCREMENTAL
-#   define GC_grungy_pages GC_arrays._grungy_pages
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_grungy_pages MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._grungy_pages
     page_hash_table _grungy_pages; /* Pages that were dirty at last     */
-                                   /* GC_read_dirty.                    */
-#   define GC_dirty_pages GC_arrays._dirty_pages
+                                   /* MANAGED_STACK_ADDRESS_BOEHM_GC_read_dirty.                    */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_pages MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._dirty_pages
     volatile page_hash_table _dirty_pages;
-                        /* Pages dirtied since last GC_read_dirty. */
+                        /* Pages dirtied since last MANAGED_STACK_ADDRESS_BOEHM_GC_read_dirty. */
 # endif
 # if (defined(CHECKSUMS) && (defined(GWW_VDB) || defined(SOFT_VDB))) \
      || defined(PROC_VDB)
-#   define GC_written_pages GC_arrays._written_pages
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_written_pages MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._written_pages
     page_hash_table _written_pages;     /* Pages ever dirtied   */
 # endif
-# define GC_heap_sects GC_arrays._heap_sects
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._heap_sects
   struct HeapSect *_heap_sects;         /* Heap segments potentially    */
                                         /* client objects.              */
 # if defined(USE_PROC_FOR_LIBRARIES)
-#   define GC_our_memory GC_arrays._our_memory
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._our_memory
     struct HeapSect _our_memory[MAX_HEAP_SECTS];
                                         /* All GET_MEM allocated        */
                                         /* memory.  Includes block      */
                                         /* headers and the like.        */
 # endif
 # ifdef ANY_MSWIN
-#   define GC_heap_bases GC_arrays._heap_bases
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_heap_bases MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._heap_bases
     ptr_t _heap_bases[MAX_HEAP_SECTS];
                 /* Start address of memory regions obtained from kernel. */
 # endif
 # ifdef MSWINCE
-#   define GC_heap_lengths GC_arrays._heap_lengths
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_heap_lengths MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._heap_lengths
     word _heap_lengths[MAX_HEAP_SECTS];
                 /* Committed lengths of memory regions obtained from kernel. */
 # endif
@@ -1669,68 +1660,68 @@ struct _GC_arrays {
   bottom_index * _top_index[TOP_SZ];
 };
 
-GC_API_PRIV GC_FAR struct _GC_arrays GC_arrays;
+MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV MANAGED_STACK_ADDRESS_BOEHM_GC_FAR struct _MANAGED_STACK_ADDRESS_BOEHM_GC_arrays MANAGED_STACK_ADDRESS_BOEHM_GC_arrays;
 
-#define GC_all_nils GC_arrays._all_nils
-#define GC_atomic_in_use GC_arrays._atomic_in_use
-#define GC_bytes_allocd_before_gc GC_arrays._bytes_allocd_before_gc
-#define GC_bytes_dropped GC_arrays._bytes_dropped
-#define GC_bytes_finalized GC_arrays._bytes_finalized
-#define GC_bytes_freed GC_arrays._bytes_freed
-#define GC_composite_in_use GC_arrays._composite_in_use
-#define GC_excl_table GC_arrays._excl_table
-#define GC_finalizer_bytes_freed GC_arrays._finalizer_bytes_freed
-#define GC_heapsize GC_arrays._heapsize
-#define GC_large_allocd_bytes GC_arrays._large_allocd_bytes
-#define GC_large_free_bytes GC_arrays._large_free_bytes
-#define GC_last_heap_addr GC_arrays._last_heap_addr
-#define GC_mark_stack GC_arrays._mark_stack
-#define GC_mark_stack_limit GC_arrays._mark_stack_limit
-#define GC_mark_stack_top GC_arrays._mark_stack_top
-#define GC_mark_procs GC_arrays._mark_procs
-#define GC_max_large_allocd_bytes GC_arrays._max_large_allocd_bytes
-#define GC_modws_valid_offsets GC_arrays._modws_valid_offsets
-#define GC_requested_heapsize GC_arrays._requested_heapsize
-#define GC_all_bottom_indices GC_arrays._all_bottom_indices
-#define GC_all_bottom_indices_end GC_arrays._all_bottom_indices_end
-#define GC_scratch_free_ptr GC_arrays._scratch_free_ptr
-#define GC_hdr_free_list GC_arrays._hdr_free_list
-#define GC_scratch_end_ptr GC_arrays._scratch_end_ptr
-#define GC_size_map GC_arrays._size_map
-#define GC_static_roots GC_arrays._static_roots
-#define GC_top_index GC_arrays._top_index
-#define GC_uobjfreelist GC_arrays._uobjfreelist
-#define GC_valid_offsets GC_arrays._valid_offsets
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._all_nils
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._atomic_in_use
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd_before_gc MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._bytes_allocd_before_gc
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_dropped MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._bytes_dropped
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_finalized MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._bytes_finalized
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_freed MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._bytes_freed
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._composite_in_use
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_excl_table MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._excl_table
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_bytes_freed MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._finalizer_bytes_freed
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._heapsize
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_large_allocd_bytes MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._large_allocd_bytes
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._large_free_bytes
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_addr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._last_heap_addr
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_stack
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_limit MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_stack_limit
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_stack_top
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_procs MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._mark_procs
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_max_large_allocd_bytes MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._max_large_allocd_bytes
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_modws_valid_offsets MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._modws_valid_offsets
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_requested_heapsize MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._requested_heapsize
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_all_bottom_indices MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._all_bottom_indices
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_all_bottom_indices_end MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._all_bottom_indices_end
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_free_ptr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._scratch_free_ptr
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_hdr_free_list MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._hdr_free_list
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_end_ptr MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._scratch_end_ptr
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_size_map MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._size_map
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_static_roots MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._static_roots
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_top_index MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._top_index
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_uobjfreelist MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._uobjfreelist
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_valid_offsets MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._valid_offsets
 
-#define beginGC_arrays ((ptr_t)(&GC_arrays))
-#define endGC_arrays ((ptr_t)(&GC_arrays) + sizeof(GC_arrays))
+#define beginMANAGED_STACK_ADDRESS_BOEHM_GC_arrays ((ptr_t)(&MANAGED_STACK_ADDRESS_BOEHM_GC_arrays))
+#define endMANAGED_STACK_ADDRESS_BOEHM_GC_arrays ((ptr_t)(&MANAGED_STACK_ADDRESS_BOEHM_GC_arrays) + sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_arrays))
 
 /* Object kinds: */
 #ifndef MAXOBJKINDS
 # define MAXOBJKINDS 16
 #endif
-GC_EXTERN struct obj_kind {
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN struct obj_kind {
   void **ok_freelist;   /* Array of free list headers for this kind of  */
-                        /* object.  Point either to GC_arrays or to     */
-                        /* storage allocated with GC_scratch_alloc.     */
+                        /* object.  Point either to MANAGED_STACK_ADDRESS_BOEHM_GC_arrays or to     */
+                        /* storage allocated with MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc.     */
   struct hblk **ok_reclaim_list;
                         /* List headers for lists of blocks waiting to  */
                         /* be swept.  Indexed by object size in         */
                         /* granules.                                    */
   word ok_descriptor;   /* Descriptor template for objects in this      */
                         /* block.                                       */
-  GC_bool ok_relocate_descr;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_bool ok_relocate_descr;
                         /* Add object size in bytes to descriptor       */
                         /* template to obtain descriptor.  Otherwise    */
                         /* template is used as is.                      */
-  GC_bool ok_init;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_bool ok_init;
                 /* Clear objects before putting them on the free list.  */
 # ifdef ENABLE_DISCLAIM
-    GC_bool ok_mark_unconditionally;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool ok_mark_unconditionally;
                         /* Mark from all, including unmarked, objects   */
                         /* in block.  Used to protect objects reachable */
                         /* from reclaim notifiers.                      */
-    int (GC_CALLBACK *ok_disclaim_proc)(void * /*obj*/);
+    int (MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK *ok_disclaim_proc)(void * /*obj*/);
                         /* The disclaim procedure is called before obj  */
                         /* is reclaimed, but must also tolerate being   */
                         /* called with object from freelist.  Non-zero  */
@@ -1739,58 +1730,58 @@ GC_EXTERN struct obj_kind {
 # else
 #   define OK_DISCLAIM_INITZ /* empty */
 # endif /* !ENABLE_DISCLAIM */
-} GC_obj_kinds[MAXOBJKINDS];
+} MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[MAXOBJKINDS];
 
-#define beginGC_obj_kinds ((ptr_t)(&GC_obj_kinds[0]))
-#define endGC_obj_kinds (beginGC_obj_kinds + sizeof(GC_obj_kinds))
+#define beginMANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds ((ptr_t)(&MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[0]))
+#define endMANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds (beginMANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds + sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds))
 
-/* Variables that used to be in GC_arrays, but need to be accessed by   */
-/* inline allocation code.  If they were in GC_arrays, the inlined      */
-/* allocation code would include GC_arrays offsets (as it did), which   */
+/* Variables that used to be in MANAGED_STACK_ADDRESS_BOEHM_GC_arrays, but need to be accessed by   */
+/* inline allocation code.  If they were in MANAGED_STACK_ADDRESS_BOEHM_GC_arrays, the inlined      */
+/* allocation code would include MANAGED_STACK_ADDRESS_BOEHM_GC_arrays offsets (as it did), which   */
 /* introduce maintenance problems.                                      */
 
 #ifdef SEPARATE_GLOBALS
-  extern word GC_bytes_allocd;
+  extern word MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd;
         /* Number of bytes allocated during this collection cycle.      */
-  extern ptr_t GC_objfreelist[MAXOBJGRANULES+1];
+  extern ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist[MAXOBJGRANULES+1];
                           /* free list for NORMAL objects */
-# define beginGC_objfreelist ((ptr_t)(&GC_objfreelist[0]))
-# define endGC_objfreelist (beginGC_objfreelist + sizeof(GC_objfreelist))
+# define beginMANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist ((ptr_t)(&MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist[0]))
+# define endMANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist (beginMANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist + sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist))
 
-  extern ptr_t GC_aobjfreelist[MAXOBJGRANULES+1];
+  extern ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist[MAXOBJGRANULES+1];
                           /* free list for atomic (PTRFREE) objects     */
-# define beginGC_aobjfreelist ((ptr_t)(&GC_aobjfreelist[0]))
-# define endGC_aobjfreelist (beginGC_aobjfreelist + sizeof(GC_aobjfreelist))
+# define beginMANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist ((ptr_t)(&MANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist[0]))
+# define endMANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist (beginMANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist + sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_aobjfreelist))
 #endif /* SEPARATE_GLOBALS */
 
 /* Predefined kinds: */
-#define PTRFREE GC_I_PTRFREE
-#define NORMAL  GC_I_NORMAL
+#define PTRFREE MANAGED_STACK_ADDRESS_BOEHM_GC_I_PTRFREE
+#define NORMAL  MANAGED_STACK_ADDRESS_BOEHM_GC_I_NORMAL
 #define UNCOLLECTABLE 2
-#ifdef GC_ATOMIC_UNCOLLECTABLE
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
 # define AUNCOLLECTABLE 3
 # define IS_UNCOLLECTABLE(k) (((k) & ~1) == UNCOLLECTABLE)
-# define GC_N_KINDS_INITIAL_VALUE 4
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_N_KINDS_INITIAL_VALUE 4
 #else
 # define IS_UNCOLLECTABLE(k) ((k) == UNCOLLECTABLE)
-# define GC_N_KINDS_INITIAL_VALUE 3
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_N_KINDS_INITIAL_VALUE 3
 #endif
 
-GC_EXTERN unsigned GC_n_kinds;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds;
 
-GC_EXTERN size_t GC_page_size;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN size_t MANAGED_STACK_ADDRESS_BOEHM_GC_page_size;
                 /* May mean the allocation granularity size, not page size. */
 
 #ifdef REAL_PAGESIZE_NEEDED
-  GC_EXTERN size_t GC_real_page_size;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN size_t MANAGED_STACK_ADDRESS_BOEHM_GC_real_page_size;
 #else
-# define GC_real_page_size GC_page_size
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_real_page_size MANAGED_STACK_ADDRESS_BOEHM_GC_page_size
 #endif
 
 /* Round up allocation size to a multiple of a page size.       */
-/* GC_setpagesize() is assumed to be already invoked.           */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_setpagesize() is assumed to be already invoked.           */
 #define ROUNDUP_PAGESIZE(lb) /* lb should have no side-effect */ \
-            (SIZET_SAT_ADD(lb, GC_page_size - 1) & ~(GC_page_size - 1))
+            (SIZET_SAT_ADD(lb, MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - 1) & ~(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - 1))
 
 /* Same as above but used to make GET_MEM() argument safe.      */
 #ifdef MMAP_SUPPORTED
@@ -1800,63 +1791,63 @@ GC_EXTERN size_t GC_page_size;
 #endif
 
 #ifdef ANY_MSWIN
-  GC_EXTERN SYSTEM_INFO GC_sysinfo;
-  GC_INNER GC_bool GC_is_heap_base(const void *p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN SYSTEM_INFO MANAGED_STACK_ADDRESS_BOEHM_GC_sysinfo;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_heap_base(const void *p);
 #endif
 
-GC_EXTERN word GC_black_list_spacing;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN word MANAGED_STACK_ADDRESS_BOEHM_GC_black_list_spacing;
                         /* Average number of bytes between blacklisted  */
                         /* blocks. Approximate.                         */
                         /* Counts only blocks that are                  */
                         /* "stack-blacklisted", i.e. that are           */
                         /* problematic in the interior of an object.    */
 
-#ifdef GC_GCJ_SUPPORT
-  extern struct hblk * GC_hblkfreelist[];
-  extern word GC_free_bytes[];  /* Both remain visible to GNU GCJ.      */
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
+  extern struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[];
+  extern word MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[];  /* Both remain visible to GNU GCJ.      */
 #endif
 
-GC_EXTERN word GC_root_size; /* Total size of registered root sections. */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN word MANAGED_STACK_ADDRESS_BOEHM_GC_root_size; /* Total size of registered root sections. */
 
-GC_EXTERN GC_bool GC_debugging_started;
-                                /* GC_debug_malloc has been called.     */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started;
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc has been called.     */
 
-/* This is used by GC_do_blocking[_inner]().            */
+/* This is used by MANAGED_STACK_ADDRESS_BOEHM_GC_do_blocking[_inner]().            */
 struct blocking_data {
-    GC_fn_type fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_fn_type fn;
     void * client_data; /* and result */
 };
 
-/* This is used by GC_call_with_gc_active(), GC_push_all_stack_sections(). */
-struct GC_traced_stack_sect_s {
+/* This is used by MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_gc_active(), MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack_sections(). */
+struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s {
   ptr_t saved_stack_ptr;
 # ifdef IA64
     ptr_t saved_backing_store_ptr;
     ptr_t backing_store_end;
 # endif
-  struct GC_traced_stack_sect_s *prev;
+  struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s *prev;
 };
 
 #ifdef THREADS
   /* Process all "traced stack sections" - scan entire stack except for */
-  /* frames belonging to the user functions invoked by GC_do_blocking.  */
-  GC_INNER void GC_push_all_stack_sections(ptr_t lo, ptr_t hi,
-                        struct GC_traced_stack_sect_s *traced_stack_sect);
-  GC_EXTERN word GC_total_stacksize; /* updated on every push_all_stacks */
+  /* frames belonging to the user functions invoked by MANAGED_STACK_ADDRESS_BOEHM_GC_do_blocking.  */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack_sections(ptr_t lo, ptr_t hi,
+                        struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s *traced_stack_sect);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN word MANAGED_STACK_ADDRESS_BOEHM_GC_total_stacksize; /* updated on every push_all_stacks */
 #else
-  GC_EXTERN ptr_t GC_blocked_sp;
-  GC_EXTERN struct GC_traced_stack_sect_s *GC_traced_stack_sect;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_blocked_sp;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s *MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect;
                         /* Points to the "frame" data held in stack by  */
-                        /* the innermost GC_call_with_gc_active().      */
+                        /* the innermost MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_gc_active().      */
                         /* NULL if no such "frame" active.              */
 #endif /* !THREADS */
 
 #ifdef IA64
-  GC_EXTERN ptr_t GC_register_stackbottom;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_register_stackbottom;
 
-  /* Similar to GC_push_all_stack_sections() but for IA-64 registers store. */
-  GC_INNER void GC_push_all_register_sections(ptr_t bs_lo, ptr_t bs_hi,
-                  int eager, struct GC_traced_stack_sect_s *traced_stack_sect);
+  /* Similar to MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack_sections() but for IA-64 registers store. */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_register_sections(ptr_t bs_lo, ptr_t bs_hi,
+                  int eager, struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s *traced_stack_sect);
 #endif /* IA64 */
 
 /*  Marks are in a reserved area in                          */
@@ -1917,79 +1908,79 @@ struct GC_traced_stack_sect_s {
 
 /* Important internal collector routines */
 
-GC_INNER ptr_t GC_approx_sp(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp(void);
 
-GC_INNER GC_bool GC_should_collect(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_should_collect(void);
 
-GC_INNER struct hblk * GC_next_block(struct hblk *h, GC_bool allow_free);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_next_block(struct hblk *h, MANAGED_STACK_ADDRESS_BOEHM_GC_bool allow_free);
                         /* Get the next block whose address is at least */
                         /* h.  Returned block is managed by GC.  The    */
                         /* block must be in use unless allow_free is    */
                         /* true.  Return 0 if there is no such block.   */
-GC_INNER struct hblk * GC_prev_block(struct hblk * h);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_prev_block(struct hblk * h);
                         /* Get the last (highest address) block whose   */
                         /* address is at most h.  Returned block is     */
                         /* managed by GC, but may or may not be in use. */
                         /* Return 0 if there is no such block.          */
-GC_INNER void GC_mark_init(void);
-GC_INNER void GC_clear_marks(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mark_init(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_clear_marks(void);
                         /* Clear mark bits for all heap objects.        */
-GC_INNER void GC_invalidate_mark_state(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_invalidate_mark_state(void);
                                 /* Tell the marker that marked          */
                                 /* objects may point to unmarked        */
                                 /* ones, and roots may point to         */
                                 /* unmarked objects.  Reset mark stack. */
-GC_INNER GC_bool GC_mark_some(ptr_t cold_gc_frame);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some(ptr_t cold_gc_frame);
                         /* Perform about one pages worth of marking     */
                         /* work of whatever kind is needed.  Returns    */
                         /* quickly if no collection is in progress.     */
                         /* Return TRUE if mark phase finished.          */
-GC_INNER void GC_initiate_gc(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_initiate_gc(void);
                                 /* initiate collection.                 */
                                 /* If the mark state is invalid, this   */
                                 /* becomes full collection.  Otherwise  */
                                 /* it's partial.                        */
 
-GC_INNER GC_bool GC_collection_in_progress(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress(void);
                         /* Collection is in progress, or was abandoned. */
 
 /* Push contents of the symbol residing in the static roots area        */
 /* excluded from scanning by the the collector for a reason.            */
 /* Note: it should be used only for symbols of relatively small size    */
 /* (one or several words).                                              */
-#define GC_PUSH_ALL_SYM(sym) GC_push_all_eager(&(sym), &(sym) + 1)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_PUSH_ALL_SYM(sym) MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_eager(&(sym), &(sym) + 1)
 
-GC_INNER void GC_push_all_stack(ptr_t b, ptr_t t);
-                                    /* As GC_push_all but consider      */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack(ptr_t b, ptr_t t);
+                                    /* As MANAGED_STACK_ADDRESS_BOEHM_GC_push_all but consider      */
                                     /* interior pointers as valid.      */
 
 #ifdef NO_VDB_FOR_STATIC_ROOTS
-# define GC_push_conditional_static(b, t, all) \
-                ((void)(all), GC_push_all(b, t))
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_push_conditional_static(b, t, all) \
+                ((void)(all), MANAGED_STACK_ADDRESS_BOEHM_GC_push_all(b, t))
 #else
-  /* Same as GC_push_conditional (does either of GC_push_all or         */
-  /* GC_push_selected depending on the third argument) but the caller   */
+  /* Same as MANAGED_STACK_ADDRESS_BOEHM_GC_push_conditional (does either of MANAGED_STACK_ADDRESS_BOEHM_GC_push_all or         */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_push_selected depending on the third argument) but the caller   */
   /* guarantees the region belongs to the registered static roots.      */
-  GC_INNER void GC_push_conditional_static(void *b, void *t, GC_bool all);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_conditional_static(void *b, void *t, MANAGED_STACK_ADDRESS_BOEHM_GC_bool all);
 #endif
 
 #if defined(WRAP_MARK_SOME) && defined(PARALLEL_MARK)
-  /* GC_mark_local does not handle memory protection faults yet.  So,   */
-  /* the static data regions are scanned immediately by GC_push_roots.  */
-  GC_INNER void GC_push_conditional_eager(void *bottom, void *top,
-                                          GC_bool all);
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_mark_local does not handle memory protection faults yet.  So,   */
+  /* the static data regions are scanned immediately by MANAGED_STACK_ADDRESS_BOEHM_GC_push_roots.  */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_conditional_eager(void *bottom, void *top,
+                                          MANAGED_STACK_ADDRESS_BOEHM_GC_bool all);
 #endif
 
   /* In the threads case, we push part of the current thread stack      */
-  /* with GC_push_all_eager when we push the registers.  This gets the  */
+  /* with MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_eager when we push the registers.  This gets the  */
   /* callee-save registers that may disappear.  The remainder of the    */
-  /* stacks are scheduled for scanning in *GC_push_other_roots, which   */
+  /* stacks are scheduled for scanning in *MANAGED_STACK_ADDRESS_BOEHM_GC_push_other_roots, which   */
   /* is thread-package-specific.                                        */
 
-GC_INNER void GC_push_roots(GC_bool all, ptr_t cold_gc_frame);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_roots(MANAGED_STACK_ADDRESS_BOEHM_GC_bool all, ptr_t cold_gc_frame);
                                         /* Push all or dirty roots.     */
 
-GC_API_PRIV GC_push_other_roots_proc GC_push_other_roots;
+MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV MANAGED_STACK_ADDRESS_BOEHM_GC_push_other_roots_proc MANAGED_STACK_ADDRESS_BOEHM_GC_push_other_roots;
                         /* Push system or application specific roots    */
                         /* onto the mark stack.  In some environments   */
                         /* (e.g. threads environments) this is          */
@@ -2000,19 +1991,19 @@ GC_API_PRIV GC_push_other_roots_proc GC_push_other_roots;
                         /* software (e.g., ECL) currently.              */
 
 #ifdef THREADS
-  void GC_push_thread_structures(void);
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_push_thread_structures(void);
 #endif
-GC_EXTERN void (*GC_push_typed_structures)(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN void (*MANAGED_STACK_ADDRESS_BOEHM_GC_push_typed_structures)(void);
                         /* A pointer such that we can avoid linking in  */
                         /* the typed allocation support if unused.      */
 
-GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
                                           volatile ptr_t arg);
 
 #if defined(E2K) || defined(IA64) || defined(SPARC)
   /* Cause all stacked registers to be saved in memory.  Return a       */
   /* pointer to the top of the corresponding memory stack.              */
-  ptr_t GC_save_regs_in_stack(void);
+  ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack(void);
 #endif
 
 #ifdef E2K
@@ -2020,7 +2011,7 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
   /* given capacity).  Returns either the required buffer size if it    */
   /* is bigger than the provided buffer capacity, otherwise the amount  */
   /* of copied bytes.  May be called from a signal handler.             */
-  GC_INNER size_t GC_get_procedure_stack(ptr_t, size_t);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER size_t MANAGED_STACK_ADDRESS_BOEHM_GC_get_procedure_stack(ptr_t, size_t);
 
 # if defined(CPPCHECK)
 #   define PS_ALLOCA_BUF(sz) __builtin_alloca(sz)
@@ -2036,7 +2027,7 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
           size_t capacity = 0;                                      \
                                                                     \
           for (*(pbuf) = NULL; ; capacity = *(psz)) {               \
-            *(psz) = GC_get_procedure_stack(*(pbuf), capacity);     \
+            *(psz) = MANAGED_STACK_ADDRESS_BOEHM_GC_get_procedure_stack(*(pbuf), capacity);     \
             if (*(psz) <= capacity) break;                          \
             /* Allocate buffer on the stack; cannot return NULL. */ \
             *(pbuf) = PS_ALLOCA_BUF(*(psz));                        \
@@ -2072,8 +2063,8 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
 # define LOAD_WORD_OR_CONTINUE(v, p) (void)(v = *(word *)(p))
 #endif /* !E2K */
 
-#if defined(AMIGA) || defined(MACOS) || defined(GC_DARWIN_THREADS)
-  void GC_push_one(word p);
+#if defined(AMIGA) || defined(MACOS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_THREADS)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(word p);
                               /* If p points to an object, mark it    */
                               /* and push contents on the mark stack  */
                               /* Pointer recognition test always      */
@@ -2082,146 +2073,146 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
                               /* stack.                               */
 #endif
 
-#ifdef GC_WIN32_THREADS
-  /* Same as GC_push_one but for a sequence of registers.       */
-  GC_INNER void GC_push_many_regs(const word *regs, unsigned count);
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS
+  /* Same as MANAGED_STACK_ADDRESS_BOEHM_GC_push_one but for a sequence of registers.       */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_many_regs(const word *regs, unsigned count);
 #endif
 
 #if defined(PRINT_BLACK_LIST) || defined(KEEP_BACK_PTRS)
-  GC_INNER void GC_mark_and_push_stack(ptr_t p, ptr_t source);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mark_and_push_stack(ptr_t p, ptr_t source);
                                 /* Ditto, omits plausibility test       */
 #else
-  GC_INNER void GC_mark_and_push_stack(ptr_t p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mark_and_push_stack(ptr_t p);
 #endif
 
-GC_INNER void GC_clear_hdr_marks(hdr * hhdr);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_clear_hdr_marks(hdr * hhdr);
                                     /* Clear the mark bits in a header */
-GC_INNER void GC_set_hdr_marks(hdr * hhdr);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_set_hdr_marks(hdr * hhdr);
                                     /* Set the mark bits in a header */
-GC_INNER void GC_set_fl_marks(ptr_t p);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_set_fl_marks(ptr_t p);
                                     /* Set all mark bits associated with */
                                     /* a free list.                      */
-#if defined(GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
-  void GC_check_fl_marks(void **);
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_check_fl_marks(void **);
                                     /* Check that all mark bits         */
                                     /* associated with a free list are  */
                                     /* set.  Abort if not.              */
 #endif
 
 #ifndef AMIGA
-  GC_INNER
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER
 #endif
-void GC_add_roots_inner(ptr_t b, ptr_t e, GC_bool tmp);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner(ptr_t b, ptr_t e, MANAGED_STACK_ADDRESS_BOEHM_GC_bool tmp);
 
 #ifdef USE_PROC_FOR_LIBRARIES
-  GC_INNER void GC_remove_roots_subregion(ptr_t b, ptr_t e);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_roots_subregion(ptr_t b, ptr_t e);
 #endif
-GC_INNER void GC_exclude_static_roots_inner(void *start, void *finish);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_exclude_static_roots_inner(void *start, void *finish);
 #if defined(DYNAMIC_LOADING) || defined(ANY_MSWIN) || defined(PCR)
-  GC_INNER void GC_register_dynamic_libraries(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries(void);
                 /* Add dynamic library data sections to the root set. */
 #endif
-GC_INNER void GC_cond_register_dynamic_libraries(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_cond_register_dynamic_libraries(void);
                 /* Remove and reregister dynamic libraries if we're     */
                 /* configured to do that at each GC.                    */
 
 /* Machine dependent startup routines */
-ptr_t GC_get_main_stack_base(void);     /* Cold end of stack.           */
+ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_get_main_stack_base(void);     /* Cold end of stack.           */
 #ifdef IA64
-  GC_INNER ptr_t GC_get_register_stack_base(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_get_register_stack_base(void);
                                         /* Cold end of register stack.  */
 #endif
 
-void GC_register_data_segments(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments(void);
 
 #ifdef THREADS
-  /* Both are invoked from GC_init only.        */
-  GC_INNER void GC_thr_init(void);
-  GC_INNER void GC_init_parallel(void);
+  /* Both are invoked from MANAGED_STACK_ADDRESS_BOEHM_GC_init only.        */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_thr_init(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_parallel(void);
 # ifndef DONT_USE_ATEXIT
-    GC_INNER GC_bool GC_is_main_thread(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_main_thread(void);
 # endif
 #else
-  GC_INNER GC_bool GC_is_static_root(void *p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_static_root(void *p);
                 /* Is the address p in one of the registered static     */
                 /* root sections?                                       */
 # ifdef TRACE_BUF
-    void GC_add_trace_entry(char *kind, word arg1, word arg2);
+    void MANAGED_STACK_ADDRESS_BOEHM_GC_add_trace_entry(char *kind, word arg1, word arg2);
 # endif
 #endif /* !THREADS */
 
 /* Black listing: */
 #ifdef PRINT_BLACK_LIST
-  GC_INNER void GC_add_to_black_list_normal(word p, ptr_t source);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal(word p, ptr_t source);
                         /* Register bits as a possible future false     */
                         /* reference from the heap or static data       */
-# define GC_ADD_TO_BLACK_LIST_NORMAL(bits, source) \
-                if (GC_all_interior_pointers) { \
-                  GC_add_to_black_list_stack((word)(bits), (source)); \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_NORMAL(bits, source) \
+                if (MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers) { \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack((word)(bits), (source)); \
                 } else \
-                  GC_add_to_black_list_normal((word)(bits), (source))
-  GC_INNER void GC_add_to_black_list_stack(word p, ptr_t source);
-# define GC_ADD_TO_BLACK_LIST_STACK(bits, source) \
-            GC_add_to_black_list_stack((word)(bits), (source))
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal((word)(bits), (source))
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack(word p, ptr_t source);
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_STACK(bits, source) \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack((word)(bits), (source))
 #else
-  GC_INNER void GC_add_to_black_list_normal(word p);
-# define GC_ADD_TO_BLACK_LIST_NORMAL(bits, source) \
-                if (GC_all_interior_pointers) { \
-                  GC_add_to_black_list_stack((word)(bits)); \
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal(word p);
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_NORMAL(bits, source) \
+                if (MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers) { \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack((word)(bits)); \
                 } else \
-                  GC_add_to_black_list_normal((word)(bits))
-  GC_INNER void GC_add_to_black_list_stack(word p);
-# define GC_ADD_TO_BLACK_LIST_STACK(bits, source) \
-            GC_add_to_black_list_stack((word)(bits))
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_normal((word)(bits))
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack(word p);
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_STACK(bits, source) \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_black_list_stack((word)(bits))
 #endif /* PRINT_BLACK_LIST */
 
-GC_INNER void GC_promote_black_lists(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_promote_black_lists(void);
                         /* Declare an end to a black listing phase.     */
-GC_INNER void GC_unpromote_black_lists(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unpromote_black_lists(void);
                         /* Approximately undo the effect of the above.  */
                         /* This actually loses some information, but    */
                         /* only in a reasonably safe way.               */
 
-GC_INNER ptr_t GC_scratch_alloc(size_t bytes);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc(size_t bytes);
                                 /* GC internal memory allocation for    */
                                 /* small objects.  Deallocation is not  */
                                 /* possible.  May return NULL.          */
 
 #ifdef GWW_VDB
-  /* GC_scratch_recycle_no_gww() not used.      */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_no_gww() not used.      */
 #else
-# define GC_scratch_recycle_no_gww GC_scratch_recycle_inner
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_no_gww MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_inner
 #endif
-GC_INNER void GC_scratch_recycle_inner(void *ptr, size_t bytes);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_inner(void *ptr, size_t bytes);
                                 /* Reuse the memory region by the heap. */
 
 /* Heap block layout maps: */
 #ifndef MARK_BIT_PER_OBJ
-  GC_INNER GC_bool GC_add_map_entry(size_t sz);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_add_map_entry(size_t sz);
                                 /* Add a heap block map for objects of  */
                                 /* size sz to obj_map.                  */
                                 /* Return FALSE on failure.             */
 #endif
 
-GC_INNER void GC_register_displacement_inner(size_t offset);
-                                /* Version of GC_register_displacement  */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner(size_t offset);
+                                /* Version of MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement  */
                                 /* that assumes lock is already held.   */
 
 /*  hblk allocation: */
-GC_INNER void GC_new_hblk(size_t size_in_granules, int kind);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_new_hblk(size_t size_in_granules, int kind);
                                 /* Allocate a new heap block, and build */
                                 /* a free list in it.                   */
 
-GC_INNER ptr_t GC_build_fl(struct hblk *h, size_t words, GC_bool clear,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl(struct hblk *h, size_t words, MANAGED_STACK_ADDRESS_BOEHM_GC_bool clear,
                            ptr_t list);
                                 /* Build a free list for objects of     */
                                 /* size sz in block h.  Append list to  */
                                 /* end of the free lists.  Possibly     */
                                 /* clear objects on the list.  Normally */
-                                /* called by GC_new_hblk, but also      */
+                                /* called by MANAGED_STACK_ADDRESS_BOEHM_GC_new_hblk, but also      */
                                 /* called explicitly without GC lock.   */
 
-GC_INNER struct hblk * GC_allochblk(size_t size_in_bytes, int kind,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk(size_t size_in_bytes, int kind,
                                     unsigned flags, size_t align_m1);
                                 /* Allocate (and return pointer to)     */
                                 /* a heap block for objects of the      */
@@ -2237,79 +2228,79 @@ GC_INNER struct hblk * GC_allochblk(size_t size_in_bytes, int kind,
                                 /* responsible for building an object   */
                                 /* freelist in the block.               */
 
-GC_INNER ptr_t GC_alloc_large(size_t lb, int k, unsigned flags,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_alloc_large(size_t lb, int k, unsigned flags,
                               size_t align_m1);
                         /* Allocate a large block of size lb bytes with */
                         /* the requested alignment (align_m1 plus one). */
                         /* The block is not cleared.  Assumes that      */
                         /* EXTRA_BYTES value is already added to lb.    */
                         /* The flags argument should be IGNORE_OFF_PAGE */
-                        /* or 0.  Calls GC_allochblk() to do the actual */
+                        /* or 0.  Calls MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk() to do the actual */
                         /* allocation, but also triggers GC and/or heap */
                         /* expansion as appropriate.  Updates value of  */
-                        /* GC_bytes_allocd; does also other accounting. */
+                        /* MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd; does also other accounting. */
 
-GC_INNER void GC_freehblk(struct hblk * p);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(struct hblk * p);
                                 /* Deallocate a heap block and mark it  */
                                 /* as invalid.                          */
 
 /*  Miscellaneous GC routines.  */
 
-GC_INNER GC_bool GC_expand_hp_inner(word n);
-GC_INNER void GC_start_reclaim(GC_bool abort_if_found);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner(word n);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_reclaim(MANAGED_STACK_ADDRESS_BOEHM_GC_bool abort_if_found);
                                 /* Restore unmarked objects to free     */
                                 /* lists, or (if abort_if_found is      */
                                 /* TRUE) report them.                   */
                                 /* Sweeping of small object pages is    */
                                 /* largely deferred.                    */
-GC_INNER void GC_continue_reclaim(word sz, int kind);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_continue_reclaim(word sz, int kind);
                                 /* Sweep pages of the given size and    */
                                 /* kind, as long as possible, and       */
                                 /* as long as the corresponding free    */
                                 /* list is empty.  sz is in granules.   */
 
-GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func, MANAGED_STACK_ADDRESS_BOEHM_GC_bool ignore_old);
                                 /* Reclaim all blocks.  Abort (in a     */
                                 /* consistent state) if stop_func()     */
                                 /* returns TRUE.                        */
-GC_INNER ptr_t GC_reclaim_generic(struct hblk * hbp, hdr *hhdr, size_t sz,
-                                  GC_bool init, ptr_t list, word *pcount);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_generic(struct hblk * hbp, hdr *hhdr, size_t sz,
+                                  MANAGED_STACK_ADDRESS_BOEHM_GC_bool init, ptr_t list, word *pcount);
                                 /* Rebuild free list in hbp with        */
                                 /* header hhdr, with objects of size sz */
                                 /* bytes.  Add list to the end of the   */
                                 /* free list.  Add the number of        */
                                 /* reclaimed bytes to *pcount.          */
-GC_INNER GC_bool GC_block_empty(hdr * hhdr);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_block_empty(hdr * hhdr);
                                 /* Block completely unmarked?   */
-GC_INNER int GC_CALLBACK GC_never_stop_func(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func(void);
                                 /* Always returns 0 (FALSE).            */
-GC_INNER GC_bool GC_try_to_collect_inner(GC_stop_func stop_func);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func);
                                 /* Collect; caller must have acquired   */
                                 /* lock.  Collection is aborted if      */
                                 /* stop_func() returns TRUE.  Returns   */
                                 /* TRUE if it completes successfully.   */
-#define GC_gcollect_inner() \
-                (void)GC_try_to_collect_inner(GC_never_stop_func)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect_inner() \
+                (void)MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func)
 
 #ifdef THREADS
-  GC_EXTERN GC_bool GC_in_thread_creation;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_in_thread_creation;
         /* We may currently be in thread creation or destruction.       */
         /* Only set to TRUE while allocation lock is held.              */
         /* When set, it is OK to run GC from unknown thread.            */
 #endif
 
-GC_EXTERN GC_bool GC_is_initialized; /* GC_init() has been run. */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized; /* MANAGED_STACK_ADDRESS_BOEHM_GC_init() has been run. */
 
-GC_INNER void GC_collect_a_little_inner(int n);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(int n);
                                 /* Do n units worth of garbage          */
                                 /* collection work, if appropriate.     */
                                 /* A unit is an amount appropriate for  */
                                 /* HBLKSIZE bytes of allocation.        */
 
-GC_INNER void * GC_generic_malloc_aligned(size_t lb, int k, unsigned flags,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_aligned(size_t lb, int k, unsigned flags,
                                           size_t align_m1);
 
-GC_INNER void * GC_generic_malloc_inner(size_t lb, int k, unsigned flags);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner(size_t lb, int k, unsigned flags);
                                 /* Allocate an object of the given      */
                                 /* kind but assuming lock already held. */
                                 /* Should not be used to directly       */
@@ -2322,100 +2313,100 @@ GC_INNER void * GC_generic_malloc_inner(size_t lb, int k, unsigned flags);
                                 /* within the first hblk) of the object */
                                 /* while it is live.                    */
 
-GC_INNER GC_bool GC_collect_or_expand(word needed_blocks, unsigned flags,
-                                      GC_bool retry);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_collect_or_expand(word needed_blocks, unsigned flags,
+                                      MANAGED_STACK_ADDRESS_BOEHM_GC_bool retry);
 
-GC_INNER ptr_t GC_allocobj(size_t gran, int kind);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_allocobj(size_t gran, int kind);
                                 /* Make the indicated free list     */
                                 /* nonempty, and return its head.   */
                                 /* The size (gran) is in granules.  */
 
-#ifdef GC_ADD_CALLER
-  /* GC_DBG_EXTRAS is used by GC debug API functions (unlike GC_EXTRAS  */
-  /* used by GC debug API macros) thus GC_RETURN_ADDR_PARENT (pointing  */
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS is used by GC debug API functions (unlike MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRAS  */
+  /* used by GC debug API macros) thus MANAGED_STACK_ADDRESS_BOEHM_GC_RETURN_ADDR_PARENT (pointing  */
   /* to client caller) should be used if possible.                      */
-# ifdef GC_HAVE_RETURN_ADDR_PARENT
-#   define GC_DBG_EXTRAS GC_RETURN_ADDR_PARENT, NULL, 0
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_RETURN_ADDR_PARENT
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS MANAGED_STACK_ADDRESS_BOEHM_GC_RETURN_ADDR_PARENT, NULL, 0
 # else
-#   define GC_DBG_EXTRAS GC_RETURN_ADDR, NULL, 0
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS MANAGED_STACK_ADDRESS_BOEHM_GC_RETURN_ADDR, NULL, 0
 # endif
 #else
-# define GC_DBG_EXTRAS "unknown", 0
-#endif /* !GC_ADD_CALLER */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS "unknown", 0
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER */
 
-#ifdef GC_COLLECT_AT_MALLOC
-  extern size_t GC_dbg_collect_at_malloc_min_lb;
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_COLLECT_AT_MALLOC
+  extern size_t MANAGED_STACK_ADDRESS_BOEHM_GC_dbg_collect_at_malloc_min_lb;
                             /* variable visible outside for debugging   */
-# define GC_DBG_COLLECT_AT_MALLOC(lb) \
-                (void)((lb) >= GC_dbg_collect_at_malloc_min_lb ? \
-                            (GC_gcollect(), 0) : 0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_COLLECT_AT_MALLOC(lb) \
+                (void)((lb) >= MANAGED_STACK_ADDRESS_BOEHM_GC_dbg_collect_at_malloc_min_lb ? \
+                            (MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect(), 0) : 0)
 #else
-# define GC_DBG_COLLECT_AT_MALLOC(lb) (void)0
-#endif /* !GC_COLLECT_AT_MALLOC */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_COLLECT_AT_MALLOC(lb) (void)0
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_COLLECT_AT_MALLOC */
 
 /* Allocation routines that bypass the thread local cache.      */
-#if defined(THREAD_LOCAL_ALLOC) && defined(GC_GCJ_SUPPORT)
-  GC_INNER void *GC_core_gcj_malloc(size_t lb, void *, unsigned flags);
+#if defined(THREAD_LOCAL_ALLOC) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void *MANAGED_STACK_ADDRESS_BOEHM_GC_core_gcj_malloc(size_t lb, void *, unsigned flags);
 #endif
 
-GC_INNER void GC_init_headers(void);
-GC_INNER struct hblkhdr * GC_install_header(struct hblk *h);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_headers(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER struct hblkhdr * MANAGED_STACK_ADDRESS_BOEHM_GC_install_header(struct hblk *h);
                                 /* Install a header for block h.        */
                                 /* Return 0 on failure, or the header   */
                                 /* otherwise.                           */
-GC_INNER GC_bool GC_install_counts(struct hblk * h, size_t sz);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_install_counts(struct hblk * h, size_t sz);
                                 /* Set up forwarding counts for block   */
                                 /* h of size sz.                        */
                                 /* Return FALSE on failure.             */
-GC_INNER void GC_remove_header(struct hblk * h);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_header(struct hblk * h);
                                 /* Remove the header for block h.       */
-GC_INNER void GC_remove_counts(struct hblk * h, size_t sz);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_counts(struct hblk * h, size_t sz);
                                 /* Remove forwarding counts for h.      */
-GC_INNER hdr * GC_find_header(ptr_t h);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER hdr * MANAGED_STACK_ADDRESS_BOEHM_GC_find_header(ptr_t h);
 
-GC_INNER ptr_t GC_os_get_mem(size_t bytes);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(size_t bytes);
                         /* Get HBLKSIZE-aligned heap memory chunk from  */
-                        /* the OS and add the chunk to GC_our_memory.   */
+                        /* the OS and add the chunk to MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory.   */
                         /* Return NULL if out of memory.                */
 
-GC_INNER void GC_print_all_errors(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_errors(void);
                         /* Print smashed and leaked objects, if any.    */
                         /* Clear the lists of such objects.             */
 
-GC_EXTERN void (*GC_check_heap)(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN void (*MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap)(void);
                         /* Check that all objects in the heap with      */
                         /* debugging info are intact.                   */
-                        /* Add any that are not to GC_smashed list.     */
-GC_EXTERN void (*GC_print_all_smashed)(void);
-                        /* Print GC_smashed if it's not empty.          */
-                        /* Clear GC_smashed list.                       */
-GC_EXTERN void (*GC_print_heap_obj)(ptr_t p);
-                        /* If possible print (using GC_err_printf)      */
+                        /* Add any that are not to MANAGED_STACK_ADDRESS_BOEHM_GC_smashed list.     */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN void (*MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed)(void);
+                        /* Print MANAGED_STACK_ADDRESS_BOEHM_GC_smashed if it's not empty.          */
+                        /* Clear MANAGED_STACK_ADDRESS_BOEHM_GC_smashed list.                       */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN void (*MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj)(ptr_t p);
+                        /* If possible print (using MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf)      */
                         /* a more detailed description (terminated with */
                         /* "\n") of the object referred to by p.        */
 
 #if defined(LINUX) && defined(__ELF__) && !defined(SMALL_CONFIG)
-  void GC_print_address_map(void);
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_print_address_map(void);
                         /* Print an address map of the process.         */
 #endif
 
 #ifndef SHORT_DBG_HDRS
-  GC_EXTERN GC_bool GC_findleak_delay_free;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_findleak_delay_free;
                         /* Do not immediately deallocate object on      */
                         /* free() in the leak-finding mode, just mark   */
                         /* it as freed (and deallocate it after GC).    */
-  GC_INNER GC_bool GC_check_leaked(ptr_t base); /* from dbg_mlc.c */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_check_leaked(ptr_t base); /* from dbg_mlc.c */
 #endif
 
 #ifdef AO_HAVE_store
-  GC_EXTERN volatile AO_t GC_have_errors;
-# define GC_SET_HAVE_ERRORS() AO_store(&GC_have_errors, (AO_t)TRUE)
-# define get_have_errors() ((GC_bool)AO_load(&GC_have_errors))
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN volatile AO_t MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors;
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_SET_HAVE_ERRORS() AO_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors, (AO_t)TRUE)
+# define get_have_errors() ((MANAGED_STACK_ADDRESS_BOEHM_GC_bool)AO_load(&MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors))
                                 /* The barriers are not needed.         */
 #else
-  GC_EXTERN GC_bool GC_have_errors;
-# define GC_SET_HAVE_ERRORS() (void)(GC_have_errors = TRUE)
-# define get_have_errors() GC_have_errors
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors;
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_SET_HAVE_ERRORS() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors = TRUE)
+# define get_have_errors() MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors
 #endif                          /* We saw a smashed or leaked object.   */
                                 /* Call error printing routine          */
                                 /* occasionally.  It is OK to read it   */
@@ -2424,134 +2415,134 @@ GC_EXTERN void (*GC_print_heap_obj)(ptr_t p);
 
 #define VERBOSE 2
 #if !defined(NO_CLOCK) || !defined(SMALL_CONFIG)
-  GC_EXTERN int GC_print_stats;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN int MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats;
                         /* Value 1 generates basic GC log;              */
                         /* VERBOSE generates additional messages.       */
 #else /* SMALL_CONFIG */
-# define GC_print_stats 0
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats 0
   /* Will this remove the message character strings from the executable? */
   /* With a particular level of optimizations, it should...              */
 #endif
 
 #ifdef KEEP_BACK_PTRS
-  GC_EXTERN long GC_backtraces;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN long MANAGED_STACK_ADDRESS_BOEHM_GC_backtraces;
 #endif
 
 /* A trivial (linear congruential) pseudo-random numbers generator, */
 /* safe for the concurrent usage.                                   */
-#define GC_RAND_MAX ((int)(~0U >> 1))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_MAX ((int)(~0U >> 1))
 #if defined(AO_HAVE_store) && defined(THREAD_SANITIZER)
-#   define GC_RAND_STATE_T volatile AO_t
-#   define GC_RAND_NEXT(pseed) GC_rand_next(pseed)
-    GC_INLINE int GC_rand_next(GC_RAND_STATE_T *pseed)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T volatile AO_t
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_NEXT(pseed) MANAGED_STACK_ADDRESS_BOEHM_GC_rand_next(pseed)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int MANAGED_STACK_ADDRESS_BOEHM_GC_rand_next(MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T *pseed)
     {
       AO_t next = (AO_t)((AO_load(pseed) * (unsigned32)1103515245UL + 12345)
-                         & (unsigned32)((unsigned)GC_RAND_MAX));
+                         & (unsigned32)((unsigned)MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_MAX));
       AO_store(pseed, next);
       return (int)next;
     }
 #else
-#   define GC_RAND_STATE_T unsigned32
-#   define GC_RAND_NEXT(pseed) /* overflow and race are OK */ \
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T unsigned32
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_NEXT(pseed) /* overflow and race are OK */ \
         (int)(*(pseed) = (*(pseed) * (unsigned32)1103515245UL + 12345) \
-                         & (unsigned32)((unsigned)GC_RAND_MAX))
+                         & (unsigned32)((unsigned)MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_MAX))
 #endif
 
-GC_EXTERN GC_bool GC_print_back_height;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_print_back_height;
 
 #ifdef MAKE_BACK_GRAPH
-  void GC_print_back_graph_stats(void);
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_print_back_graph_stats(void);
 #endif
 
 #ifdef THREADS
   /* Explicitly deallocate the object when we already hold lock.        */
   /* Only used for internally allocated objects.                        */
-  GC_INNER void GC_free_inner(void * p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_free_inner(void * p);
 #endif
 
 /* Macros used for collector internal allocation.       */
 /* These assume the collector lock is held.             */
 #ifdef DBG_HDRS_ALL
-  GC_INNER void * GC_debug_generic_malloc_inner(size_t lb, int k,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc_inner(size_t lb, int k,
                                                 unsigned flags);
-# define GC_INTERNAL_MALLOC(lb, k) GC_debug_generic_malloc_inner(lb, k, 0)
-# define GC_INTERNAL_MALLOC_IGNORE_OFF_PAGE(lb, k) \
-               GC_debug_generic_malloc_inner(lb, k, IGNORE_OFF_PAGE)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_MALLOC(lb, k) MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc_inner(lb, k, 0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_MALLOC_IGNORE_OFF_PAGE(lb, k) \
+               MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc_inner(lb, k, IGNORE_OFF_PAGE)
 # ifdef THREADS
-    GC_INNER void GC_debug_free_inner(void * p);
-#   define GC_INTERNAL_FREE GC_debug_free_inner
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free_inner(void * p);
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_FREE MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free_inner
 # else
-#   define GC_INTERNAL_FREE GC_debug_free
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_FREE MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free
 # endif
 #else
-# define GC_INTERNAL_MALLOC(lb, k) GC_generic_malloc_inner(lb, k, 0)
-# define GC_INTERNAL_MALLOC_IGNORE_OFF_PAGE(lb, k) \
-               GC_generic_malloc_inner(lb, k, IGNORE_OFF_PAGE)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_MALLOC(lb, k) MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner(lb, k, 0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_MALLOC_IGNORE_OFF_PAGE(lb, k) \
+               MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner(lb, k, IGNORE_OFF_PAGE)
 # ifdef THREADS
-#   define GC_INTERNAL_FREE GC_free_inner
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_FREE MANAGED_STACK_ADDRESS_BOEHM_GC_free_inner
 # else
-#   define GC_INTERNAL_FREE GC_free
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_FREE MANAGED_STACK_ADDRESS_BOEHM_GC_free
 # endif
 #endif /* !DBG_HDRS_ALL */
 
 #ifdef USE_MUNMAP
   /* Memory unmapping: */
-  GC_INNER void GC_unmap_old(unsigned threshold);
-  GC_INNER void GC_merge_unmapped(void);
-  GC_INNER void GC_unmap(ptr_t start, size_t bytes);
-  GC_INNER void GC_remap(ptr_t start, size_t bytes);
-  GC_INNER void GC_unmap_gap(ptr_t start1, size_t bytes1, ptr_t start2,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_old(unsigned threshold);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_merge_unmapped(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unmap(ptr_t start, size_t bytes);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remap(ptr_t start, size_t bytes);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_gap(ptr_t start1, size_t bytes1, ptr_t start2,
                              size_t bytes2);
 
 # ifndef NOT_GCBUILD
     /* Compute end address for an unmap operation on the indicated block. */
-    GC_INLINE ptr_t GC_unmap_end(ptr_t start, size_t bytes)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_end(ptr_t start, size_t bytes)
     {
-      return (ptr_t)((word)(start + bytes) & ~(word)(GC_page_size-1));
+      return (ptr_t)((word)(start + bytes) & ~(word)(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1));
     }
 # endif
 #endif /* USE_MUNMAP */
 
 #ifdef CAN_HANDLE_FORK
-  GC_EXTERN int GC_handle_fork;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN int MANAGED_STACK_ADDRESS_BOEHM_GC_handle_fork;
                 /* Fork-handling mode:                                  */
                 /* 0 means no fork handling requested (but client could */
                 /* anyway call fork() provided it is surrounded with    */
-                /* GC_atfork_prepare/parent/child calls);               */
+                /* MANAGED_STACK_ADDRESS_BOEHM_GC_atfork_prepare/parent/child calls);               */
                 /* -1 means GC tries to use pthread_at_fork if it is    */
-                /* available (if it succeeds then GC_handle_fork value  */
+                /* available (if it succeeds then MANAGED_STACK_ADDRESS_BOEHM_GC_handle_fork value  */
                 /* is changed to 1), client should nonetheless surround */
-                /* fork() with GC_atfork_prepare/parent/child (for the  */
+                /* fork() with MANAGED_STACK_ADDRESS_BOEHM_GC_atfork_prepare/parent/child (for the  */
                 /* case of pthread_at_fork failure or absence);         */
                 /* 1 (or other values) means client fully relies on     */
                 /* pthread_at_fork (so if it is missing or failed then  */
-                /* abort occurs in GC_init), GC_atfork_prepare and the  */
+                /* abort occurs in MANAGED_STACK_ADDRESS_BOEHM_GC_init), MANAGED_STACK_ADDRESS_BOEHM_GC_atfork_prepare and the  */
                 /* accompanying routines are no-op in such a case.      */
 #endif
 
-#ifdef GC_DISABLE_INCREMENTAL
-# define GC_incremental FALSE
-# define GC_auto_incremental FALSE
-# define GC_manual_vdb FALSE
-# define GC_dirty(p) (void)(p)
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_incremental FALSE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_auto_incremental FALSE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb FALSE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_dirty(p) (void)(p)
 # define REACHABLE_AFTER_DIRTY(p) (void)(p)
 
-#else /* !GC_DISABLE_INCREMENTAL */
-  GC_EXTERN GC_bool GC_incremental;
+#else /* !MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_incremental;
                         /* Using incremental/generational collection.   */
                         /* Assumes dirty bits are being maintained.     */
 
   /* Virtual dirty bit implementation:            */
   /* Each implementation exports the following:   */
-  GC_INNER void GC_read_dirty(GC_bool output_unneeded);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_read_dirty(MANAGED_STACK_ADDRESS_BOEHM_GC_bool output_unneeded);
                         /* Retrieve dirty bits.  Set output_unneeded to */
                         /* indicate that reading of the retrieved dirty */
                         /* bits is not planned till the next retrieval. */
-  GC_INNER GC_bool GC_page_was_dirty(struct hblk *h);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_dirty(struct hblk *h);
                         /* Read retrieved dirty bits.   */
 
-  GC_INNER void GC_remove_protection(struct hblk *h, word nblocks,
-                                   GC_bool pointerfree);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_protection(struct hblk *h, word nblocks,
+                                   MANAGED_STACK_ADDRESS_BOEHM_GC_bool pointerfree);
                 /* h is about to be written or allocated.  Ensure that  */
                 /* it is not write protected by the virtual dirty bit   */
                 /* implementation.  I.e., this is a call that:          */
@@ -2563,121 +2554,121 @@ GC_EXTERN GC_bool GC_print_back_height;
                 /* not protected.                                       */
 
 # if !defined(NO_VDB_FOR_STATIC_ROOTS) && !defined(PROC_VDB)
-    GC_INNER GC_bool GC_is_vdb_for_static_roots(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_vdb_for_static_roots(void);
                 /* Is VDB working for static roots?                     */
 # endif
 
 # ifdef CAN_HANDLE_FORK
 #   if defined(PROC_VDB) || defined(SOFT_VDB)
-      GC_INNER void GC_dirty_update_child(void);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_update_child(void);
                 /* Update pid-specific resources (like /proc file       */
                 /* descriptors) needed by the dirty bits implementation */
                 /* after fork in the child process.                     */
 #   else
-#     define GC_dirty_update_child() (void)0
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_update_child() (void)0
 #   endif
 # endif /* CAN_HANDLE_FORK */
 
-  GC_INNER GC_bool GC_dirty_init(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_init(void);
                 /* Returns true if dirty bits are maintained (otherwise */
                 /* it is OK to be called again if the client invokes    */
-                /* GC_enable_incremental once more).                    */
+                /* MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental once more).                    */
 
-  GC_EXTERN GC_bool GC_manual_vdb;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb;
                 /* The incremental collection is in the manual VDB      */
-                /* mode.  Assumes GC_incremental is true.  Should not   */
-                /* be modified once GC_incremental is set to true.      */
+                /* mode.  Assumes MANAGED_STACK_ADDRESS_BOEHM_GC_incremental is true.  Should not   */
+                /* be modified once MANAGED_STACK_ADDRESS_BOEHM_GC_incremental is set to true.      */
 
-# define GC_auto_incremental (GC_incremental && !GC_manual_vdb)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_auto_incremental (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && !MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb)
 
-  GC_INNER void GC_dirty_inner(const void *p); /* does not require locking */
-# define GC_dirty(p) (GC_manual_vdb ? GC_dirty_inner(p) : (void)0)
-# define REACHABLE_AFTER_DIRTY(p) GC_reachable_here(p)
-#endif /* !GC_DISABLE_INCREMENTAL */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_inner(const void *p); /* does not require locking */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_dirty(p) (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb ? MANAGED_STACK_ADDRESS_BOEHM_GC_dirty_inner(p) : (void)0)
+# define REACHABLE_AFTER_DIRTY(p) MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(p)
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL */
 
-/* Same as GC_base but excepts and returns a pointer to const object.   */
-#define GC_base_C(p) ((const void *)GC_base((/* no const */ void *)(word)(p)))
+/* Same as MANAGED_STACK_ADDRESS_BOEHM_GC_base but excepts and returns a pointer to const object.   */
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_base_C(p) ((const void *)MANAGED_STACK_ADDRESS_BOEHM_GC_base((/* no const */ void *)(word)(p)))
 
 /* Debugging print routines: */
-void GC_print_block_list(void);
-void GC_print_hblkfreelist(void);
-void GC_print_heap_sects(void);
-void GC_print_static_roots(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_block_list(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_hblkfreelist(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_sects(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_static_roots(void);
 
 #ifdef KEEP_BACK_PTRS
-  GC_INNER void GC_store_back_pointer(ptr_t source, ptr_t dest);
-  GC_INNER void GC_marked_for_finalization(ptr_t dest);
-# define GC_STORE_BACK_PTR(source, dest) GC_store_back_pointer(source, dest)
-# define GC_MARKED_FOR_FINALIZATION(dest) GC_marked_for_finalization(dest)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_store_back_pointer(ptr_t source, ptr_t dest);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_marked_for_finalization(ptr_t dest);
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STORE_BACK_PTR(source, dest) MANAGED_STACK_ADDRESS_BOEHM_GC_store_back_pointer(source, dest)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MARKED_FOR_FINALIZATION(dest) MANAGED_STACK_ADDRESS_BOEHM_GC_marked_for_finalization(dest)
 #else
-# define GC_STORE_BACK_PTR(source, dest) (void)(source)
-# define GC_MARKED_FOR_FINALIZATION(dest)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STORE_BACK_PTR(source, dest) (void)(source)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MARKED_FOR_FINALIZATION(dest)
 #endif /* !KEEP_BACK_PTRS */
 
 /* Make arguments appear live to compiler */
-void GC_noop6(word, word, word, word, word, word);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_noop6(word, word, word, word, word, word);
 
-#ifndef GC_ATTR_FORMAT_PRINTF
-# if GC_GNUC_PREREQ(3, 0)
-#   define GC_ATTR_FORMAT_PRINTF(spec_argnum, first_checked) \
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 0)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(spec_argnum, first_checked) \
         __attribute__((__format__(__printf__, spec_argnum, first_checked)))
 # else
-#   define GC_ATTR_FORMAT_PRINTF(spec_argnum, first_checked)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(spec_argnum, first_checked)
 # endif
 #endif
 
 /* Logging and diagnostic output:       */
-/* GC_printf is used typically on client explicit print requests.       */
-/* For all GC_X_printf routines, it is recommended to put "\n" at       */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_printf is used typically on client explicit print requests.       */
+/* For all MANAGED_STACK_ADDRESS_BOEHM_GC_X_printf routines, it is recommended to put "\n" at       */
 /* 'format' string end (for output atomicity).                          */
-GC_API_PRIV void GC_printf(const char * format, ...)
-                        GC_ATTR_FORMAT_PRINTF(1, 2);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV void MANAGED_STACK_ADDRESS_BOEHM_GC_printf(const char * format, ...)
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(1, 2);
                         /* A version of printf that doesn't allocate,   */
                         /* 1 KB total output length.                    */
                         /* (We use sprintf.  Hopefully that doesn't     */
                         /* allocate for long arguments.)                */
-GC_API_PRIV void GC_err_printf(const char * format, ...)
-                        GC_ATTR_FORMAT_PRINTF(1, 2);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV void MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf(const char * format, ...)
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(1, 2);
 
-/* Basic logging routine.  Typically, GC_log_printf is called directly  */
+/* Basic logging routine.  Typically, MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf is called directly  */
 /* only inside various DEBUG_x blocks.                                  */
-GC_API_PRIV void GC_log_printf(const char * format, ...)
-                        GC_ATTR_FORMAT_PRINTF(1, 2);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV void MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf(const char * format, ...)
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(1, 2);
 
-#ifndef GC_ANDROID_LOG
-# define GC_PRINT_STATS_FLAG (GC_print_stats != 0)
-# define GC_INFOLOG_PRINTF GC_COND_LOG_PRINTF
-  /* GC_verbose_log_printf is called only if GC_print_stats is VERBOSE. */
-# define GC_verbose_log_printf GC_log_printf
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ANDROID_LOG
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS_FLAG (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats != 0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INFOLOG_PRINTF MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_verbose_log_printf is called only if MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats is VERBOSE. */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_verbose_log_printf MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf
 #else
-  extern GC_bool GC_quiet;
-# define GC_PRINT_STATS_FLAG (!GC_quiet)
-  /* INFO/DBG loggers are enabled even if GC_print_stats is off. */
-# ifndef GC_INFOLOG_PRINTF
-#   define GC_INFOLOG_PRINTF if (GC_quiet) {} else GC_info_log_printf
+  extern MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_quiet;
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS_FLAG (!MANAGED_STACK_ADDRESS_BOEHM_GC_quiet)
+  /* INFO/DBG loggers are enabled even if MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats is off. */
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_INFOLOG_PRINTF
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_INFOLOG_PRINTF if (MANAGED_STACK_ADDRESS_BOEHM_GC_quiet) {} else MANAGED_STACK_ADDRESS_BOEHM_GC_info_log_printf
 # endif
-  GC_INNER void GC_info_log_printf(const char *format, ...)
-                        GC_ATTR_FORMAT_PRINTF(1, 2);
-  GC_INNER void GC_verbose_log_printf(const char *format, ...)
-                        GC_ATTR_FORMAT_PRINTF(1, 2);
-#endif /* GC_ANDROID_LOG */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_info_log_printf(const char *format, ...)
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(1, 2);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_verbose_log_printf(const char *format, ...)
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_FORMAT_PRINTF(1, 2);
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ANDROID_LOG */
 
-#if defined(SMALL_CONFIG) || defined(GC_ANDROID_LOG)
-# define GC_ERRINFO_PRINTF GC_INFOLOG_PRINTF
+#if defined(SMALL_CONFIG) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ANDROID_LOG)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ERRINFO_PRINTF MANAGED_STACK_ADDRESS_BOEHM_GC_INFOLOG_PRINTF
 #else
-# define GC_ERRINFO_PRINTF GC_log_printf
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ERRINFO_PRINTF MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf
 #endif
 
-/* Convenient macros for GC_[verbose_]log_printf invocation.    */
-#define GC_COND_LOG_PRINTF \
-                if (EXPECT(!GC_print_stats, TRUE)) {} else GC_log_printf
-#define GC_VERBOSE_LOG_PRINTF \
-    if (EXPECT(GC_print_stats != VERBOSE, TRUE)) {} else GC_verbose_log_printf
-#ifndef GC_DBGLOG_PRINTF
-# define GC_DBGLOG_PRINTF if (!GC_PRINT_STATS_FLAG) {} else GC_log_printf
+/* Convenient macros for MANAGED_STACK_ADDRESS_BOEHM_GC_[verbose_]log_printf invocation.    */
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF \
+                if (EXPECT(!MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats, TRUE)) {} else MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_VERBOSE_LOG_PRINTF \
+    if (EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats != VERBOSE, TRUE)) {} else MANAGED_STACK_ADDRESS_BOEHM_GC_verbose_log_printf
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINTF
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINTF if (!MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS_FLAG) {} else MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf
 #endif
 
-void GC_err_puts(const char *s);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_err_puts(const char *s);
                         /* Write s to stderr, don't buffer, don't add   */
                         /* newlines, don't ...                          */
 
@@ -2685,227 +2676,227 @@ void GC_err_puts(const char *s);
 /* to nearest value).                                                   */
 #define TO_KiB_UL(v) ((unsigned long)(((v) + ((1 << 9) - 1)) >> 10))
 
-GC_EXTERN unsigned GC_fail_count;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count;
                         /* How many consecutive GC/expansion failures?  */
-                        /* Reset by GC_allochblk(); defined in alloc.c. */
+                        /* Reset by MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk(); defined in alloc.c. */
 
-GC_EXTERN long GC_large_alloc_warn_interval; /* defined in misc.c */
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN long MANAGED_STACK_ADDRESS_BOEHM_GC_large_alloc_warn_interval; /* defined in misc.c */
 
-GC_EXTERN signed_word GC_bytes_found;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN signed_word MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found;
                 /* Number of reclaimed bytes after garbage collection;  */
                 /* protected by GC lock; defined in reclaim.c.          */
 
-#ifndef GC_GET_HEAP_USAGE_NOT_NEEDED
-  GC_EXTERN word GC_reclaimed_bytes_before_gc;
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_GET_HEAP_USAGE_NOT_NEEDED
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN word MANAGED_STACK_ADDRESS_BOEHM_GC_reclaimed_bytes_before_gc;
                 /* Number of bytes reclaimed before this        */
                 /* collection cycle; used for statistics only.  */
 #endif
 
 #ifdef USE_MUNMAP
-  GC_EXTERN unsigned GC_unmap_threshold; /* defined in alloc.c */
-  GC_EXTERN GC_bool GC_force_unmap_on_gcollect; /* defined in misc.c */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold; /* defined in alloc.c */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_force_unmap_on_gcollect; /* defined in misc.c */
 #endif
 
 #ifdef MSWIN32
-  GC_EXTERN GC_bool GC_no_win32_dlls; /* defined in os_dep.c */
-  GC_EXTERN GC_bool GC_wnt;     /* Is Windows NT derivative;    */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_no_win32_dlls; /* defined in os_dep.c */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_wnt;     /* Is Windows NT derivative;    */
                                 /* defined and set in os_dep.c. */
 #endif
 
 #ifdef THREADS
 # if (defined(MSWIN32) && !defined(CONSOLE_LOG)) || defined(MSWINCE)
-    GC_EXTERN CRITICAL_SECTION GC_write_cs; /* defined in misc.c */
-#   ifdef GC_ASSERTIONS
-      GC_EXTERN GC_bool GC_write_disabled;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN CRITICAL_SECTION MANAGED_STACK_ADDRESS_BOEHM_GC_write_cs; /* defined in misc.c */
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_write_disabled;
                                 /* defined in win32_threads.c;  */
-                                /* protected by GC_write_cs.    */
+                                /* protected by MANAGED_STACK_ADDRESS_BOEHM_GC_write_cs.    */
 
 #   endif
 # endif /* MSWIN32 || MSWINCE */
-# if defined(GC_DISABLE_INCREMENTAL) || defined(HAVE_LOCKFREE_AO_OR)
-#   define GC_acquire_dirty_lock() (void)0
-#   define GC_release_dirty_lock() (void)0
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL) || defined(HAVE_LOCKFREE_AO_OR)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_dirty_lock() (void)0
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock() (void)0
 # else
     /* Acquire the spin lock we use to update dirty bits.       */
     /* Threads should not get stopped holding it.  But we may   */
-    /* acquire and release it during GC_remove_protection call. */
-#   define GC_acquire_dirty_lock() \
+    /* acquire and release it during MANAGED_STACK_ADDRESS_BOEHM_GC_remove_protection call. */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_dirty_lock() \
         do { /* empty */ \
-        } while (AO_test_and_set_acquire(&GC_fault_handler_lock) == AO_TS_SET)
-#   define GC_release_dirty_lock() AO_CLEAR(&GC_fault_handler_lock)
-    GC_EXTERN volatile AO_TS_t GC_fault_handler_lock;
+        } while (AO_test_and_set_acquire(&MANAGED_STACK_ADDRESS_BOEHM_GC_fault_handler_lock) == AO_TS_SET)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock() AO_CLEAR(&MANAGED_STACK_ADDRESS_BOEHM_GC_fault_handler_lock)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN volatile AO_TS_t MANAGED_STACK_ADDRESS_BOEHM_GC_fault_handler_lock;
                                         /* defined in os_dep.c */
 # endif
 # ifdef MSWINCE
-    GC_EXTERN GC_bool GC_dont_query_stack_min;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_dont_query_stack_min;
                                 /* Defined and set in os_dep.c. */
 # endif
 #elif defined(IA64)
-  GC_EXTERN ptr_t GC_save_regs_ret_val; /* defined in mach_dep.c. */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_ret_val; /* defined in mach_dep.c. */
                         /* Previously set to backing store pointer.     */
 #endif /* !THREADS */
 
 #ifdef THREAD_LOCAL_ALLOC
-  GC_EXTERN GC_bool GC_world_stopped; /* defined in alloc.c */
-  GC_INNER void GC_mark_thread_local_free_lists(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped; /* defined in alloc.c */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mark_thread_local_free_lists(void);
 #endif
 
-#if defined(GLIBC_2_19_TSX_BUG) && defined(GC_PTHREADS_PARAMARK)
+#if defined(GLIBC_2_19_TSX_BUG) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS_PARAMARK)
   /* Parse string like <major>[.<minor>[<tail>]] and return major value. */
-  GC_INNER int GC_parse_version(int *pminor, const char *pverstr);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_parse_version(int *pminor, const char *pverstr);
 #endif
 
 #if defined(MPROTECT_VDB) && defined(GWW_VDB)
-    GC_INNER GC_bool GC_gww_dirty_init(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_gww_dirty_init(void);
                         /* Returns TRUE if GetWriteWatch is available.  */
                         /* May be called repeatedly.  May be called     */
                         /* with or without the GC lock held.            */
 #endif
 
 #if defined(CHECKSUMS) || defined(PROC_VDB)
-  GC_INNER GC_bool GC_page_was_ever_dirty(struct hblk * h);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_ever_dirty(struct hblk * h);
                         /* Could the page contain valid heap pointers?  */
 #endif
 
 #ifdef CHECKSUMS
 # if defined(MPROTECT_VDB) && !defined(DARWIN)
-    void GC_record_fault(struct hblk * h);
+    void MANAGED_STACK_ADDRESS_BOEHM_GC_record_fault(struct hblk * h);
 # endif
-  void GC_check_dirty(void);
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_check_dirty(void);
 #endif
 
-GC_INNER void GC_default_print_heap_obj_proc(ptr_t p);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_default_print_heap_obj_proc(ptr_t p);
 
-GC_INNER void GC_setpagesize(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_setpagesize(void);
 
-GC_INNER void GC_initialize_offsets(void);      /* defined in obj_map.c */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_initialize_offsets(void);      /* defined in obj_map.c */
 
-GC_INNER void GC_bl_init(void);
-GC_INNER void GC_bl_init_no_interiors(void);    /* defined in blacklst.c */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_bl_init(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_bl_init_no_interiors(void);    /* defined in blacklst.c */
 
-GC_INNER void GC_start_debugging_inner(void);   /* defined in dbg_mlc.c. */
-                        /* Should not be called if GC_debugging_started. */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_debugging_inner(void);   /* defined in dbg_mlc.c. */
+                        /* Should not be called if MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started. */
 
 /* Store debugging info into p.  Return displaced pointer.      */
 /* Assumes we hold the allocation lock.                         */
-GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void *MANAGED_STACK_ADDRESS_BOEHM_GC_store_debug_info_inner(void *p, word sz, const char *str,
                                          int linenum);
 
 #ifdef REDIRECT_MALLOC
-# ifdef GC_LINUX_THREADS
-    GC_INNER GC_bool GC_text_mapping(char *nm, ptr_t *startp, ptr_t *endp);
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_text_mapping(char *nm, ptr_t *startp, ptr_t *endp);
                                                 /* from os_dep.c */
 # endif
 #elif defined(USE_WINALLOC)
-  GC_INNER void GC_add_current_malloc_heap(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_add_current_malloc_heap(void);
 #endif /* !REDIRECT_MALLOC */
 
 #ifdef MAKE_BACK_GRAPH
-  GC_INNER void GC_build_back_graph(void);
-  GC_INNER void GC_traverse_back_graph(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_build_back_graph(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_traverse_back_graph(void);
 #endif
 
 #ifdef MSWIN32
-  GC_INNER void GC_init_win32(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_win32(void);
 #endif
 
 #ifndef ANY_MSWIN
-  GC_INNER void * GC_roots_present(ptr_t);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_roots_present(ptr_t);
         /* The type is a lie, since the real type doesn't make sense here, */
         /* and we only test for NULL.                                      */
 #endif
 
-#ifdef GC_WIN32_THREADS
-  GC_INNER void GC_get_next_stack(char *start, char * limit, char **lo,
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_get_next_stack(char *start, char * limit, char **lo,
                                   char **hi);
 # if defined(MPROTECT_VDB) && !defined(CYGWIN32)
-    GC_INNER void GC_set_write_fault_handler(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_set_write_fault_handler(void);
 # endif
-# if defined(WRAP_MARK_SOME) && !defined(GC_PTHREADS)
-    GC_INNER GC_bool GC_started_thread_while_stopped(void);
+# if defined(WRAP_MARK_SOME) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_started_thread_while_stopped(void);
         /* Did we invalidate mark phase with an unexpected thread start? */
 # endif
-#endif /* GC_WIN32_THREADS */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS */
 
-#if defined(GC_DARWIN_THREADS) && defined(MPROTECT_VDB)
-  GC_INNER void GC_mprotect_stop(void);
-  GC_INNER void GC_mprotect_resume(void);
-# ifndef GC_NO_THREADS_DISCOVERY
-    GC_INNER void GC_darwin_register_self_mach_handler(void);
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_THREADS) && defined(MPROTECT_VDB)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mprotect_stop(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mprotect_resume(void);
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_darwin_register_self_mach_handler(void);
 # endif
 #endif
 
 #ifdef THREADS
-# ifndef GC_NO_FINALIZATION
-    GC_INNER void GC_reset_finalizer_nested(void);
-    GC_INNER unsigned char *GC_check_finalizer_nested(void);
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_reset_finalizer_nested(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER unsigned char *MANAGED_STACK_ADDRESS_BOEHM_GC_check_finalizer_nested(void);
 # endif
-  GC_INNER void GC_do_blocking_inner(ptr_t data, void * context);
-  GC_INNER void GC_push_all_stacks(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_do_blocking_inner(ptr_t data, void * context);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks(void);
 # ifdef USE_PROC_FOR_LIBRARIES
-    GC_INNER GC_bool GC_segment_is_thread_stack(ptr_t lo, ptr_t hi);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_segment_is_thread_stack(ptr_t lo, ptr_t hi);
 # endif
 # if (defined(HAVE_PTHREAD_ATTR_GET_NP) || defined(HAVE_PTHREAD_GETATTR_NP)) \
      && defined(IA64)
-    GC_INNER ptr_t GC_greatest_stack_base_below(ptr_t bound);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_stack_base_below(ptr_t bound);
 # endif
 #endif /* THREADS */
 
 #ifdef DYNAMIC_LOADING
-  GC_INNER GC_bool GC_register_main_static_data(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data(void);
 # ifdef DARWIN
-    GC_INNER void GC_init_dyld(void);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_dyld(void);
 # endif
 #endif /* DYNAMIC_LOADING */
 
 #ifdef SEARCH_FOR_DATA_START
-  GC_INNER void GC_init_linux_data_start(void);
-  void * GC_find_limit(void *, int);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_linux_data_start(void);
+  void * MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit(void *, int);
 #endif
 
 #ifdef UNIX_LIKE
-  GC_INNER void GC_set_and_save_fault_handler(void (*handler)(int));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_set_and_save_fault_handler(void (*handler)(int));
 #endif
 
 #ifdef NEED_PROC_MAPS
 # if defined(DYNAMIC_LOADING) && defined(USE_PROC_FOR_LIBRARIES)
-    GC_INNER const char *GC_parse_map_entry(const char *maps_ptr,
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER const char *MANAGED_STACK_ADDRESS_BOEHM_GC_parse_map_entry(const char *maps_ptr,
                                             ptr_t *start, ptr_t *end,
                                             const char **prot,
                                             unsigned *maj_dev,
                                             const char **mapping_name);
 # endif
 # if defined(IA64) || defined(INCLUDE_LINUX_THREAD_DESCR)
-    GC_INNER GC_bool GC_enclosing_mapping(ptr_t addr,
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_enclosing_mapping(ptr_t addr,
                                           ptr_t *startp, ptr_t *endp);
 # endif
-  GC_INNER const char *GC_get_maps(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER const char *MANAGED_STACK_ADDRESS_BOEHM_GC_get_maps(void);
 #endif /* NEED_PROC_MAPS */
 
-#ifdef GC_ASSERTIONS
-  GC_INNER word GC_compute_large_free_bytes(void);
-  GC_INNER word GC_compute_root_size(void);
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER word MANAGED_STACK_ADDRESS_BOEHM_GC_compute_large_free_bytes(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER word MANAGED_STACK_ADDRESS_BOEHM_GC_compute_root_size(void);
 #endif
 
 /* Check a compile time assertion at compile time.      */
 #if defined(_MSC_VER) && (_MSC_VER >= 1700)
-# define GC_STATIC_ASSERT(expr) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(expr) \
                 static_assert(expr, "static assertion failed: " #expr)
 #elif defined(static_assert) && !defined(CPPCHECK) \
       && (__STDC_VERSION__ >= 201112L)
-# define GC_STATIC_ASSERT(expr) static_assert(expr, #expr)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(expr) static_assert(expr, #expr)
 #elif defined(mips) && !defined(__GNUC__) && !defined(CPPCHECK)
 /* DOB: MIPSPro C gets an internal error taking the sizeof an array type.
    This code works correctly (ugliness is to avoid "unused var" warnings) */
-# define GC_STATIC_ASSERT(expr) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(expr) \
     do { if (0) { char j[(expr)? 1 : -1]; j[0]='\0'; j[0]=j[0]; } } while(0)
 #else
   /* The error message for failure is a bit baroque, but ...    */
-# define GC_STATIC_ASSERT(expr) (void)sizeof(char[(expr)? 1 : -1])
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(expr) (void)sizeof(char[(expr)? 1 : -1])
 #endif
 
 /* Runtime check for an argument declared as non-null is actually not null. */
-#if GC_GNUC_PREREQ(4, 0)
+#if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 0)
   /* Workaround tautological-pointer-compare Clang warning.     */
 # define NONNULL_ARG_NOT_NULL(arg) (*(volatile void **)(word)(&(arg)) != NULL)
 #else
@@ -2914,16 +2905,16 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
 
 #define COND_DUMP_CHECKS \
           do { \
-            GC_ASSERT(I_HOLD_LOCK()); \
-            GC_ASSERT(GC_compute_large_free_bytes() == GC_large_free_bytes); \
-            GC_ASSERT(GC_compute_root_size() == GC_root_size); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_compute_large_free_bytes() == MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_compute_root_size() == MANAGED_STACK_ADDRESS_BOEHM_GC_root_size); \
           } while (0)
 
 #ifndef NO_DEBUGGING
-  GC_EXTERN GC_bool GC_dump_regularly;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_dump_regularly;
                                 /* Generate regular debugging dumps.    */
-# define COND_DUMP if (EXPECT(GC_dump_regularly, FALSE)) { \
-                        GC_dump_named(NULL); \
+# define COND_DUMP if (EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_dump_regularly, FALSE)) { \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_dump_named(NULL); \
                    } else COND_DUMP_CHECKS
 #else
 # define COND_DUMP COND_DUMP_CHECKS
@@ -2935,43 +2926,43 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
   /* than the main garbage collector lock; standard pthreads-based      */
   /* implementations should be sufficient.                              */
 
-# define GC_markers_m1 GC_parallel
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_markers_m1 MANAGED_STACK_ADDRESS_BOEHM_GC_parallel
                         /* Number of mark threads we would like to have */
                         /* excluding the initiating thread.             */
 
-  GC_EXTERN GC_bool GC_parallel_mark_disabled;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled;
                         /* A flag to temporarily avoid parallel marking.*/
 
   /* The mark lock and condition variable.  If the GC lock is also      */
   /* acquired, the GC lock must be acquired first.  The mark lock is    */
   /* used to both protect some variables used by the parallel           */
-  /* marker, and to protect GC_fl_builder_count, below.                 */
-  /* GC_notify_all_marker() is called when                              */
+  /* marker, and to protect MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count, below.                 */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_notify_all_marker() is called when                              */
   /* the state of the parallel marker changes                           */
   /* in some significant way (see gc_mark.h for details).  The          */
-  /* latter set of events includes incrementing GC_mark_no.             */
-  /* GC_notify_all_builder() is called when GC_fl_builder_count         */
+  /* latter set of events includes incrementing MANAGED_STACK_ADDRESS_BOEHM_GC_mark_no.             */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_notify_all_builder() is called when MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count         */
   /* reaches 0.                                                         */
 
-  GC_INNER void GC_wait_for_markers_init(void);
-  GC_INNER void GC_acquire_mark_lock(void);
-  GC_INNER void GC_release_mark_lock(void);
-  GC_INNER void GC_notify_all_builder(void);
-  GC_INNER void GC_wait_for_reclaim(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_markers_init(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_mark_lock(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_release_mark_lock(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_notify_all_builder(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim(void);
 
-  GC_EXTERN signed_word GC_fl_builder_count; /* Protected by mark lock. */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN signed_word MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count; /* Protected by mark lock. */
 
-  GC_INNER void GC_notify_all_marker(void);
-  GC_INNER void GC_wait_marker(void);
-  GC_EXTERN word GC_mark_no;            /* Protected by mark lock.      */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_notify_all_marker(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_wait_marker(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN word MANAGED_STACK_ADDRESS_BOEHM_GC_mark_no;            /* Protected by mark lock.      */
 
-  GC_INNER void GC_help_marker(word my_mark_no);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_help_marker(word my_mark_no);
               /* Try to help out parallel marker for mark cycle         */
               /* my_mark_no.  Returns if the mark cycle finishes or     */
               /* was already done, or there was nothing to do for       */
               /* some other reason.                                     */
 
-  GC_INNER void GC_start_mark_threads_inner(void);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_mark_threads_inner(void);
 #endif /* PARALLEL_MARK */
 
 #if defined(SIGNAL_BASED_STOP_WORLD) && !defined(SIG_SUSPEND)
@@ -2989,8 +2980,8 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
     /* use some synchronous one instead (which is again unlikely to be  */
     /* used by clients directly).                                       */
 #   define SIG_SUSPEND SIGSYS
-# elif (defined(GC_LINUX_THREADS) || defined(GC_DGUX386_THREADS)) \
-       && !defined(GC_USESIGRT_SIGNALS)
+# elif (defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DGUX386_THREADS)) \
+       && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS)
 #   if defined(SPARC) && !defined(SIGPWR)
       /* Linux/SPARC doesn't properly define SIGPWR in <signal.h>.      */
       /* It is aliased to SIGLOST in asm/signal.h, though.              */
@@ -2999,24 +2990,24 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
       /* Linuxthreads itself uses SIGUSR1 and SIGUSR2.                  */
 #     define SIG_SUSPEND SIGPWR
 #   endif
-# elif defined(GC_FREEBSD_THREADS) && defined(__GLIBC__) \
-       && !defined(GC_USESIGRT_SIGNALS)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS) && defined(__GLIBC__) \
+       && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS)
 #   define SIG_SUSPEND (32+6)
-# elif (defined(GC_FREEBSD_THREADS) || defined(HURD) || defined(RTEMS)) \
-       && !defined(GC_USESIGRT_SIGNALS)
+# elif (defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS) || defined(HURD) || defined(RTEMS)) \
+       && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS)
 #   define SIG_SUSPEND SIGUSR1
         /* SIGTSTP and SIGCONT could be used alternatively on FreeBSD.  */
-# elif defined(GC_OPENBSD_THREADS) && !defined(GC_USESIGRT_SIGNALS)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_OPENBSD_THREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS)
 #     define SIG_SUSPEND SIGXFSZ
 # elif defined(_SIGRTMIN) && !defined(CPPCHECK)
 #   define SIG_SUSPEND _SIGRTMIN + 6
 # else
 #   define SIG_SUSPEND SIGRTMIN + 6
 # endif
-#endif /* GC_PTHREADS && !SIG_SUSPEND */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS && !SIG_SUSPEND */
 
-#if defined(GC_PTHREADS) && !defined(GC_SEM_INIT_PSHARED)
-# define GC_SEM_INIT_PSHARED 0
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SEM_INIT_PSHARED)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_SEM_INIT_PSHARED 0
 #endif
 
 /* Some macros for setjmp that works across signal handlers     */
@@ -3024,7 +3015,7 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
 /* catching accesses to bad addresses when that's               */
 /* possible/needed.                                             */
 #if (defined(UNIX_LIKE) || (defined(NEED_FIND_LIMIT) && defined(CYGWIN32))) \
-    && !defined(GC_NO_SIGSETJMP)
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP)
 # if defined(SUNOS5SIGS) && !defined(FREEBSD) && !defined(LINUX)
     EXTERN_C_END
 #   include <sys/siginfo.h>
@@ -3043,45 +3034,45 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
 # endif
 # define LONGJMP(env, val) longjmp(env, val)
 # define JMP_BUF jmp_buf
-#endif /* !UNIX_LIKE || GC_NO_SIGSETJMP */
+#endif /* !UNIX_LIKE || MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP */
 
 #if defined(DATASTART_USES_BSDGETDATASTART)
   EXTERN_C_END
 # include <machine/trap.h>
   EXTERN_C_BEGIN
-  GC_INNER ptr_t GC_FreeBSDGetDataStart(size_t, ptr_t);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_FreeBSDGetDataStart(size_t, ptr_t);
 # define DATASTART_IS_FUNC
 #endif /* DATASTART_USES_BSDGETDATASTART */
 
 #if defined(NEED_FIND_LIMIT) \
      || (defined(WRAP_MARK_SOME) && defined(NO_SEH_AVAILABLE)) \
      || (defined(USE_PROC_FOR_LIBRARIES) && defined(THREADS))
-  GC_EXTERN JMP_BUF GC_jmp_buf;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN JMP_BUF MANAGED_STACK_ADDRESS_BOEHM_GC_jmp_buf;
 
   /* Set up a handler for address faults which will longjmp to  */
-  /* GC_jmp_buf.                                                */
-  GC_INNER void GC_setup_temporary_fault_handler(void);
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_jmp_buf.                                                */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_setup_temporary_fault_handler(void);
 
-  /* Undo the effect of GC_setup_temporary_fault_handler.       */
-  GC_INNER void GC_reset_fault_handler(void);
+  /* Undo the effect of MANAGED_STACK_ADDRESS_BOEHM_GC_setup_temporary_fault_handler.       */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_reset_fault_handler(void);
 #endif /* NEED_FIND_LIMIT || USE_PROC_FOR_LIBRARIES || WRAP_MARK_SOME */
 
 /* Some convenience macros for cancellation support. */
 #ifdef CANCEL_SAFE
-# if defined(GC_ASSERTIONS) \
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) \
      && (defined(USE_COMPILER_TLS) \
-         || (defined(LINUX) && !defined(ARM32) && GC_GNUC_PREREQ(3, 3) \
+         || (defined(LINUX) && !defined(ARM32) && MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 3) \
              || defined(HPUX) /* and probably others ... */))
-    extern __thread unsigned char GC_cancel_disable_count;
+    extern __thread unsigned char MANAGED_STACK_ADDRESS_BOEHM_GC_cancel_disable_count;
 #   define NEED_CANCEL_DISABLE_COUNT
-#   define INCR_CANCEL_DISABLE() ++GC_cancel_disable_count
-#   define DECR_CANCEL_DISABLE() --GC_cancel_disable_count
-#   define ASSERT_CANCEL_DISABLED() GC_ASSERT(GC_cancel_disable_count > 0)
+#   define INCR_CANCEL_DISABLE() ++MANAGED_STACK_ADDRESS_BOEHM_GC_cancel_disable_count
+#   define DECR_CANCEL_DISABLE() --MANAGED_STACK_ADDRESS_BOEHM_GC_cancel_disable_count
+#   define ASSERT_CANCEL_DISABLED() MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_cancel_disable_count > 0)
 # else
 #   define INCR_CANCEL_DISABLE()
 #   define DECR_CANCEL_DISABLE()
 #   define ASSERT_CANCEL_DISABLED() (void)0
-# endif /* !GC_ASSERTIONS */
+# endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 # define DISABLE_CANCEL(state) \
         do { pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &state); \
           INCR_CANCEL_DISABLE(); } while (0)
@@ -3095,7 +3086,7 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
 # define ASSERT_CANCEL_DISABLED() (void)0
 #endif /* !CANCEL_SAFE */
 
-/* Multiply 32-bit unsigned values (used by GC_push_contents_hdr).  */
+/* Multiply 32-bit unsigned values (used by MANAGED_STACK_ADDRESS_BOEHM_GC_push_contents_hdr).  */
 #ifdef NO_LONGLONG64
 # define LONG_MULT(hprod, lprod, x, y) \
     do { \
@@ -3126,7 +3117,7 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
     do { \
         ULONG_MULT_T prod = (ULONG_MULT_T)(x) * (ULONG_MULT_T)(y); \
         \
-        GC_STATIC_ASSERT(sizeof(x) + sizeof(y) <= sizeof(prod)); \
+        MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(sizeof(x) + sizeof(y) <= sizeof(prod)); \
         hprod = (unsigned32)(prod >> 32); \
         lprod = (unsigned32)prod; \
     } while (0)
@@ -3134,4 +3125,4 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz, const char *str,
 
 EXTERN_C_END
 
-#endif /* GC_PRIVATE_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H */

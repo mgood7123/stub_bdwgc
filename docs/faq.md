@@ -18,7 +18,7 @@ It is common for a handful of objects to appear accessible even though they
 should not be, e.g. because temporary pointers to them haven't yet been
 overwritten.  Also note that by default only the first item in a chain of
 finalizable objects will be finalized in a collection.
-* Another GC_ call notices that there are finalizers waiting to be run and
+* Another MANAGED_STACK_ADDRESS_BOEHM_GC_ call notices that there are finalizers waiting to be run and
 does so.
 
 Small test programs typically don't run long enough for this to happen.
@@ -40,7 +40,7 @@ Jan. 2002, pp. 93-100
 
 ### How can I get more of the finalizers to run to convince myself that the GC is working?
 
-Invoke GC_gcollect a couple of times just before process exit.
+Invoke MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect a couple of times just before process exit.
 
 ### I want to ensure that all my objects are finalized and reclaimed before process exit.  How can I do that?
 
@@ -74,17 +74,17 @@ initialize objects, even if you don't.
 
 Here are some hints:
 
-* Use `GC_MALLOC_ATOMIC` where possible.
+* Use `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC` where possible.
 * For a multi-threaded application, ensure the GC library is compiled with
 `THREAD_LOCAL_ALLOC` macro defined (this is the default behavior) to avoid
 locking on each allocation.
 * If you use large statically allocated arrays or mapped files, consider
-`GC_exclude_static_roots`.
+`MANAGED_STACK_ADDRESS_BOEHM_GC_exclude_static_roots`.
 
 ### If my heap uses 2 GB on a 32-bit machine, won't every other integer or other random data be misinterpreted as a pointer by the collector?  Thus won't way too much memory be retained?
 
 Maybe.  Probably, if the collector is used purely conservatively, with no
-pointer layout information (such as use of `GC_MALLOC_ATOMIC`).
+pointer layout information (such as use of `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC`).
 
 With a gigabyte heap, you are clearly much better off on a 64-bit machine.
 Empirical evidence seems to suggest that some such applications work on

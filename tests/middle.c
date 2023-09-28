@@ -24,24 +24,24 @@ int main(void)
 {
   int i;
 
-  GC_set_all_interior_pointers(0);
-  GC_INIT();
-  if (GC_get_find_leak())
+  MANAGED_STACK_ADDRESS_BOEHM_GC_set_all_interior_pointers(0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
     printf("This test program is not designed for leak detection mode\n");
 
   for (i = 0; i < N_TESTS; ++i) {
-    CHECK_OUT_OF_MEMORY(GC_malloc_atomic(ALLOC_SZ));
-    CHECK_OUT_OF_MEMORY(GC_malloc(ALLOC_SZ));
+    CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic(ALLOC_SZ));
+    CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(ALLOC_SZ));
   }
 
   /* Test delayed start of marker threads, if they are enabled. */
-  GC_start_mark_threads();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_start_mark_threads();
 
   for (i = 0; i < N_TESTS; ++i) {
-    CHECK_OUT_OF_MEMORY(GC_malloc_atomic(ALLOC_SZ / 2));
-    CHECK_OUT_OF_MEMORY(GC_malloc(ALLOC_SZ / 2));
+    CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic(ALLOC_SZ / 2));
+    CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(ALLOC_SZ / 2));
   }
 
-  printf("Final heap size is %lu\n", (unsigned long)GC_get_heap_size());
+  printf("Final heap size is %lu\n", (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_get_heap_size());
   return 0;
 }

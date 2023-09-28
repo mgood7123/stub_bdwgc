@@ -13,13 +13,13 @@ WHATS NEW:
    returning chip-mem.
 
    The lower part of the new file AmigaOS.c does this in various ways, mainly by
-   wrapping GC_malloc, GC_malloc_atomic, GC_malloc_uncollectable,
-   GC_malloc_atomic_uncollectable, GC_malloc_ignore_off_page
-   and GC_malloc_atomic_ignore_off_page. GC_realloc is also wrapped, but
+   wrapping MANAGED_STACK_ADDRESS_BOEHM_GC_malloc, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable,
+   MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_uncollectable, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page
+   and MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_ignore_off_page. MANAGED_STACK_ADDRESS_BOEHM_GC_realloc is also wrapped, but
    doesn't do the same effort in preventing to return chip-mem.
-   Other allocating-functions (e.g., GC_*_typed) can probably be
+   Other allocating-functions (e.g., MANAGED_STACK_ADDRESS_BOEHM_GC_*_typed) can probably be
    used without any problems, but beware that the warn hook will not be called.
-   In case of problems, don't define GC_AMIGA_FASTALLOC.
+   In case of problems, don't define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC.
 
    Programs using more time actually using the memory allocated
    (instead of just allocate and free rapidly) have
@@ -31,19 +31,19 @@ WHATS NEW:
    could happen quite often. Beware that an atexit handler had to be added,
    so using the abort() function will make a big memory-loss.
    If you absolutely must call abort() instead of exit(), try calling
-   the GC_amiga_free_all_mem function before abort().
+   the MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_free_all_mem function before abort().
 
    New Amiga-specific compilation flags:
 
-   GC_AMIGA_FASTALLOC - By NOT defining this option, GC will work like before,
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC - By NOT defining this option, GC will work like before,
                         it will not try to force fast-mem out of the OS, and
                         it will use normal calloc for allocation, and the rest
                         of the following flags will have no effect.
 
-   GC_AMIGA_ONLYFAST - Makes GC never to return chip-mem. GC_AMIGA_RETRY have
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST - Makes GC never to return chip-mem. MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY have
                        no effect if this flag is set.
 
-   GC_AMIGA_GC - If gc returns NULL, do a GC_gcollect, and try again. This
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC - If gc returns NULL, do a MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect, and try again. This
                  usually is a success with the standard GC configuration.
                  It is also the most important flag to set to prevent
                  GC from returning chip-mem. Beware that it slows down a lot
@@ -52,51 +52,51 @@ WHATS NEW:
                  chip-memory left. It's not a very common situation, but gctest
                  sometimes (very rare) use many minutes because of this.
 
-   GC_AMIGA_RETRY - If gc succeed allocating memory, but it is chip-mem,
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY - If gc succeed allocating memory, but it is chip-mem,
                     try again and see if it is fast-mem. Most of the time,
                     it will actually return fast-mem for the second try.
                     I have set max number of retries to 9 or size/5000. You
-                    can change this if you like. (see GC_amiga_rec_alloc())
+                    can change this if you like. (see MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_rec_alloc())
 
-   GC_AMIGA_PRINTSTATS - Gather some statistics during the execution of a
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS - Gather some statistics during the execution of a
                          program, and prints out the info when the atexit-handler
                          is called.
 
-   My recommendation is to set all this flags, except GC_AMIGA_PRINTSTATS and
-   GC_AMIGA_ONLYFAST.
+   My recommendation is to set all this flags, except MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS and
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST.
 
    If your program demands high response-time, you should
-   not define GC_AMIGA_GC, and possible also define GC_AMIGA_ONLYFAST.
-   GC_AMIGA_RETRY does not seem to slow down much.
+   not define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC, and possible also define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST.
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY does not seem to slow down much.
 
-   Also, when compiling up programs, and GC_AMIGA_FASTALLOC was not defined when
-   compiling gc, you can define GC_AMIGA_MAKINGLIB to avoid having these allocation-
+   Also, when compiling up programs, and MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC was not defined when
+   compiling gc, you can define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MAKINGLIB to avoid having these allocation-
    functions wrapped. (see gc.h)
 
-   Note that GC_realloc must not be called before any of
+   Note that MANAGED_STACK_ADDRESS_BOEHM_GC_realloc must not be called before any of
    the other above mentioned allocating-functions have been called. (shouldn't be
    any programs doing so either, I hope).
 
    Another note. The allocation-function is wrapped when defining
-   GC_AMIGA_FASTALLOC by letting the function go thru the new
-   GC_amiga_allocwrapper_do function-pointer (see gc.h). Means that
-   sending function-pointers, such as GC_malloc, GC_malloc_atomic, etc.,
-   for later to be called, e.g., like this, (*GC_malloc_function_pointer)(size),
+   MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC by letting the function go thru the new
+   MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do function-pointer (see gc.h). Means that
+   sending function-pointers, such as MANAGED_STACK_ADDRESS_BOEHM_GC_malloc, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic, etc.,
+   for later to be called, e.g., like this, (*MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_function_pointer)(size),
    will not wrap the function. This is normally not a big problem, unless
    all allocation function is called like this, which will cause the
    atexit un-allocating function never to be called. Then you either
    have to manually add the atexit handler, or call the allocation-
    functions function-pointer functions like this;
-   (*GC_amiga_allocwrapper_do)(size,GC_malloc_function_pointer).
+   (*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do)(size,MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_function_pointer).
    There are probably better ways this problem could be handled, unfortunately,
    I didn't find any without rewriting or replacing a lot of the GC-code, which
-   I really didn't want to. (Making new GC_malloc_* functions, and just
-   defining, e.g., GC_malloc as GC_amiga_malloc should work too).
+   I really didn't want to. (Making new MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_* functions, and just
+   defining, e.g., MANAGED_STACK_ADDRESS_BOEHM_GC_malloc as MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_malloc should work too).
 
 
    New Amiga-specific function:
 
-     void GC_amiga_set_toany(void (*func)(void));
+     void MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_set_toany(void (*func)(void));
 
    'func' is a function that will be called right before gc has to change
    allocation-method from MEMF_FAST to MEMF_ANY. I.e., when it is likely
@@ -112,10 +112,10 @@ IGNORE= IGNORE=85 IGNORE=154 IGNORE=161 IGNORE=100
 OPTIMIZE=optimize optimizetime optglobal optimizerdepth=100 optimizerpeephole optloop OPTSCHED optimizerinlocal optimizerrecurdepth=100
 OPT= $(OPTIMIZE) NOSTACKCHECK MAPHUNK NOVERSION NOICONS nodebug parm=reg
 
-DEFINE __USE_SYSBASE DEFINE AMIGA_SKIP_SEG DEFINE GC_ATOMIC_UNCOLLECTABLE
-DEFINE GC_AMIGA_FASTALLOC GC_AMIGA_RETRY GC_AMIGA_PRINTSTATS GC_AMIGA_GC
+DEFINE __USE_SYSBASE DEFINE AMIGA_SKIP_SEG DEFINE MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
+DEFINE MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC
 
-DEFINE GC_AMIGA_MAKINGLIB
+DEFINE MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MAKINGLIB
 DEFINE AMIGA IGNORE=100 IGNORE=161
 
 
@@ -148,7 +148,7 @@ CC=gcc $(ABI_FLAG)
 
 TECHNICAL NOTES
 
-- `GC_get_stack_base()`, `GC_register_data_segments()` works now with every
+- `MANAGED_STACK_ADDRESS_BOEHM_GC_get_stack_base()`, `MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments()` works now with every
    C compiler; also Workbench.
 
 - Removed AMIGA_SKIP_SEG, but the Code-Segment must not be scanned by GC.
@@ -159,7 +159,7 @@ PROBLEMS
   do it always.
 
 - With ixemul.library V47.3, when an GC program launched from another program
-  (example: `Make` or `if_mach M68K AMIGA gctest`), `GC_register_data_segments()`
+  (example: `Make` or `if_mach M68K AMIGA gctest`), `MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments()`
   found the Segment-List of the caller program.
   Can be fixed, if the run-time initialization code (for C programs, usually *crt0*)
   support `__data` and `__bss`.
@@ -208,7 +208,7 @@ In addition to Jesper's notes, I have the following to say:
 
   Anyway, the code which decides whether to skip a segment or not can be
   removed simply by not defining AMIGA_SKIP_SEG. But notice that if you do
-  so, gctest will complain (it will say that "GC_is_visible produced wrong
+  so, gctest will complain (it will say that "MANAGED_STACK_ADDRESS_BOEHM_GC_is_visible produced wrong
   failure indication"). However, it may be useful if you happen to have
   pointers stored in a code segment (you really shouldn't).
 
@@ -240,7 +240,7 @@ is that supplied with SAS/C versions 6.0 or later. This allows
 assumptions to be made about where to find the stack base pointer
 and data segments when programs are run from WorkBench, as opposed
 to running from the CLI. The compiler dependent code is all in the
-GC_get_stack_base() and GC_register_data_segments() functions, but
+MANAGED_STACK_ADDRESS_BOEHM_GC_get_stack_base() and MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments() functions, but
 may spread as I add Amiga specific features.
 
 Given that SAS/C was assumed, the port is set up to be built with
@@ -261,7 +261,7 @@ problem is the entire physical address space may have to me scanned,
 since there is no telling who we may have passed memory to.
 
 If you allocate your own stack in client code, you will have to
-assign the pointer plus stack size to GC_stackbottom.
+assign the pointer plus stack size to MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom.
 
 The initial stack size of the target program can be compiled in by
 setting the __stack symbol (see SAS documentation). It can be over-

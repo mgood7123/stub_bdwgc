@@ -8,7 +8,7 @@ in which system resources are embedded in complex data structures (e.g. file
 descriptors in the `cord.h`).
 
 Our collector provides the necessary functionality through
-`GC_register_finalizer` in `include/gc.h`, or by inheriting from `gc_cleanup`
+`MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer` in `include/gc.h`, or by inheriting from `gc_cleanup`
 in `include/gc_cpp.h`).
 
 However, finalization should not be used in the same way as C++ destructors.
@@ -44,16 +44,16 @@ In general the following guidelines should be followed:
   the normal locking conventions to ensure safety. Code run directly from
   finalizers should not acquire locks that may be held during allocation.
   This restriction can be easily circumvented by calling
-  `GC_set_finalize_on_demand(1)` at program start and creating a separate
-  thread dedicated to periodic invocation of `GC_invoke_finalizers()`.
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_set_finalize_on_demand(1)` at program start and creating a separate
+  thread dedicated to periodic invocation of `MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers()`.
 
 In single-threaded code, it is also often easiest to have finalizers queued
-and, then to have them explicitly executed by `GC_invoke_finalizers()`.
+and, then to have them explicitly executed by `MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers()`.
 
 ## Topologically ordered finalization
 
 Our _conservative garbage collector_ supports a form of finalization (with
-`GC_register_finalizer`) in which objects are finalized in topological order.
+`MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer`) in which objects are finalized in topological order.
 If _A_ points to _B_ and both are registered for finalization, it is
 guaranteed the _A_ will be finalized first. This usually guarantees that
 finalization procedures see only unfinalized objects.
@@ -80,7 +80,7 @@ does not refer to _B_, we could fairly easily have avoided the dependency.
 We could have split _A_ into _A'_ and _A''_ such that any references to _A_
 become references to _A'_, _A'_ points to _A''_ but not vice-versa, only
 fields needed for finalization are stored in _A''_, and _A''_ is enabled for
-finalization. (`GC_register_disappearing_link` provides an alternative
+finalization. (`MANAGED_STACK_ADDRESS_BOEHM_GC_register_disappearing_link` provides an alternative
 mechanism that does not require breaking up objects.)
 
 Thus assume that _A_ actually does need access to _B_ during finalization.
@@ -128,7 +128,7 @@ Experience with Cedar has shown that cycles or long chains of finalizable
 objects are typically not a problem. Finalizable objects are typically rare.
 There are several ways to reduce spurious dependencies between finalizable
 objects. Splitting objects as discussed above is one technique. The collector
-also provides `GC_register_disappearing_link`, which explicitly nils a pointer
+also provides `MANAGED_STACK_ADDRESS_BOEHM_GC_register_disappearing_link`, which explicitly nils a pointer
 before determining finalization ordering.
 
 Some so-called "operating systems" fail to clean up some resources associated
@@ -144,7 +144,7 @@ then.
 
 There are certain situations in which cycles between finalizable objects are
 genuinely unavoidable. Most notably, C++ compilers introduce self-cycles
-to represent inheritance. `GC_register_finalizer_ignore_self` tells the
+to represent inheritance. `MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_ignore_self` tells the
 finalization part of the collector to ignore self cycles. This is used by the
 C++ interface.
 

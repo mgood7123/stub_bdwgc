@@ -166,7 +166,7 @@ CORD CORD_cat_char_star(CORD x, const char * y, size_t leny)
         lenx = strlen(x);
         result_len = lenx + leny;
         if (result_len <= SHORT_LIMIT) {
-            char * result = (char *)GC_MALLOC_ATOMIC(result_len + 1);
+            char * result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(result_len + 1);
 
             if (NULL == result) OUT_OF_MEMORY;
 #           ifdef LINT2
@@ -205,7 +205,7 @@ CORD CORD_cat_char_star(CORD x, const char * y, size_t leny)
             }
             result_len = right_len + leny;  /* length of new_right */
             if (result_len <= SHORT_LIMIT) {
-                new_right = (char *)GC_MALLOC_ATOMIC(result_len + 1);
+                new_right = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(result_len + 1);
                 if (new_right == 0) OUT_OF_MEMORY;
                 memcpy(new_right, right, right_len);
                 memcpy(new_right + right_len, y, leny);
@@ -228,7 +228,7 @@ CORD CORD_cat_char_star(CORD x, const char * y, size_t leny)
     }
     {
       /* The general case; lenx, result_len is known: */
-        CordRep *result = GC_NEW(CordRep);
+        CordRep *result = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(CordRep);
 
         if (NULL == result) OUT_OF_MEMORY;
         result -> generic.header = CONCAT_HDR;
@@ -237,8 +237,8 @@ CORD CORD_cat_char_star(CORD x, const char * y, size_t leny)
             result -> generic.left_len = (unsigned char)lenx;
         result -> generic.len = (unsigned long)result_len;
         result -> data.concat.left = x;
-        GC_PTR_STORE_AND_DIRTY((void *)(&result -> data.concat.right), y);
-        GC_reachable_here(x);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY((void *)(&result -> data.concat.right), y);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(x);
         if (depth >= CORD_MAX_DEPTH) {
             return CORD_balance((CORD)result);
         } else {
@@ -269,7 +269,7 @@ CORD CORD_cat(CORD x, CORD y)
     }
     result_len = lenx + LEN(y);
     {
-        CordRep *result = GC_NEW(CordRep);
+        CordRep *result = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(CordRep);
 
         if (NULL == result) OUT_OF_MEMORY;
         result -> generic.header = CONCAT_HDR;
@@ -278,8 +278,8 @@ CORD CORD_cat(CORD x, CORD y)
             result -> generic.left_len = (unsigned char)lenx;
         result -> generic.len = (unsigned long)result_len;
         result -> data.concat.left = x;
-        GC_PTR_STORE_AND_DIRTY((void *)&(result -> data.concat.right), y);
-        GC_reachable_here(x);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY((void *)&(result -> data.concat.right), y);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(x);
         if (depth >= CORD_MAX_DEPTH) {
             return CORD_balance((CORD)result);
         } else {
@@ -303,7 +303,7 @@ static CordRep *CORD_from_fn_inner(CORD_fn fn, void * client_data, size_t len)
             buf[i] = c;
         }
 
-        result = (char *)GC_MALLOC_ATOMIC(len + 1);
+        result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
         if (NULL == result) OUT_OF_MEMORY;
         memcpy(result, buf, len);
         result[len] = '\0';
@@ -311,14 +311,14 @@ static CordRep *CORD_from_fn_inner(CORD_fn fn, void * client_data, size_t len)
     }
   gen_case:
     {
-        CordRep *result = GC_NEW(CordRep);
+        CordRep *result = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(CordRep);
 
         if (NULL == result) OUT_OF_MEMORY;
         result -> generic.header = FN_HDR;
         /* depth is already 0 */
         result -> generic.len = (unsigned long)len;
         result -> data.function.fn = fn;
-        GC_PTR_STORE_AND_DIRTY(&(result -> data.function.client_data),
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(&(result -> data.function.client_data),
                                client_data);
         return result;
     }
@@ -360,12 +360,12 @@ static char CORD_apply_access_fn(size_t i, void * client_data)
 /* Assumes i >= 0 and i + n < length(x).                                */
 static CORD CORD_substr_closure(CORD x, size_t i, size_t n, CORD_fn f)
 {
-    struct substr_args * sa = GC_NEW(struct substr_args);
+    struct substr_args * sa = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(struct substr_args);
     CordRep * result;
 
     if (sa == 0) OUT_OF_MEMORY;
     sa->sa_index = i;
-    GC_PTR_STORE_AND_DIRTY(&sa->sa_cord, x);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(&sa->sa_cord, x);
     result = CORD_from_fn_inner(f, (void *)sa, n);
     if ((CORD)result != CORD_EMPTY && 0 == result -> generic.nul)
         result -> generic.header = SUBSTR_HDR;
@@ -384,7 +384,7 @@ static CORD CORD_substr_checked(CORD x, size_t i, size_t n)
         if (n > SUBSTR_LIMIT) {
             return CORD_substr_closure(x, i, n, CORD_index_access_fn);
         } else {
-            char * result = (char *)GC_MALLOC_ATOMIC(n + 1);
+            char * result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(n + 1);
 
             if (NULL == result) OUT_OF_MEMORY;
             strncpy(result, x+i, n);
@@ -454,7 +454,7 @@ static CORD CORD_substr_checked(CORD x, size_t i, size_t n)
                 }
                 *p++ = c;
             }
-            result = (char *)GC_MALLOC_ATOMIC(n + 1);
+            result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(n + 1);
             if (NULL == result) OUT_OF_MEMORY;
             memcpy(result, buf, n);
             result[n] = '\0';

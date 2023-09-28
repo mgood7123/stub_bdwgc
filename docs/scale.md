@@ -2,7 +2,7 @@
 
 If Makefile.direct is used, in its default configuration the
 Boehm-Demers-Weiser garbage collector is not thread-safe. Generally, it can be
-made thread-safe by building the collector with `-DGC_THREADS` compilation
+made thread-safe by building the collector with `-DMANAGED_STACK_ADDRESS_BOEHM_GC_THREADS` compilation
 flag. This has primarily the following effects:
 
   1. It causes the garbage collector to stop all other threads when it needs
@@ -39,21 +39,21 @@ to Makefile.direct again.)
   is performed by the thread that triggered the collection, together with
   _N_ - 1 dedicated threads, where _N_ is the number of processors (cores)
   detected by the collector. The dedicated marker threads are created when the
-  client calls `GC_start_mark_threads()` or when the client starts the first
+  client calls `MANAGED_STACK_ADDRESS_BOEHM_GC_start_mark_threads()` or when the client starts the first
   non-main thread after the GC initialization (or after fork operation in
   a child process). Another effect of this flag is to switch to a more
-  concurrent implementation of `GC_malloc_many`, so that free lists can be
+  concurrent implementation of `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_many`, so that free lists can be
   built and memory can be cleared by more than one thread concurrently.
   * Building the collector with `-DTHREAD_LOCAL_ALLOC` adds support for
-  thread-local allocation. This causes `GC_malloc` (actually `GC_malloc_kind`)
-  and `GC_gcj_malloc` to be redefined to perform thread-local allocation.
+  thread-local allocation. This causes `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` (actually `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind`)
+  and `MANAGED_STACK_ADDRESS_BOEHM_GC_gcj_malloc` to be redefined to perform thread-local allocation.
 
 Memory returned from thread-local allocators is completely interchangeable
 with that returned by the standard allocators. It may be used by other
 threads. The only difference is that, if the thread allocates enough memory
 of a certain kind, it will build a thread-local free list for objects of that
 kind, and allocate from that. This greatly reduces locking. The thread-local
-free lists are refilled using `GC_malloc_many`.
+free lists are refilled using `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_many`.
 
 An important side effect of this flag is to replace the default
 spin-then-sleep lock to be replaced by a spin-then-queue based implementation.
@@ -88,7 +88,7 @@ The sequential marking code is reused to process local mark stacks. Hence the
 amount of additional code required for parallel marking is minimal.
 
 It should be possible to use incremental/generational collection in the
-presence of the parallel collector by calling `GC_enable_incremental`, but
+presence of the parallel collector by calling `MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental`, but
 the current implementation does not allow interruption of the parallel marker,
 so the latter is mostly avoided if the client sets the collection time limit.
 
@@ -97,11 +97,11 @@ allocation and incremental collection. They should work correctly with one or
 the other, but not both.
 
 The number of marker threads is set on startup to the number of available
-processor cores (or to the value of either `GC_MARKERS` or `GC_NPROCS`
+processor cores (or to the value of either `MANAGED_STACK_ADDRESS_BOEHM_GC_MARKERS` or `MANAGED_STACK_ADDRESS_BOEHM_GC_NPROCS`
 environment variable, if provided). If only a single processor is detected,
 parallel marking is disabled.
 
-Note that setting `GC_NPROCS` to 1 also causes some lock acquisitions inside
+Note that setting `MANAGED_STACK_ADDRESS_BOEHM_GC_NPROCS` to 1 also causes some lock acquisitions inside
 the collector to immediately yield the processor instead of busy waiting
 first. In the case of a multiprocessor and a client with multiple
 simultaneously runnable threads, this may have disastrous performance
@@ -118,7 +118,7 @@ allocation. This was run with an ancient GC (released in 2000) on a dual
 processor Pentium III/500 machine under Linux 2.2.12.
 
 Running with a thread-unsafe collector, the benchmark ran in 9 seconds. With
-the simple thread-safe collector, built with `-DGC_THREADS`, the execution
+the simple thread-safe collector, built with `-DMANAGED_STACK_ADDRESS_BOEHM_GC_THREADS`, the execution
 time increased to 10.3 seconds, or 23.5 elapsed seconds with two clients. (The
 times for the `malloc`/`free` version with glibc `malloc` are 10.51 (standard
 library, pthreads not linked), 20.90 (one thread, pthreads linked), and 24.55
@@ -127,7 +127,7 @@ objects are small.)
 
 The following table gives execution times for the collector built with
 parallel marking and thread-local allocation support
-(`-DGC_THREADS -DPARALLEL_MARK -DTHREAD_LOCAL_ALLOC`). We tested the client
+(`-DMANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -DPARALLEL_MARK -DTHREAD_LOCAL_ALLOC`). We tested the client
 using either one or two marker threads, and running one or two client threads.
 Note that the client uses thread local allocation exclusively. With
 `-DTHREAD_LOCAL_ALLOC` the collector switches to a locking strategy that

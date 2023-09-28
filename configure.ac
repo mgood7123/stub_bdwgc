@@ -21,13 +21,13 @@ AC_CONFIG_SRCDIR(gcj_mlc.c)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_TARGET
 AC_PREREQ(2.61)
-GC_SET_VERSION
+MANAGED_STACK_ADDRESS_BOEHM_GC_SET_VERSION
 AM_INIT_AUTOMAKE([foreign nostdinc subdir-objects])
 AC_CONFIG_HEADERS([include/config.h])
 AM_MAINTAINER_MODE
 
 AC_SUBST(PACKAGE)
-AC_SUBST(GC_VERSION)
+AC_SUBST(MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION)
 
 AM_PROG_CC_C_O
 AC_PROG_CXX
@@ -52,7 +52,7 @@ if test :"$GCC": = :yes: ; then
     gc_cflags="${gc_cflags} -fexceptions"
 else
     case "$host" in
-      hppa*-*-hpux*)
+      hppa*-*-hpux* )
         if test :$GCC: != :"yes": ; then
             gc_cflags="${gc_cflags} +ESdbgasm"
         fi
@@ -77,8 +77,10 @@ esac
 
 # Set any host dependent compiler flags.
 case "${host}" in
-  mips-tx39-* | mipstx39-unknown-*)
+  mips-tx39-*|mipstx39-unknown-*)
     gc_cflags="${gc_cflags} -G 0"
+    ;;
+  *)
     ;;
 esac
 
@@ -101,8 +103,8 @@ AS_IF([test "${emscripten}" = yes -a "${enable_emscripten_asyncify}" = yes],
       [gc_cflags="${gc_cflags} -DEMSCRIPTEN_ASYNCIFY"
        gc_cflags="${gc_cflags} -sASYNCIFY -sASYNCIFY_STACK_SIZE=128000"])
 
-GC_CFLAGS=${gc_cflags}
-AC_SUBST(GC_CFLAGS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_CFLAGS=${gc_cflags}
+AC_SUBST(MANAGED_STACK_ADDRESS_BOEHM_GC_CFLAGS)
 
 dnl Extra user-defined flags to pass both to C and C++ compilers.
 AC_SUBST([CFLAGS_EXTRA])
@@ -110,7 +112,7 @@ AC_SUBST([CFLAGS_EXTRA])
 AC_ARG_ENABLE(threads,
   [AS_HELP_STRING([--enable-threads=TYPE], [choose threading package])],
   THREADS=$enableval,
-   [AC_MSG_CHECKING([for thread model used by GCC])
+  [ AC_MSG_CHECKING([for thread model used by GCC])
     THREADS=`$CC -v 2>&1 | sed -n 's/^Thread model: //p'`
     if test -z "$THREADS" -o "x$emscripten" = "xyes"; then
       THREADS=no
@@ -123,7 +125,7 @@ AC_ARG_ENABLE(threads,
           ;;
       esac
     fi
-    AC_MSG_RESULT([$THREADS])])
+    AC_MSG_RESULT([$THREADS]) ])
 
 AC_ARG_ENABLE(parallel-mark,
     [AS_HELP_STRING([--disable-parallel-mark],
@@ -134,7 +136,8 @@ AC_ARG_ENABLE(parallel-mark,
           AC_MSG_ERROR([Parallel mark requires --enable-threads=x spec])
         fi
         ;;
-     esac])
+     esac]
+)
 
 AC_ARG_ENABLE(thread-local-alloc,
     [AS_HELP_STRING([--disable-thread-local-alloc],
@@ -152,7 +155,7 @@ AC_ARG_ENABLE(threads-discovery,
     [AS_HELP_STRING([--disable-threads-discovery],
                     [disable threads discovery in GC])])
 if test "${enable_threads_discovery}" = no; then
-    AC_DEFINE([GC_NO_THREADS_DISCOVERY], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY], 1,
               [Disable threads discovery in GC.])
 fi
 
@@ -167,8 +170,8 @@ AH_TEMPLATE([USE_COMPILER_TLS],
             [Define to use of compiler-support for thread-local variables.])
 
 dnl Thread selection macros.
-AH_TEMPLATE([GC_THREADS], [Define to support platform-specific threads.])
-AH_TEMPLATE([GC_WIN32_PTHREADS],
+AH_TEMPLATE([MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS], [Define to support platform-specific threads.])
+AH_TEMPLATE([MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS],
                 [Define to support pthreads-win32 or winpthreads.])
 
 dnl System header feature requests.
@@ -180,7 +183,7 @@ AH_TEMPLATE([UNICODE],
         [Use Unicode (W) variant of Win32 API instead of ASCII (A) one.])
 
 dnl GC API symbols export control.
-AH_TEMPLATE([GC_DLL],
+AH_TEMPLATE([MANAGED_STACK_ADDRESS_BOEHM_GC_DLL],
         [Define to build dynamic libraries with only API symbols exposed.])
 
 dnl Check for a flavor of supported inline keyword.
@@ -209,13 +212,13 @@ case "$THREADS" in
       *-*-freebsd* | *-*-haiku* | *-*-hpux11* | *-*-irix* | \
       *-*-kfreebsd*-gnu | *-*-gnu* | *-*-*linux* | *-*-msys* | *-*-nacl* | \
       *-*-netbsd* | *-*-openbsd* | *-*-osf* | *-*-solaris*)
-        AC_DEFINE(GC_THREADS)
+        AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
         AC_DEFINE([_REENTRANT], [1],
                   [Required define if using POSIX threads.])
         use_parallel_mark=$enable_parallel_mark
         use_thread_local_alloc=$enable_thread_local_alloc
         default_threadlibs=true
-        AC_MSG_WARN("Explicit GC_INIT() calls may be required.")
+        AC_MSG_WARN("Explicit MANAGED_STACK_ADDRESS_BOEHM_GC_INIT() calls may be required.")
         ;;
     esac
     AC_CHECK_LIB(pthread, pthread_self, THREADDLLIBS="-lpthread",,)
@@ -258,7 +261,7 @@ case "$THREADS" in
         win32_threads=true
         ;;
       *-*-mingw*)
-        AC_DEFINE(GC_WIN32_PTHREADS)
+        AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS)
         # Using pthreads-win32 (or other non-Cygwin pthreads) library.
         THREADDLLIBS="-lpthread"
         use_parallel_mark=$enable_parallel_mark
@@ -275,8 +278,8 @@ case "$THREADS" in
         ;;
       *)
         AS_IF([test x$default_threadlibs != xtrue],
-              [AC_MSG_ERROR(
-                    [Pthreads not supported by the GC on this platform])])
+              [ AC_MSG_ERROR(
+                    [Pthreads not supported by the GC on this platform]) ])
         # The default THREADDLLIBS.
         ;;
     esac
@@ -289,15 +292,15 @@ case "$THREADS" in
     esac
     ;;
   mcf | win32)
-    AC_DEFINE(GC_THREADS)
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
     use_parallel_mark=$enable_parallel_mark
     if test "${enable_parallel_mark}" != no \
             -o "${enable_shared}" != yes -o "${enable_static}" != no; then
-      # Imply THREAD_LOCAL_ALLOC unless GC_DLL.
+      # Imply THREAD_LOCAL_ALLOC unless MANAGED_STACK_ADDRESS_BOEHM_GC_DLL.
       use_thread_local_alloc=$enable_thread_local_alloc
     fi
     if test "${enable_win32_dllmain}" = yes; then
-      AC_DEFINE(GC_INSIDE_DLL, 1,
+      AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_INSIDE_DLL, 1,
                 [Enable Win32 DllMain-based approach of threads registering.])
     fi
     win32_threads=true
@@ -305,25 +308,25 @@ case "$THREADS" in
               [Wine getenv may not return NULL for missing entry.])
     ;;
   dgux386)
-    AC_DEFINE(GC_THREADS)
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
     # Use pthread GCC switch
     THREADDLLIBS=-pthread
     use_parallel_mark=$enable_parallel_mark
     use_thread_local_alloc=$enable_thread_local_alloc
-    AC_MSG_WARN("Explicit GC_INIT() calls may be required.")
+    AC_MSG_WARN("Explicit MANAGED_STACK_ADDRESS_BOEHM_GC_INIT() calls may be required.")
     AM_CFLAGS="-pthread $AM_CFLAGS"
     ;;
   aix)
     THREADS=posix
     THREADDLLIBS=-lpthread
-    AC_DEFINE(GC_THREADS)
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
     AC_DEFINE(_REENTRANT)
     use_parallel_mark=$enable_parallel_mark
     use_thread_local_alloc=$enable_thread_local_alloc
     ;;
   rtems)
     THREADS=posix
-    AC_DEFINE(GC_THREADS)
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
     use_parallel_mark=$enable_parallel_mark
     use_thread_local_alloc=$enable_thread_local_alloc
     ;;
@@ -374,7 +377,7 @@ case "$host" in
     ;;
   *-*-wince*)
     if test "$enable_gc_debug" != "no"; then
-      AC_DEFINE([GC_READ_ENV_FILE], 1,
+      AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_READ_ENV_FILE], 1,
                 [Read environment variables from the GC 'env' file.])
     fi
     ;;
@@ -451,7 +454,7 @@ fi
 
 # Check for getcontext (uClibc can be configured without it, for example)
 AC_CHECK_FUNC([getcontext], [],
-    [AC_DEFINE([NO_GETCONTEXT], [1], [Missing getcontext function.])])
+    [ AC_DEFINE([NO_GETCONTEXT], [1], [Missing getcontext function.]) ])
 
 # Check whether dl_iterate_phdr exists (as a strong symbol).
 case "$host" in
@@ -476,17 +479,18 @@ case "$host" in
     ;;
 esac
 
-avoid_cpp_lib=no
 case "$host" in
   *-*-hpux*)
-    avoid_cpp_lib=yes
+    avoid_cpp_lib=yes;;
+  *)
+    avoid_cpp_lib=no;
     ;;
 esac
 AM_CONDITIONAL(AVOID_CPP_LIB,test $avoid_cpp_lib = yes)
 
 # Check for various headers.
 AC_CHECK_HEADER([execinfo.h], [],
-    [AC_DEFINE([GC_MISSING_EXECINFO_H], [1], [Missing execinfo.h header.])])
+    [ AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_MISSING_EXECINFO_H], [1], [Missing execinfo.h header.]) ])
 
 # extra LD Flags which are required for targets
 case "${host}" in
@@ -506,9 +510,10 @@ dnl I/O routines.
 dnl FIXME: this should not be a local option but a global target
 dnl system; at present there is no eCos target.
 TARGET_ECOS="no"
-AC_ARG_WITH([ecos],
-    [AS_HELP_STRING([--with-ecos], [enable runtime eCos target support])],
-    [TARGET_ECOS="$with_ecos"])
+AC_ARG_WITH(ecos,
+[  --with-ecos             enable runtime eCos target support],
+TARGET_ECOS="$with_ecos"
+)
 
 addobjs=
 addlibs=
@@ -516,12 +521,12 @@ CXXLIBS=
 
 case "$TARGET_ECOS" in
   no)
-    ;;
+      ;;
   *)
-    AC_DEFINE([ECOS], 1, [Define to enable eCos target support.])
-    AM_CPPFLAGS="-I${TARGET_ECOS}/include $AM_CPPFLAGS"
-    addobjs="$addobjs ecos.lo"
-    ;;
+      AC_DEFINE([ECOS], 1, [Define to enable eCos target support.])
+      AM_CPPFLAGS="-I${TARGET_ECOS}/include $AM_CPPFLAGS"
+      addobjs="$addobjs ecos.lo"
+      ;;
 esac
 
 AM_CONDITIONAL(CPLUSPLUS, test "${enable_cplusplus}" = yes)
@@ -529,7 +534,7 @@ AM_CONDITIONAL(CPLUSPLUS, test "${enable_cplusplus}" = yes)
 AC_ARG_ENABLE(throw-bad-alloc-library,
     [AS_HELP_STRING([--disable-throw-bad-alloc-library],
                     [do not build C++ gctba library])])
-AM_CONDITIONAL(GC_TBA_LIBRARY,
+AM_CONDITIONAL(MANAGED_STACK_ADDRESS_BOEHM_GC_TBA_LIBRARY,
                test "${enable_cplusplus}" = yes \
                     -a "${enable_throw_bad_alloc_library}" != no)
 
@@ -562,15 +567,17 @@ AC_ENABLE_SHARED
 
 case "$host" in
   alpha-*-openbsd*)
-    enable_shared=no
-    ;;
+     enable_shared=no
+     ;;
+  *)
+     ;;
 esac
 
 AC_MSG_RESULT($enable_shared)
 
-# Compile with GC_DLL defined unless building static libraries.
+# Compile with MANAGED_STACK_ADDRESS_BOEHM_GC_DLL defined unless building static libraries.
 if test "${enable_shared}" != no -a "${enable_static}" != yes; then
-    AC_DEFINE(GC_DLL)
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_DLL)
     if test "$GCC" = yes; then
       # Pass -fvisibility=hidden option if supported
       AC_MSG_CHECKING([whether compiler supports -fvisibility])
@@ -580,8 +587,8 @@ if test "${enable_shared}" != no -a "${enable_static}" != yes; then
                 [ac_cv_fvisibility_hidden=yes], [ac_cv_fvisibility_hidden=no])
       CFLAGS="$old_CFLAGS"
       AS_IF([test "$ac_cv_fvisibility_hidden" = yes],
-            [CFLAGS="-DGC_VISIBILITY_HIDDEN_SET -fvisibility=hidden $CFLAGS"],
-            [CFLAGS="-DGC_NO_VISIBILITY $CFLAGS"])
+            [CFLAGS="-DMANAGED_STACK_ADDRESS_BOEHM_GC_VISIBILITY_HIDDEN_SET -fvisibility=hidden $CFLAGS"],
+            [CFLAGS="-DMANAGED_STACK_ADDRESS_BOEHM_GC_NO_VISIBILITY $CFLAGS"])
       AC_MSG_RESULT($ac_cv_fvisibility_hidden)
     fi
 else
@@ -594,7 +601,7 @@ else
       # Use inline version of GC new and delete operators in cpptest
       # otherwise the system ones might be used instead because of arbitrary
       # ordering of object files when linking.
-      CXXFLAGS="$CXXFLAGS -DGC_NOT_DLL"
+      CXXFLAGS="$CXXFLAGS -DMANAGED_STACK_ADDRESS_BOEHM_GC_NOT_DLL"
       ;;
   esac
 fi
@@ -660,12 +667,11 @@ if test x$compile_asm = xtrue -a "$GCC" = yes; then
 fi
 
 dnl We use these options to decide which functions to include.
-AC_ARG_WITH([target-subdir],
-    [AS_HELP_STRING([--with-target-subdir=SUBDIR],
-                    [configuring target with a cross compiler])])
-AC_ARG_WITH([cross-host],
-    [AS_HELP_STRING([--with-cross-host=HOST],
-                    [configuring host with a cross compiler])])
+AC_ARG_WITH(target-subdir,
+[  --with-target-subdir=SUBDIR
+                          configuring with a cross compiler])
+AC_ARG_WITH(cross-host,
+[  --with-cross-host=HOST  configuring with a cross compiler])
 
 dnl automake wants to see AC_EXEEXT.  But we don't need it.  And having
 dnl it is actually a problem, because the compiler we're passed can't
@@ -693,7 +699,7 @@ case "$host" in
           *)
             new_CFLAGS="$new_CFLAGS $i"
             ;;
-        esac
+         esac
       done
       CFLAGS="$new_CFLAGS"
     else
@@ -722,18 +728,18 @@ dnl By default, make the library as general as possible.
 AC_ARG_ENABLE(gcj-support,
     [AS_HELP_STRING([--disable-gcj-support], [disable support for gcj])])
 if test x"$enable_gcj_support" != xno; then
-    AC_DEFINE(GC_GCJ_SUPPORT, 1, [Define to include support for gcj.])
+    AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT, 1, [Define to include support for gcj.])
     case "$host" in
       *-*-kfreebsd*-gnu)
         # FIXME: For a reason, gctest hangs up on kFreeBSD if both of
-        # THREAD_LOCAL_ALLOC and GC_ENABLE_SUSPEND_THREAD are defined.
+        # THREAD_LOCAL_ALLOC and MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD are defined.
         if test "${enable_thread_local_alloc}" = no; then
-          AC_DEFINE(GC_ENABLE_SUSPEND_THREAD)
+          AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD)
         fi
         ;;
       *)
-        AC_DEFINE([GC_ENABLE_SUSPEND_THREAD], 1,
-              [Define to turn on GC_suspend_thread support (Linux only).])
+        AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD], 1,
+              [Define to turn on MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_thread support (Linux only).])
         ;;
     esac
 fi
@@ -744,7 +750,7 @@ AC_ARG_ENABLE(sigrt-signals,
     [AS_HELP_STRING([--enable-sigrt-signals],
         [force GC to use SIGRTMIN-based signals for thread suspend/resume])])
 if test x"${enable_sigrt_signals}" = xyes; then
-    AC_DEFINE([GC_USESIGRT_SIGNALS], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS], 1,
               [Force the GC to use signals based on SIGRTMIN+k.])
 fi
 
@@ -752,7 +758,7 @@ fi
 dnl Debugging
 dnl ---------
 
-AH_TEMPLATE([GC_HAVE_BUILTIN_BACKTRACE],
+AH_TEMPLATE([MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_BUILTIN_BACKTRACE],
             [Define if backtrace information is supported.])
 AH_TEMPLATE([MAKE_BACK_GRAPH],
             [Define to build the collector with the support of the
@@ -765,8 +771,8 @@ UNWINDLIBS=
 AC_ARG_ENABLE(gc-debug,
               [AS_HELP_STRING([--enable-gc-debug],
                     [include full support for pointer backtracing etc.])],
- [if test "$enable_gc_debug" = "yes"; then
-    AC_MSG_WARN("Should define GC_DEBUG and use debug alloc in clients.")
+[ if test "$enable_gc_debug" = "yes"; then
+    AC_MSG_WARN("Should define MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG and use debug alloc in clients.")
     AC_DEFINE([KEEP_BACK_PTRS], 1,
               [Define to save back-pointers in debugging headers.])
     keep_back_ptrs=true
@@ -775,29 +781,27 @@ AC_ARG_ENABLE(gc-debug,
     AH_TEMPLATE([SHORT_DBG_HDRS],
                 [Shorten the headers to minimize object size at the expense
                  of checking for writes past the end.])
+
     case $host in
-      ia64-*-linux*)
-        AC_CHECK_LIB(unwind, backtrace,
-           [AC_DEFINE(GC_HAVE_BUILTIN_BACKTRACE)
-            UNWINDLIBS=-lunwind
-            AC_MSG_WARN("Client code may need to link against libunwind.")])
-        ;;
-    esac
-    case $host in
-      i[3456]86-*-dgux* | *-*-*linux*)
+      ia64-*-linux* )
         AC_DEFINE(MAKE_BACK_GRAPH)
-        ;;
-    esac
-    case $host in
-      e2k-*-linux*)
-        # Some bug exists in backtrace().
-        ;;
-      *-*-*linux*)
+        AC_DEFINE(SAVE_CALL_COUNT, 8)
+        AC_CHECK_LIB(unwind, backtrace, [
+          AC_DEFINE(MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_BUILTIN_BACKTRACE)
+          UNWINDLIBS=-lunwind
+          AC_MSG_WARN("Client code may need to link against libunwind.")
+        ])
+      ;;
+      x86-*-linux* | i586-*-linux* | i686-*-linux* | x86_64-*-linux* )
+        AC_DEFINE(MAKE_BACK_GRAPH)
         AC_MSG_WARN("Client must not use -fomit-frame-pointer.")
         AC_DEFINE(SAVE_CALL_COUNT, 8)
-        ;;
-    esac
-  fi])
+      ;;
+      i[3456]86-*-dgux*)
+        AC_DEFINE(MAKE_BACK_GRAPH)
+      ;;
+    esac ]
+  fi)
 AM_CONDITIONAL([MAKE_BACK_GRAPH], [test x"$enable_gc_debug" = xyes])
 AM_CONDITIONAL([KEEP_BACK_PTRS], [test x"$keep_back_ptrs" = xtrue])
 
@@ -847,7 +851,7 @@ AS_IF([test "$THREADS" = posix],
 #           include <signal.h>
          ], [sigset_t t; (void)pthread_sigmask(SIG_BLOCK, 0, &t)])],
        [AC_MSG_RESULT(yes)
-        AC_DEFINE([GC_HAVE_PTHREAD_SIGMASK], [1],
+        AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_PTHREAD_SIGMASK], [1],
                   [Define to use 'pthread_sigmask' function if needed.])],
        [AC_MSG_RESULT(no)])
      CFLAGS="$old_CFLAGS"])])
@@ -860,18 +864,18 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <setjmp.h>],
                                 [sigjmp_buf t; sigsetjmp(t, 0)])],
   [AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)
-   AC_DEFINE([GC_NO_SIGSETJMP], [1], [Missing sigsetjmp function.])])
+   AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP], [1], [Missing sigsetjmp function.])])
 CFLAGS="$old_CFLAGS"
 
-# Build with GC_wcsdup() support if possible.
+# Build with MANAGED_STACK_ADDRESS_BOEHM_GC_wcsdup() support if possible.
 AC_MSG_CHECKING(for wcslen)
 old_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $CFLAGS_EXTRA"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <wchar.h>],
                                 [wchar_t ws[] = {0}; (void)wcslen(&ws)])],
   [AC_MSG_RESULT(yes)
-   AC_DEFINE([GC_REQUIRE_WCSDUP], [1],
-             [Define and export GC_wcsdup function.])],
+   AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP], [1],
+             [Define and export MANAGED_STACK_ADDRESS_BOEHM_GC_wcsdup function.])],
   [AC_MSG_RESULT(no)])
 CFLAGS="$old_CFLAGS"
 
@@ -948,7 +952,7 @@ AC_ARG_ENABLE(atomic-uncollectable,
     [AS_HELP_STRING([--disable-atomic-uncollectible],
                     [disable support for atomic uncollectible allocation])])
 if test x"$enable_atomic_uncollectible" != x"no"; then
-    AC_DEFINE([GC_ATOMIC_UNCOLLECTABLE], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE], 1,
         [Define to enable atomic uncollectible allocation.])
 fi
 
@@ -958,16 +962,16 @@ AC_ARG_ENABLE(redirect-malloc,
 
 if test "${enable_redirect_malloc}" = yes; then
     if test "${enable_gc_debug}" = yes; then
-        AC_DEFINE([REDIRECT_MALLOC], GC_debug_malloc_replacement,
+        AC_DEFINE([REDIRECT_MALLOC], MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_replacement,
                   [If defined, redirect malloc to this function.])
-        AC_DEFINE([REDIRECT_REALLOC], GC_debug_realloc_replacement,
-                  [If defined, redirect GC_realloc to this function.])
-        AC_DEFINE([REDIRECT_FREE], GC_debug_free,
+        AC_DEFINE([REDIRECT_REALLOC], MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc_replacement,
+                  [If defined, redirect MANAGED_STACK_ADDRESS_BOEHM_GC_realloc to this function.])
+        AC_DEFINE([REDIRECT_FREE], MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free,
                   [If defined, redirect free to this function.])
     else
-        AC_DEFINE(REDIRECT_MALLOC, GC_malloc)
+        AC_DEFINE(REDIRECT_MALLOC, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc)
     fi
-    AC_DEFINE([GC_USE_DLOPEN_WRAP], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_USE_DLOPEN_WRAP], 1,
               [Define to cause the collector to redefine malloc and
                intercepted pthread routines with their real names while using
                dlsym to refer to the original routines.])
@@ -982,14 +986,6 @@ if test x"$enable_disclaim" != xno; then
 fi
 AM_CONDITIONAL(ENABLE_DISCLAIM,
     [test x"$enable_disclaim" != xno])
-
-AC_ARG_ENABLE(dynamic-pointer-mask,
-    [AS_HELP_STRING([--enable-dynamic-pointer-mask],
-        [support pointer mask/shift set at runtime])])
-if test "${enable_dynamic_pointer_mask}" = yes; then
-    AC_DEFINE(DYNAMIC_POINTER_MASK, 1,
-              [Define to support pointer mask/shift set at runtime.])
-fi
 
 AC_ARG_ENABLE(large-config,
     [AS_HELP_STRING([--enable-large-config],
@@ -1011,7 +1007,7 @@ fi
 
 if test "$enable_gc_debug" = "no"; then
    AC_DEFINE([NO_DEBUGGING], 1,
-             [Disable debugging, like GC_dump and its callees.])
+             [Disable debugging, like MANAGED_STACK_ADDRESS_BOEHM_GC_dump and its callees.])
 fi
 
 AC_SUBST(UNWINDLIBS)
@@ -1020,7 +1016,7 @@ AC_ARG_ENABLE(gc-assertions,
     [AS_HELP_STRING([--enable-gc-assertions],
         [collector-internal assertion checking])])
 if test "${enable_gc_assertions}" = yes; then
-    AC_DEFINE([GC_ASSERTIONS], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS], 1,
               [Define to enable internal debug assertions.])
 fi
 
@@ -1069,7 +1065,7 @@ AC_ARG_ENABLE(register-main-static-data,
     [AS_HELP_STRING([--disable-register-main-static-data],
                     [skip the initial guess of data root sets])])
 if test "${enable_register_main_static_data}" = "no"; then
-    AC_DEFINE([GC_DONT_REGISTER_MAIN_STATIC_DATA], 1,
+    AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_REGISTER_MAIN_STATIC_DATA], 1,
               [Skip the initial guess of data root sets.])
 fi
 
@@ -1108,9 +1104,9 @@ AC_ARG_ENABLE(single-obj-compilation,
     [AS_HELP_STRING([--enable-single-obj-compilation],
                     [compile all libgc source files into single .o
                      (default: yes if static libraries are disabled)])],
-    [], [AS_IF([test x"$enable_static" = xno],
-               [enable_single_obj_compilation=yes])])
-AM_CONDITIONAL([SINGLE_GC_OBJ],
+    [], [ AS_IF([test x"$enable_static" = xno],
+                [enable_single_obj_compilation=yes]) ])
+AM_CONDITIONAL([SINGLE_MANAGED_STACK_ADDRESS_BOEHM_GC_OBJ],
                [test x"$enable_single_obj_compilation" = xyes])
 
 AC_ARG_ENABLE(gcov,
@@ -1143,14 +1139,14 @@ AC_ARG_WITH([libatomic-ops],
     [AS_HELP_STRING([--with-libatomic-ops[=yes|no|check|none]],
                     [use an external libatomic_ops? (default: check;
                      none: use compiler intrinsics or no thread support)])],
-    [], [AS_IF([test x"$THREADS" != xnone],
-               [with_libatomic_ops=check], [with_libatomic_ops=none])])
+    [], [ AS_IF([test x"$THREADS" != xnone],
+                [with_libatomic_ops=check], [with_libatomic_ops=none]) ])
 
 # Check whether compiler atomic intrinsics can be used.
 if test x"$with_libatomic_ops" = xcheck; then
   AC_MSG_CHECKING(for compiler intrinsics support)
   old_CFLAGS="$CFLAGS"
-  CFLAGS="$CFLAGS $CFLAGS_EXTRA -DGC_BUILTIN_ATOMIC"
+  CFLAGS="$CFLAGS $CFLAGS_EXTRA -DMANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC"
   CFLAGS="$CFLAGS -I${srcdir}/include -I${srcdir}"
   AC_RUN_IFELSE([AC_LANG_SOURCE([[#include "tests/atomicops.c"]])],
     [AC_MSG_RESULT(yes)
@@ -1164,50 +1160,50 @@ fi
 # First, check that libatomic_ops usage is not disabled explicitly.
 missing_libatomic_ops=false
 AS_IF([test x"$with_libatomic_ops" != xno -a x"$with_libatomic_ops" != xnone],
-  [missing_libatomic_ops=true])
+  [ missing_libatomic_ops=true ])
 
 dnl To avoid "syntax error near unexpected token ATOMIC_OPS" configure error
 dnl observed by some clients, the following 3 code lines are commented out:
 dnl
 dnl AS_IF([test x$missing_libatomic_ops = xtrue],
-dnl  [PKG_CHECK_MODULES([ATOMIC_OPS], [atomic_ops],
-dnl    [missing_libatomic_ops=false], [[]])])
+dnl  [ PKG_CHECK_MODULES([ATOMIC_OPS], [atomic_ops],
+dnl    [ missing_libatomic_ops=false ], [ [] ]) ])
 
 dnl Retry with AC_CHECK_HEADER if PKG_CHECK_MODULES failed.
 AS_IF([test x$missing_libatomic_ops = xtrue],
-      [AC_CHECK_HEADER([atomic_ops.h], [missing_libatomic_ops=false])])
+      [ AC_CHECK_HEADER([atomic_ops.h], [missing_libatomic_ops=false]) ])
 AS_IF([test x$missing_libatomic_ops = xtrue],
-      [AS_IF([test x"$with_libatomic_ops" != xcheck],
-             [AC_MSG_ERROR([An external libatomic_ops was not found])])
-        with_libatomic_ops=no])
+      [ AS_IF([test x"$with_libatomic_ops" != xcheck],
+              [ AC_MSG_ERROR([An external libatomic_ops was not found]) ])
+        with_libatomic_ops=no ])
 
 # If we have neither an external or an internal version, offer a useful hint
 # and exit.
 AS_IF([test x"$with_libatomic_ops" = xno \
             -a ! -e "$srcdir/libatomic_ops/src/atomic_ops.h"],
-  [AC_MSG_ERROR([libatomic_ops is required.  You can either install it on
-                 your system, or fetch and unpack a recent version into the
-                 source directory and link or rename it to libatomic_ops.])])
+  [ AC_MSG_ERROR([libatomic_ops is required.  You can either install it on
+                  your system, or fetch and unpack a recent version into the
+                  source directory and link or rename it to libatomic_ops.]) ])
 
 # Finally, emit the definitions for bundled or external AO.
 AC_MSG_CHECKING([which libatomic_ops to use])
 AS_IF([test x"$with_libatomic_ops" != xno],
-  [AS_IF([test x"$with_libatomic_ops" != xnone -a x"$THREADS" != xnone],
-         [AC_MSG_RESULT([external])
-          ATOMIC_OPS_LIBS="-latomic_ops"
-          AC_SUBST([ATOMIC_OPS_LIBS])],
-         [AC_MSG_RESULT([none])
-          AS_IF([test x"$THREADS" != xnone],
-                [AC_DEFINE([GC_BUILTIN_ATOMIC], [1],
-                           [Use GCC atomic intrinsics instead of
-                            libatomic_ops primitives.])])])
-    AO_TRYLINK_CFLAGS=""],
-  [AC_MSG_RESULT([internal])
-   AO_TRYLINK_CFLAGS="-I${srcdir}/libatomic_ops/src"
-   ATOMIC_OPS_CFLAGS='-I$(top_builddir)/libatomic_ops/src -I$(top_srcdir)/libatomic_ops/src'
-   ATOMIC_OPS_LIBS=""
-   AC_SUBST([ATOMIC_OPS_CFLAGS])
-   AC_CONFIG_SUBDIRS([libatomic_ops])
+  [ AS_IF([test x"$with_libatomic_ops" != xnone -a x"$THREADS" != xnone],
+          [ AC_MSG_RESULT([external])
+            ATOMIC_OPS_LIBS="-latomic_ops"
+            AC_SUBST([ATOMIC_OPS_LIBS]) ],
+          [ AC_MSG_RESULT([none])
+            AS_IF([test x"$THREADS" != xnone],
+                  [ AC_DEFINE([MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC], [1],
+                              [Use GCC atomic intrinsics instead of
+                               libatomic_ops primitives.]) ]) ])
+    AO_TRYLINK_CFLAGS="" ],
+  [ AC_MSG_RESULT([internal])
+    AO_TRYLINK_CFLAGS="-I${srcdir}/libatomic_ops/src"
+    ATOMIC_OPS_CFLAGS='-I$(top_builddir)/libatomic_ops/src -I$(top_srcdir)/libatomic_ops/src'
+    ATOMIC_OPS_LIBS=""
+    AC_SUBST([ATOMIC_OPS_CFLAGS])
+    AC_CONFIG_SUBDIRS([libatomic_ops])
   ])
 AM_CONDITIONAL([USE_INTERNAL_LIBATOMIC_OPS],
     [test x$with_libatomic_ops = xno -a x"$THREADS" != xnone])
@@ -1219,51 +1215,51 @@ AM_CONDITIONAL([NEED_ATOMIC_OPS_ASM],
 # binary file is not needed in case of absence of the emulation (except for
 # Solaris SPARC).
 AS_IF([test x$with_libatomic_ops != xnone -a x$need_atomic_ops_asm != xtrue],
-    [old_CFLAGS="$CFLAGS"
-     CFLAGS="$CFLAGS $AO_TRYLINK_CFLAGS $CFLAGS_EXTRA"
-     AC_MSG_CHECKING([for lock-free AO_or primitive])
-     AC_LINK_IFELSE([AC_LANG_PROGRAM([#include "atomic_ops.h"],
-                                     [AO_t x=0; AO_or(&x,1)])],
-       [AC_MSG_RESULT(yes)
-        AC_DEFINE([HAVE_LOCKFREE_AO_OR], [1],
-          [libatomic_ops AO_or primitive implementation is lock-free.])],
-       [AC_MSG_RESULT(no)])
-     AC_MSG_CHECKING([for lock-free AO load/store, test-and-set primitives])
-     AC_LINK_IFELSE([AC_LANG_PROGRAM([#include "atomic_ops.h"],
+    [ old_CFLAGS="$CFLAGS"
+      CFLAGS="$CFLAGS $AO_TRYLINK_CFLAGS $CFLAGS_EXTRA"
+      AC_MSG_CHECKING([for lock-free AO_or primitive])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([#include "atomic_ops.h"],
+                                      [AO_t x=0; AO_or(&x,1)])],
+        [ AC_MSG_RESULT(yes)
+          AC_DEFINE([HAVE_LOCKFREE_AO_OR], [1],
+            [libatomic_ops AO_or primitive implementation is lock-free.]) ],
+        [ AC_MSG_RESULT(no) ])
+      AC_MSG_CHECKING([for lock-free AO load/store, test-and-set primitives])
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([#include "atomic_ops.h"],
  [AO_t x=0;unsigned char c=0;AO_TS_t z=AO_TS_INITIALIZER;
   (void)AO_test_and_set_acquire(&z);AO_CLEAR(&z);AO_compiler_barrier();
   AO_store(&x,AO_load(&x)+1);AO_char_store(&c,AO_char_load(&c)+1);
   AO_store_release(&x,AO_load_acquire(&x)+1)])],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_RESULT(no)
-         use_thread_local_alloc=no
-         AC_DEFINE([BASE_ATOMIC_OPS_EMULATED], [1],
-                   [AO load, store and/or test-and-set primitives are
-                    implemented in libatomic_ops using locks.])])
+        [ AC_MSG_RESULT(yes) ],
+        [ AC_MSG_RESULT(no)
+          use_thread_local_alloc=no
+          AC_DEFINE([BASE_ATOMIC_OPS_EMULATED], [1],
+                    [AO load, store and/or test-and-set primitives are
+                     implemented in libatomic_ops using locks.]) ])
       AS_IF([test x$use_parallel_mark != xno],
-        [AC_MSG_CHECKING(
-            [for lock-free compare-and-swap and fetch-and-add primitives])
-         AC_LINK_IFELSE([AC_LANG_PROGRAM([
+        [ AC_MSG_CHECKING(
+                [for lock-free compare-and-swap and fetch-and-add primitives])
+          AC_LINK_IFELSE([AC_LANG_PROGRAM([
 #             define AO_REQUIRE_CAS
 #             include "atomic_ops.h"
             ],
  [AO_t x=0;(void)AO_fetch_and_add(&x,1);(void)AO_compare_and_swap(&x,1,2)])],
-                    [AC_MSG_RESULT(yes)],
-                    [AC_MSG_RESULT(no)
-                     use_parallel_mark=no ])])
-      CFLAGS="$old_CFLAGS"])
+                    [ AC_MSG_RESULT(yes) ],
+                    [ AC_MSG_RESULT(no)
+                      use_parallel_mark=no ]) ])
+      CFLAGS="$old_CFLAGS" ])
 
 AS_IF([test x$use_parallel_mark != xno],
-      [AC_DEFINE(PARALLEL_MARK)])
+      [ AC_DEFINE(PARALLEL_MARK) ])
 AS_IF([test x$use_thread_local_alloc != xno],
-      [AC_DEFINE(THREAD_LOCAL_ALLOC)])
+      [ AC_DEFINE(THREAD_LOCAL_ALLOC) ])
 AM_CONDITIONAL(THREAD_LOCAL_ALLOC, test x$use_thread_local_alloc != xno)
 
 AC_ARG_ENABLE(handle-fork,
     [AS_HELP_STRING([--enable-handle-fork[=yes|no|auto|manual]],
                     [attempt to ensure a usable collector after fork()
                      in multi-threaded programs (default: auto;
-                     manual: GC_atfork_prepare/parent/child should be
+                     manual: MANAGED_STACK_ADDRESS_BOEHM_GC_atfork_prepare/parent/child should be
                      called by the client)])])
 if test "${enable_handle_fork}" = yes; then
     AC_DEFINE(HANDLE_FORK, 1,
@@ -1292,10 +1288,10 @@ dnl -----------------
 AC_CONFIG_FILES([Makefile bdw-gc.pc])
 
 AC_CONFIG_COMMANDS([default],,
-   [srcdir="${srcdir}"
+  [ srcdir="${srcdir}"
     host=${host}
     CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
     CC="${CC}"
-    DEFS="$DEFS"])
+    DEFS="$DEFS" ])
 
 AC_OUTPUT

@@ -19,17 +19,17 @@
 /* file to avoid having to link against libdl.{a,so} if the client      */
 /* doesn't call dlopen.  Of course this fails if the collector is in    */
 /* a dynamic library. -HB                                               */
-#if defined(GC_PTHREADS) && !defined(GC_NO_DLOPEN)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_DLOPEN)
 
-#undef GC_MUST_RESTORE_REDEFINED_DLOPEN
-#if defined(dlopen) && !defined(GC_USE_LD_WRAP)
+#undef MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
+#if defined(dlopen) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USE_LD_WRAP)
   /* To support various threads pkgs, gc.h interposes on dlopen by      */
-  /* defining "dlopen" to be "GC_dlopen", which is implemented below.   */
-  /* However, both GC_FirstDLOpenedLinkMap() and GC_dlopen() use the    */
+  /* defining "dlopen" to be "MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen", which is implemented below.   */
+  /* However, both MANAGED_STACK_ADDRESS_BOEHM_GC_FirstDLOpenedLinkMap() and MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen() use the    */
   /* real system dlopen() in their implementation. We first remove      */
-  /* gc.h's dlopen definition and restore it later, after GC_dlopen().  */
+  /* gc.h's dlopen definition and restore it later, after MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen().  */
 # undef dlopen
-# define GC_MUST_RESTORE_REDEFINED_DLOPEN
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
 #endif
 
 /* Make sure we're not in the middle of a collection, and make sure we  */
@@ -44,31 +44,31 @@
   static void disable_gc_for_dlopen(void)
   {
     LOCK();
-    while (GC_incremental && GC_collection_in_progress()) {
+    while (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress()) {
       ENTER_GC();
-      GC_collect_a_little_inner(1000);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1000);
       EXIT_GC();
     }
-    ++GC_dont_gc;
+    ++MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc;
     UNLOCK();
   }
 #endif
 
 /* Redefine dlopen to guarantee mutual exclusion with           */
-/* GC_register_dynamic_libraries.  Should probably happen for   */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries.  Should probably happen for   */
 /* other operating systems, too.                                */
 
 /* This is similar to WRAP/REAL_FUNC() in pthread_support.c.    */
-#ifdef GC_USE_LD_WRAP
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_USE_LD_WRAP
 # define WRAP_DLFUNC(f) __wrap_##f
 # define REAL_DLFUNC(f) __real_##f
   void * REAL_DLFUNC(dlopen)(const char *, int);
 #else
-# define WRAP_DLFUNC(f) GC_##f
+# define WRAP_DLFUNC(f) MANAGED_STACK_ADDRESS_BOEHM_GC_##f
 # define REAL_DLFUNC(f) f
 #endif
 
-GC_API void * WRAP_DLFUNC(dlopen)(const char *path, int mode)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void * WRAP_DLFUNC(dlopen)(const char *path, int mode)
 {
   void * result;
 
@@ -79,23 +79,23 @@ GC_API void * WRAP_DLFUNC(dlopen)(const char *path, int mode)
 # endif
   result = REAL_DLFUNC(dlopen)(path, mode);
 # ifndef USE_PROC_FOR_LIBRARIES
-    GC_enable(); /* undoes disable_gc_for_dlopen */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_enable(); /* undoes disable_gc_for_dlopen */
 # endif
   return result;
 }
 
-#ifdef GC_USE_LD_WRAP
-  /* Define GC_ function as an alias for the plain one, which will be   */
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_USE_LD_WRAP
+  /* Define MANAGED_STACK_ADDRESS_BOEHM_GC_ function as an alias for the plain one, which will be   */
   /* intercepted.  This allows files which include gc.h, and hence      */
-  /* generate references to the GC_ symbol, to see the right symbol.    */
-  GC_API void *GC_dlopen(const char *path, int mode)
+  /* generate references to the MANAGED_STACK_ADDRESS_BOEHM_GC_ symbol, to see the right symbol.    */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void *MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen(const char *path, int mode)
   {
     return dlopen(path, mode);
   }
-#endif /* GC_USE_LD_WRAP */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_USE_LD_WRAP */
 
-#ifdef GC_MUST_RESTORE_REDEFINED_DLOPEN
-# define dlopen GC_dlopen
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_MUST_RESTORE_REDEFINED_DLOPEN
+# define dlopen MANAGED_STACK_ADDRESS_BOEHM_GC_dlopen
 #endif
 
-#endif  /* GC_PTHREADS && !GC_NO_DLOPEN */
+#endif  /* MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS && !MANAGED_STACK_ADDRESS_BOEHM_GC_NO_DLOPEN */

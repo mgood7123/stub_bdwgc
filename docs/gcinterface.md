@@ -2,9 +2,9 @@
 
 On many platforms, a single-threaded garbage collector library can be built
 to act as a plug-in `malloc` replacement. (Build it with
-`-DREDIRECT_MALLOC=GC_malloc -DIGNORE_FREE`.) This is often the best way to
+`-DREDIRECT_MALLOC=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc -DIGNORE_FREE`.) This is often the best way to
 deal with third-party libraries which leak or prematurely free objects.
-`-DREDIRECT_MALLOC=GC_malloc` is intended primarily as an easy way to adapt
+`-DREDIRECT_MALLOC=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` is intended primarily as an easy way to adapt
 old code, not for new development.
 
 New code should use the interface discussed below.
@@ -21,7 +21,7 @@ interface is described in `gc.h` file.
 Clients should include `gc.h` (i.e., not `gc_config_macros.h`,
 `gc_pthread_redirects.h`, `gc_version.h`). In the case of multi-threaded code,
 `gc.h` should be included after the threads header file, and after defining
-`GC_THREADS` macro. The header file `gc.h` must be included in files that use
+`MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS` macro. The header file `gc.h` must be included in files that use
 either GC or threads primitives, since threads primitives will be redefined
 to cooperate with the GC on many platforms.
 
@@ -31,17 +31,17 @@ pointed to by thread-local variables should also be pointed to by a globally
 visible data area, e.g. thread's stack. (This behavior is viewed as a bug, but
 as one that is exceedingly hard to fix without some `libc` hooks.)
 
-`void * GC_MALLOC(size_t _bytes_)` - Allocates and clears _bytes_
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(size_t _bytes_)` - Allocates and clears _bytes_
 of storage. Requires (amortized) time proportional to _bytes_. The resulting
 object will be automatically deallocated when unreferenced. References from
 objects allocated with the system malloc are usually not considered by the
-collector. (See `GC_MALLOC_UNCOLLECTABLE`, however. Building the collector
-with `-DREDIRECT_MALLOC=GC_malloc_uncollectable` is often a way around this.)
-`GC_MALLOC` is a macro which invokes `GC_malloc` by default or, if `GC_DEBUG`
+collector. (See `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_UNCOLLECTABLE`, however. Building the collector
+with `-DREDIRECT_MALLOC=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable` is often a way around this.)
+`MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` is a macro which invokes `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` by default or, if `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG`
 is defined before `gc.h` is included, a debugging version that checks
 occasionally for overwrite errors, and the like.
 
-`void * GC_MALLOC_ATOMIC(size_t _bytes_)` - Allocates _bytes_
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(size_t _bytes_)` - Allocates _bytes_
 of storage. Requires (amortized) time proportional to _bytes_. The resulting
 object will be automatically deallocated when unreferenced. The client
 promises that the resulting object will never contain any pointers. The memory
@@ -49,26 +49,26 @@ is not cleared. This is the preferred way to allocate strings, floating point
 arrays, bitmaps, etc. More precise information about pointer locations can be
 communicated to the collector using the interface in `gc_typed.h`.
 
-`void * GC_MALLOC_UNCOLLECTABLE(size_t _bytes_)` - Identical
-to `GC_MALLOC`, except that the resulting object is not automatically
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_UNCOLLECTABLE(size_t _bytes_)` - Identical
+to `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC`, except that the resulting object is not automatically
 deallocated. Unlike the system-provided `malloc`, the collector does scan the
 object for pointers to garbage-collectible memory, even if the block itself
 does not appear to be reachable. (Objects allocated in this way are
 effectively treated as roots by the collector.)
 
-`void * GC_REALLOC(void * _old_object_, size_t _new_bytes_)` - Allocates
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC(void * _old_object_, size_t _new_bytes_)` - Allocates
 a new object of the indicated size and copy the old object's content into the
 new object. The old object is reused in place if convenient. If the original
-object was allocated with `GC_MALLOC_ATOMIC`, the new object is subject to the
+object was allocated with `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC`, the new object is subject to the
 same constraints. If it was allocated as an uncollectible object, then the new
 object is uncollectible, and the old object (if different) is deallocated.
 
-`void GC_FREE(void * _object_)` - Explicitly deallocates an _object_.
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_FREE(void * _object_)` - Explicitly deallocates an _object_.
 Typically not useful for small collectible objects.
 
-`void * GC_MALLOC_IGNORE_OFF_PAGE(size_t _bytes_)` and
-`void * GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE(size_t _bytes_)` - Analogous
-to `GC_MALLOC` and `GC_MALLOC_ATOMIC`, respectively, except that the client
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_IGNORE_OFF_PAGE(size_t _bytes_)` and
+`void * MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE(size_t _bytes_)` - Analogous
+to `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` and `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC`, respectively, except that the client
 guarantees that as long as the resulting object is of use, a pointer
 is maintained to someplace inside the first heap block (hblk) of the object.
 This pointer should be declared volatile to avoid interference from compiler
@@ -76,33 +76,33 @@ optimizations. (Other nonvolatile pointers to the object may exist as well.)
 This is the preferred way to allocate objects that are likely to be
 more than 100 KB in size. It greatly reduces the risk that such objects will
 be accidentally retained when they are no longer needed. Thus space usage may
-be significantly reduced. Another way is `GC_set_all_interior_pointers(0)`
+be significantly reduced. Another way is `MANAGED_STACK_ADDRESS_BOEHM_GC_set_all_interior_pointers(0)`
 called at program start (this, however, is generally not suitable for C++ code
 because of multiple inheritance).
 
-`void GC_INIT()` - On some platforms, it is necessary to invoke this _from
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_INIT()` - On some platforms, it is necessary to invoke this _from
 the main executable_, _not from a dynamic library_, before the initial
 invocation of a GC routine. It is recommended that this be done in portable
 code, though we try to ensure that it expands to a no-op on as many platforms
 as possible.
 
-`void GC_gcollect(void)` - Explicitly forces a garbage collection.
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect(void)` - Explicitly forces a garbage collection.
 
-`void GC_enable_incremental(void)` - Causes the garbage collector
-to perform a small amount of work every few invocations of `GC_MALLOC` or the
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental(void)` - Causes the garbage collector
+to perform a small amount of work every few invocations of `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` or the
 like, instead of performing an entire collection at once. This is likely
 to increase total running time. It will improve response on a platform that
 has suitable support in the garbage collector (Linux and most Unix versions,
 Win32 if the collector was suitably built). On many platforms this interacts
 poorly with system calls that write to the garbage collected heap.
 
-`void GC_set_warn_proc(GC_warn_proc)` - Replaces the default procedure
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_set_warn_proc(MANAGED_STACK_ADDRESS_BOEHM_GC_warn_proc)` - Replaces the default procedure
 used by the collector to print warnings. The collector may otherwise
-write to `stderr`, most commonly because `GC_malloc` was used in a situation
-in which `GC_malloc_ignore_off_page` would have been more appropriate. See
+write to `stderr`, most commonly because `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` was used in a situation
+in which `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page` would have been more appropriate. See
 `gc.h` for details.
 
-`void GC_REGISTER_FINALIZER(...)` - Registers a function to be called when
+`void MANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_FINALIZER(...)` - Registers a function to be called when
 an object becomes inaccessible. This is often useful as a backup method for
 releasing system resources (e.g. closing files) when the object referencing
 them becomes inaccessible. It is not an acceptable method to perform actions
@@ -157,7 +157,7 @@ is referenced by pointers stored in one of
 
 Traceable objects are not necessarily reclaimed by the collector, but are
 scanned for pointers to collectible objects. They are usually allocated
-by `GC_MALLOC_UNCOLLECTABLE`, as described above, and through some interfaces
+by `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_UNCOLLECTABLE`, as described above, and through some interfaces
 described below.
 
 On most platforms, the collector may not trace correctly from in-flight
@@ -193,10 +193,10 @@ it safe to refer to collectible objects from the resulting memory.
 
 If the user includes `gc_cpp.h` but `::new` should not be overridden then
 `gctba` (in addition to the `gc`) library should be linked with to provide
-the definition of `GC_throw_bad_alloc` C++ function used by operator `new` of
-class `gc`. Alternatively, the client may define `GC_NEW_ABORTS_ON_OOM` macro
+the definition of `MANAGED_STACK_ADDRESS_BOEHM_GC_throw_bad_alloc` C++ function used by operator `new` of
+class `gc`. Alternatively, the client may define `MANAGED_STACK_ADDRESS_BOEHM_GC_NEW_ABORTS_ON_OOM` macro
 before include of `gc_cpp.h` (this instructs `::new` to issue an abort instead
-of throwing an exception), or may define `GC_INCLUDE_NEW` one before include
+of throwing an exception), or may define `MANAGED_STACK_ADDRESS_BOEHM_GC_INCLUDE_NEW` one before include
 of `gc_cpp.h` (however, this might not compile or work as expected on some
 platforms).
 
@@ -211,6 +211,6 @@ suitably, as is done by `gccpp`.
 Note that user-implemented small-block allocation often works poorly with
 an underlying garbage-collected large block allocator, since the collector has
 to view all objects accessible from the user's free list as reachable. This
-is likely to cause problems if `GC_MALLOC` is used with something like the
+is likely to cause problems if `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` is used with something like the
 original HP version of STL. This approach works well with the SGI versions
 of the STL only if the STL "malloc_alloc" allocator is used.

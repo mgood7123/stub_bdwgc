@@ -32,10 +32,10 @@
  * The implementation idea is due to A. Demers.
  */
 
-#ifndef GC_BACKPTR_H
-#define GC_BACKPTR_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_BACKPTR_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_BACKPTR_H
 
-#ifndef GC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_H
 # include "gc.h"
 #endif
 
@@ -44,14 +44,14 @@
 #endif
 
 typedef enum {
-    GC_UNREFERENCED,    /* No reference info available.         */
-    GC_NO_SPACE,        /* Dest not allocated with debug alloc. */
-    GC_REFD_FROM_ROOT,  /* Referenced directly by root *base_p. */
-    GC_REFD_FROM_REG,   /* Referenced from a register, i.e.     */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_UNREFERENCED,    /* No reference info available.         */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SPACE,        /* Dest not allocated with debug alloc. */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_ROOT,  /* Referenced directly by root *base_p. */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_REG,   /* Referenced from a register, i.e.     */
                         /* a root without an address.           */
-    GC_REFD_FROM_HEAP,  /* Referenced from another heap obj.    */
-    GC_FINALIZER_REFD   /* Finalizable and hence accessible.    */
-} GC_ref_kind;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_HEAP,  /* Referenced from another heap obj.    */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_FINALIZER_REFD   /* Finalizable and hence accessible.    */
+} MANAGED_STACK_ADDRESS_BOEHM_GC_ref_kind;
 
 /* Store information about the object referencing dest in *base_p   */
 /* and *offset_p.                                                   */
@@ -64,32 +64,32 @@ typedef enum {
 /* The allocation lock is not acquired by design (despite of        */
 /* the possibility of a race); anyway the function should not be    */
 /* used in production code.                                         */
-GC_API GC_ref_kind GC_CALL GC_get_back_ptr_info(void * /* dest */,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ref_kind MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_back_ptr_info(void * /* dest */,
                                 void ** /* base_p */, size_t * /* offset_p */)
-                                GC_ATTR_NONNULL(1);
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NONNULL(1);
 
 /* Generate a random heap address.  The resulting address is    */
 /* in the heap, but not necessarily inside a valid object.      */
 /* The caller should hold the allocation lock.                  */
-GC_API void * GC_CALL GC_generate_random_heap_address(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_heap_address(void);
 
 /* Generate a random address inside a valid marked heap object. */
 /* The caller should hold the allocation lock.                  */
-GC_API void * GC_CALL GC_generate_random_valid_address(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_valid_address(void);
 
 /* Force a garbage collection and generate a backtrace from a   */
 /* random heap address.                                         */
-/* This uses the GC logging mechanism (GC_printf) to produce    */
+/* This uses the GC logging mechanism (MANAGED_STACK_ADDRESS_BOEHM_GC_printf) to produce    */
 /* output.  It can often be called from a debugger.             */
-GC_API void GC_CALL GC_generate_random_backtrace(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace(void);
 
 /* Print a backtrace from a specific address.  Used by the      */
-/* above.  The client should call GC_gcollect() immediately     */
+/* above.  The client should call MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect() immediately     */
 /* before invocation.                                           */
-GC_API void GC_CALL GC_print_backtrace(void *) GC_ATTR_NONNULL(1);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_print_backtrace(void *) MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NONNULL(1);
 
 #ifdef __cplusplus
   } /* extern "C" */
 #endif
 
-#endif /* GC_BACKPTR_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_BACKPTR_H */

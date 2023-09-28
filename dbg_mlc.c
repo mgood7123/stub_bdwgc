@@ -28,16 +28,16 @@
   /* p is assumed to point to a legitimate object in our part     */
   /* of the heap.                                                 */
   /* This excludes the check as to whether the back pointer is    */
-  /* odd, which is added by the GC_HAS_DEBUG_INFO macro.          */
+  /* odd, which is added by the MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO macro.          */
   /* Note that if DBG_HDRS_ALL is set, uncollectible objects      */
   /* on free lists may not have debug information set.  Thus it's */
   /* not always safe to return TRUE (1), even if the client does  */
   /* its part.  Return -1 if the object with debug info has been  */
   /* marked as deallocated.                                       */
-  GC_INNER int GC_has_other_debug_info(ptr_t p)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(ptr_t p)
   {
     ptr_t body = (ptr_t)((oh *)p + 1);
-    word sz = GC_size(p);
+    word sz = MANAGED_STACK_ADDRESS_BOEHM_GC_size(p);
 
     if (HBLKPTR(p) != HBLKPTR((ptr_t)body)
         || sz < DEBUG_BYTES + EXTRA_BYTES) {
@@ -60,14 +60,14 @@
   /* Use a custom trivial random() implementation as the standard   */
   /* one might lead to crashes (if used from a multi-threaded code) */
   /* or to a compiler warning about the deterministic result.       */
-  static int GC_rand(void)
+  static int MANAGED_STACK_ADDRESS_BOEHM_GC_rand(void)
   {
-    static GC_RAND_STATE_T seed;
+    static MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T seed;
 
-    return GC_RAND_NEXT(&seed);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_NEXT(&seed);
   }
 
-# define RANDOM() (long)GC_rand()
+# define RANDOM() (long)MANAGED_STACK_ADDRESS_BOEHM_GC_rand()
 
   /* Store back pointer to source in dest, if that appears to be possible. */
   /* This is not completely safe, since we may mistakenly conclude that    */
@@ -75,9 +75,9 @@
   /* small, and this shouldn't be used in production code.                 */
   /* We assume that dest is the real base pointer.  Source will usually    */
   /* be a pointer to the interior of an object.                            */
-  GC_INNER void GC_store_back_pointer(ptr_t source, ptr_t dest)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_store_back_pointer(ptr_t source, ptr_t dest)
   {
-    if (GC_HAS_DEBUG_INFO(dest)) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(dest)) {
 #     ifdef PARALLEL_MARK
         AO_store((volatile AO_t *)&((oh *)dest)->oh_back_ptr,
                  (AO_t)HIDE_BACK_PTR(source));
@@ -87,29 +87,29 @@
     }
   }
 
-  GC_INNER void GC_marked_for_finalization(ptr_t dest)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_marked_for_finalization(ptr_t dest)
   {
-    GC_store_back_pointer(MARKED_FOR_FINALIZATION, dest);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_store_back_pointer(MARKED_FOR_FINALIZATION, dest);
   }
 
-  GC_API GC_ref_kind GC_CALL GC_get_back_ptr_info(void *dest, void **base_p,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ref_kind MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_back_ptr_info(void *dest, void **base_p,
                                                   size_t *offset_p)
   {
-    oh * hdr = (oh *)GC_base(dest);
+    oh * hdr = (oh *)MANAGED_STACK_ADDRESS_BOEHM_GC_base(dest);
     ptr_t bp;
     ptr_t bp_base;
 
 #   ifdef LINT2
       /* Explicitly instruct the code analysis tool that                */
-      /* GC_get_back_ptr_info is not expected to be called with an      */
+      /* MANAGED_STACK_ADDRESS_BOEHM_GC_get_back_ptr_info is not expected to be called with an      */
       /* incorrect "dest" value.                                        */
-      if (!hdr) ABORT("Invalid GC_get_back_ptr_info argument");
+      if (!hdr) ABORT("Invalid MANAGED_STACK_ADDRESS_BOEHM_GC_get_back_ptr_info argument");
 #   endif
-    if (!GC_HAS_DEBUG_INFO((ptr_t)hdr)) return GC_NO_SPACE;
-    bp = (ptr_t)GC_REVEAL_POINTER(hdr -> oh_back_ptr);
-    if (MARKED_FOR_FINALIZATION == bp) return GC_FINALIZER_REFD;
-    if (MARKED_FROM_REGISTER == bp) return GC_REFD_FROM_REG;
-    if (NOT_MARKED == bp) return GC_UNREFERENCED;
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO((ptr_t)hdr)) return MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SPACE;
+    bp = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_POINTER(hdr -> oh_back_ptr);
+    if (MARKED_FOR_FINALIZATION == bp) return MANAGED_STACK_ADDRESS_BOEHM_GC_FINALIZER_REFD;
+    if (MARKED_FROM_REGISTER == bp) return MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_REG;
+    if (NOT_MARKED == bp) return MANAGED_STACK_ADDRESS_BOEHM_GC_UNREFERENCED;
 #   if ALIGNMENT == 1
       /* Heuristically try to fix off-by-one errors we introduced by    */
       /* insisting on even addresses.                                   */
@@ -118,112 +118,112 @@
         ptr_t target = *(ptr_t *)bp;
         ptr_t alternate_target = *(ptr_t *)alternate_ptr;
 
-        if ((word)alternate_target > GC_least_real_heap_addr
-            && (word)alternate_target < GC_greatest_real_heap_addr
-            && ((word)target <= GC_least_real_heap_addr
-                || (word)target >= GC_greatest_real_heap_addr)) {
+        if ((word)alternate_target > MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr
+            && (word)alternate_target < MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr
+            && ((word)target <= MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr
+                || (word)target >= MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr)) {
             bp = alternate_ptr;
         }
       }
 #   endif
-    bp_base = (ptr_t)GC_base(bp);
+    bp_base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(bp);
     if (NULL == bp_base) {
       *base_p = bp;
       *offset_p = 0;
-      return GC_REFD_FROM_ROOT;
+      return MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_ROOT;
     } else {
-      if (GC_HAS_DEBUG_INFO(bp_base)) bp_base += sizeof(oh);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(bp_base)) bp_base += sizeof(oh);
       *base_p = bp_base;
       *offset_p = (size_t)(bp - bp_base);
-      return GC_REFD_FROM_HEAP;
+      return MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_HEAP;
     }
   }
 
   /* Generate a random heap address.            */
   /* The resulting address is in the heap, but  */
   /* not necessarily inside a valid object.     */
-  GC_API void * GC_CALL GC_generate_random_heap_address(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_heap_address(void)
   {
     size_t i;
     word heap_offset = (word)RANDOM();
 
-    if (GC_heapsize > (word)GC_RAND_MAX) {
-        heap_offset *= GC_RAND_MAX;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_MAX) {
+        heap_offset *= MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_MAX;
         heap_offset += (word)RANDOM();
     }
-    heap_offset %= GC_heapsize;
+    heap_offset %= MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize;
         /* This doesn't yield a uniform distribution, especially if     */
-        /* e.g. RAND_MAX is 1.5*GC_heapsize.  But for typical cases,    */
+        /* e.g. RAND_MAX is 1.5*MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize.  But for typical cases,    */
         /* it's not too bad.                                            */
 
     for (i = 0;; ++i) {
         size_t size;
 
-        if (i >= GC_n_heap_sects)
-          ABORT("GC_generate_random_heap_address: size inconsistency");
+        if (i >= MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects)
+          ABORT("MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_heap_address: size inconsistency");
 
-        size = GC_heap_sects[i].hs_bytes;
+        size = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes;
         if (heap_offset < size) {
             break;
         } else {
             heap_offset -= size;
         }
     }
-    return GC_heap_sects[i].hs_start + heap_offset;
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start + heap_offset;
   }
 
   /* Generate a random address inside a valid marked heap object. */
-  GC_API void * GC_CALL GC_generate_random_valid_address(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_valid_address(void)
   {
     ptr_t result;
     ptr_t base;
     do {
-      result = (ptr_t)GC_generate_random_heap_address();
-      base = (ptr_t)GC_base(result);
-    } while (NULL == base || !GC_is_marked(base));
+      result = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_heap_address();
+      base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(result);
+    } while (NULL == base || !MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(base));
     return result;
   }
 
   /* Print back trace for p */
-  GC_API void GC_CALL GC_print_backtrace(void *p)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_print_backtrace(void *p)
   {
     void *current = p;
     int i;
-    GC_ref_kind source;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ref_kind source;
     size_t offset;
     void *base;
 
-    GC_ASSERT(I_DONT_HOLD_LOCK());
-    GC_print_heap_obj((ptr_t)GC_base(current));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj((ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(current));
 
     for (i = 0; ; ++i) {
-      source = GC_get_back_ptr_info(current, &base, &offset);
-      if (GC_UNREFERENCED == source) {
-        GC_err_printf("Reference could not be found\n");
+      source = MANAGED_STACK_ADDRESS_BOEHM_GC_get_back_ptr_info(current, &base, &offset);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_UNREFERENCED == source) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Reference could not be found\n");
         goto out;
       }
-      if (GC_NO_SPACE == source) {
-        GC_err_printf("No debug info in object: Can't find reference\n");
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SPACE == source) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("No debug info in object: Can't find reference\n");
         goto out;
       }
-      GC_err_printf("Reachable via %d levels of pointers from ", i);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Reachable via %d levels of pointers from ", i);
       switch(source) {
-        case GC_REFD_FROM_ROOT:
-          GC_err_printf("root at %p\n\n", base);
+        case MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_ROOT:
+          MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("root at %p\n\n", base);
           goto out;
-        case GC_REFD_FROM_REG:
-          GC_err_printf("root in register\n\n");
+        case MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_REG:
+          MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("root in register\n\n");
           goto out;
-        case GC_FINALIZER_REFD:
-          GC_err_printf("list of finalizable objects\n\n");
+        case MANAGED_STACK_ADDRESS_BOEHM_GC_FINALIZER_REFD:
+          MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("list of finalizable objects\n\n");
           goto out;
-        case GC_REFD_FROM_HEAP:
-          GC_err_printf("offset %ld in object:\n", (long)offset);
-          /* Take GC_base(base) to get real base, i.e. header. */
-          GC_print_heap_obj((ptr_t)GC_base(base));
+        case MANAGED_STACK_ADDRESS_BOEHM_GC_REFD_FROM_HEAP:
+          MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("offset %ld in object:\n", (long)offset);
+          /* Take MANAGED_STACK_ADDRESS_BOEHM_GC_base(base) to get real base, i.e. header. */
+          MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj((ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(base));
           break;
         default:
-          GC_err_printf("INTERNAL ERROR: UNEXPECTED SOURCE!!!!\n");
+          MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("INTERNAL ERROR: UNEXPECTED SOURCE!!!!\n");
           goto out;
       }
       current = base;
@@ -231,23 +231,23 @@
     out:;
   }
 
-  GC_API void GC_CALL GC_generate_random_backtrace(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace(void)
   {
     void *current;
 
-    GC_ASSERT(I_DONT_HOLD_LOCK());
-    if (GC_try_to_collect(GC_never_stop_func) == 0) {
-      GC_err_printf("Cannot generate a backtrace: "
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect(MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func) == 0) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Cannot generate a backtrace: "
                     "garbage collection is disabled!\n");
       return;
     }
 
     /* Generate/print a backtrace from a random heap address.   */
     LOCK();
-    current = GC_generate_random_valid_address();
+    current = MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_valid_address();
     UNLOCK();
-    GC_printf("\n****Chosen address %p in object\n", current);
-    GC_print_backtrace(current);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\n****Chosen address %p in object\n", current);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_backtrace(current);
   }
 
 #endif /* KEEP_BACK_PTRS */
@@ -255,14 +255,14 @@
 # define CROSSES_HBLK(p, sz) \
         (((word)((p) + sizeof(oh) + (sz) - 1) ^ (word)(p)) >= HBLKSIZE)
 
-GC_INNER void *GC_store_debug_info_inner(void *p, word sz,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void *MANAGED_STACK_ADDRESS_BOEHM_GC_store_debug_info_inner(void *p, word sz,
                                          const char *string, int linenum)
 {
     word * result = (word *)((oh *)p + 1);
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_size(p) >= sizeof(oh) + sz);
-    GC_ASSERT(!(SMALL_OBJ(sz) && CROSSES_HBLK((ptr_t)p, sz)));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_size(p) >= sizeof(oh) + sz);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!(SMALL_OBJ(sz) && CROSSES_HBLK((ptr_t)p, sz)));
 #   ifdef KEEP_BACK_PTRS
       ((oh *)p) -> oh_back_ptr = HIDE_BACK_PTR(NOT_MARKED);
 #   endif
@@ -276,7 +276,7 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz,
 #   else
       ((oh *)p) -> oh_sz = sz;
       ((oh *)p) -> oh_sf = START_FLAG ^ (word)result;
-      ((word *)p)[BYTES_TO_WORDS(GC_size(p))-1] =
+      ((word *)p)[BYTES_TO_WORDS(MANAGED_STACK_ADDRESS_BOEHM_GC_size(p))-1] =
          result[SIMPLE_ROUNDED_UP_WORDS(sz)] = END_FLAG ^ (word)result;
 #   endif
     return result;
@@ -285,20 +285,20 @@ GC_INNER void *GC_store_debug_info_inner(void *p, word sz,
 /* Check the allocation is successful, store debugging info into p,     */
 /* start the debugging mode (if not yet), and return displaced pointer. */
 static void *store_debug_info(void *p, size_t lb,
-                              const char *fn, GC_EXTRA_PARAMS)
+                              const char *fn, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
     void *result;
 
     if (NULL == p) {
-        GC_err_printf("%s(%lu) returning NULL (%s:%d)\n",
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("%s(%lu) returning NULL (%s:%d)\n",
                       fn, (unsigned long)lb, s, i);
         return NULL;
     }
     LOCK();
-    if (!GC_debugging_started)
-        GC_start_debugging_inner();
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_start_debugging_inner();
     ADD_CALL_CHAIN(p, ra);
-    result = GC_store_debug_info_inner(p, (word)lb, s, i);
+    result = MANAGED_STACK_ADDRESS_BOEHM_GC_store_debug_info_inner(p, (word)lb, s, i);
     UNLOCK();
     return result;
 }
@@ -307,10 +307,10 @@ static void *store_debug_info(void *p, size_t lb,
   /* Check the object with debugging info at ohdr.      */
   /* Return NULL if it's OK.  Else return clobbered     */
   /* address.                                           */
-  STATIC ptr_t GC_check_annotated_obj(oh *ohdr)
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_check_annotated_obj(oh *ohdr)
   {
     ptr_t body = (ptr_t)(ohdr + 1);
-    word gc_sz = GC_size((ptr_t)ohdr);
+    word gc_sz = MANAGED_STACK_ADDRESS_BOEHM_GC_size((ptr_t)ohdr);
     if (ohdr -> oh_sz + DEBUG_BYTES > gc_sz) {
         return (ptr_t)(&(ohdr -> oh_sz));
     }
@@ -328,13 +328,13 @@ static void *store_debug_info(void *p, size_t lb,
   }
 #endif /* !SHORT_DBG_HDRS */
 
-STATIC GC_describe_type_fn GC_describe_type_fns[MAXOBJKINDS] = {0};
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fn MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fns[MAXOBJKINDS] = {0};
 
-GC_API void GC_CALL GC_register_describe_type_fn(int kind,
-                                                 GC_describe_type_fn fn)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_register_describe_type_fn(int kind,
+                                                 MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fn fn)
 {
-  GC_ASSERT((unsigned)kind < MAXOBJKINDS);
-  GC_describe_type_fns[kind] = fn;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((unsigned)kind < MAXOBJKINDS);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fns[kind] = fn;
 }
 
 #define GET_OH_LINENUM(ohdr) ((int)(ohdr)->oh_int)
@@ -349,31 +349,31 @@ GC_API void GC_CALL GC_register_describe_type_fn(int kind,
 
 /* Print a human-readable description of the object to stderr.          */
 /* p points to somewhere inside an object with the debugging info.      */
-STATIC void GC_print_obj(ptr_t p)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_print_obj(ptr_t p)
 {
-    oh * ohdr = (oh *)GC_base(p);
+    oh * ohdr = (oh *)MANAGED_STACK_ADDRESS_BOEHM_GC_base(p);
     ptr_t q;
     hdr * hhdr;
     int kind;
     const char *kind_str;
-    char buffer[GC_TYPE_DESCR_LEN + 1];
+    char buffer[MANAGED_STACK_ADDRESS_BOEHM_GC_TYPE_DESCR_LEN + 1];
 
-    GC_ASSERT(I_DONT_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
 #   ifdef LINT2
-      if (!ohdr) ABORT("Invalid GC_print_obj argument");
+      if (!ohdr) ABORT("Invalid MANAGED_STACK_ADDRESS_BOEHM_GC_print_obj argument");
 #   endif
 
     q = (ptr_t)(ohdr + 1);
     /* Print a type description for the object whose client-visible     */
     /* address is q.                                                    */
-    hhdr = GC_find_header(q);
+    hhdr = MANAGED_STACK_ADDRESS_BOEHM_GC_find_header(q);
     kind = hhdr -> hb_obj_kind;
-    if (0 != GC_describe_type_fns[kind] && GC_is_marked(ohdr)) {
+    if (0 != MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fns[kind] && MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(ohdr)) {
         /* This should preclude free list objects except with   */
         /* thread-local allocation.                             */
-        buffer[GC_TYPE_DESCR_LEN] = 0;
-        (GC_describe_type_fns[kind])(q, buffer);
-        GC_ASSERT(buffer[GC_TYPE_DESCR_LEN] == 0);
+        buffer[MANAGED_STACK_ADDRESS_BOEHM_GC_TYPE_DESCR_LEN] = 0;
+        (MANAGED_STACK_ADDRESS_BOEHM_GC_describe_type_fns[kind])(q, buffer);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(buffer[MANAGED_STACK_ADDRESS_BOEHM_GC_TYPE_DESCR_LEN] == 0);
         kind_str = buffer;
     } else {
         switch(kind) {
@@ -386,7 +386,7 @@ STATIC void GC_print_obj(ptr_t p)
           case UNCOLLECTABLE:
             kind_str = "UNCOLLECTABLE";
             break;
-#         ifdef GC_ATOMIC_UNCOLLECTABLE
+#         ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
             case AUNCOLLECTABLE:
               kind_str = "ATOMIC_UNCOLLECTABLE";
               break;
@@ -399,13 +399,13 @@ STATIC void GC_print_obj(ptr_t p)
     }
 
     if (NULL != kind_str) {
-        GC_err_printf("%p (%s:%d," IF_NOT_SHORTDBG_HDRS(" sz= %lu,") " %s)\n",
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("%p (%s:%d," IF_NOT_SHORTDBG_HDRS(" sz= %lu,") " %s)\n",
                       (void *)((ptr_t)ohdr + sizeof(oh)),
                       ohdr->oh_string, GET_OH_LINENUM(ohdr) /*, */
                       COMMA_IFNOT_SHORTDBG_HDRS((unsigned long)ohdr->oh_sz),
                       kind_str);
     } else {
-        GC_err_printf("%p (%s:%d," IF_NOT_SHORTDBG_HDRS(" sz= %lu,")
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("%p (%s:%d," IF_NOT_SHORTDBG_HDRS(" sz= %lu,")
                       " kind= %d, descr= 0x%lx)\n",
                       (void *)((ptr_t)ohdr + sizeof(oh)),
                       ohdr->oh_string, GET_OH_LINENUM(ohdr) /*, */
@@ -415,37 +415,37 @@ STATIC void GC_print_obj(ptr_t p)
     PRINT_CALL_CHAIN(ohdr);
 }
 
-STATIC void GC_debug_print_heap_obj_proc(ptr_t p)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_debug_print_heap_obj_proc(ptr_t p)
 {
-    GC_ASSERT(I_DONT_HOLD_LOCK());
-    if (GC_HAS_DEBUG_INFO(p)) {
-        GC_print_obj(p);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p)) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_print_obj(p);
     } else {
-        GC_default_print_heap_obj_proc(p);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_default_print_heap_obj_proc(p);
     }
 }
 
 #ifndef SHORT_DBG_HDRS
-  /* Use GC_err_printf and friends to print a description of the object */
+  /* Use MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf and friends to print a description of the object */
   /* whose client-visible address is p, and which was smashed at        */
   /* clobbered_addr.                                                    */
-  STATIC void GC_print_smashed_obj(const char *msg, void *p,
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_print_smashed_obj(const char *msg, void *p,
                                    ptr_t clobbered_addr)
   {
-    oh * ohdr = (oh *)GC_base(p);
+    oh * ohdr = (oh *)MANAGED_STACK_ADDRESS_BOEHM_GC_base(p);
 
-    GC_ASSERT(I_DONT_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
 #   ifdef LINT2
-      if (!ohdr) ABORT("Invalid GC_print_smashed_obj argument");
+      if (!ohdr) ABORT("Invalid MANAGED_STACK_ADDRESS_BOEHM_GC_print_smashed_obj argument");
 #   endif
     if ((word)clobbered_addr <= (word)(&ohdr->oh_sz)
         || ohdr -> oh_string == 0) {
-        GC_err_printf(
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf(
                 "%s %p in or near object at %p(<smashed>, appr. sz= %lu)\n",
                 msg, (void *)clobbered_addr, p,
-                (unsigned long)(GC_size((ptr_t)ohdr) - DEBUG_BYTES));
+                (unsigned long)(MANAGED_STACK_ADDRESS_BOEHM_GC_size((ptr_t)ohdr) - DEBUG_BYTES));
     } else {
-        GC_err_printf("%s %p in or near object at %p (%s:%d, sz= %lu)\n",
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("%s %p in or near object at %p (%s:%d, sz= %lu)\n",
                 msg, (void *)clobbered_addr, p,
                 (word)(ohdr -> oh_string) < HBLKSIZE ? "(smashed string)" :
                 ohdr -> oh_string[0] == '\0' ? "EMPTY(smashed?)" :
@@ -455,49 +455,49 @@ STATIC void GC_debug_print_heap_obj_proc(ptr_t p)
     }
   }
 
-  STATIC void GC_check_heap_proc (void);
-  STATIC void GC_print_all_smashed_proc (void);
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_proc (void);
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed_proc (void);
 #else
-  STATIC void GC_do_nothing(void) {}
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_do_nothing(void) {}
 #endif /* SHORT_DBG_HDRS */
 
-GC_INNER void GC_start_debugging_inner(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_debugging_inner(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 # ifndef SHORT_DBG_HDRS
-    GC_check_heap = GC_check_heap_proc;
-    GC_print_all_smashed = GC_print_all_smashed_proc;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap = MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_proc;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed = MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed_proc;
 # else
-    GC_check_heap = GC_do_nothing;
-    GC_print_all_smashed = GC_do_nothing;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap = MANAGED_STACK_ADDRESS_BOEHM_GC_do_nothing;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed = MANAGED_STACK_ADDRESS_BOEHM_GC_do_nothing;
 # endif
-  GC_print_heap_obj = GC_debug_print_heap_obj_proc;
-  GC_debugging_started = TRUE;
-  GC_register_displacement_inner((word)sizeof(oh));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj = MANAGED_STACK_ADDRESS_BOEHM_GC_debug_print_heap_obj_proc;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started = TRUE;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner((word)sizeof(oh));
 # if defined(CPPCHECK)
-    GC_noop1(GC_debug_header_size);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_noop1(MANAGED_STACK_ADDRESS_BOEHM_GC_debug_header_size);
 # endif
 }
 
-const size_t GC_debug_header_size = sizeof(oh);
+const size_t MANAGED_STACK_ADDRESS_BOEHM_GC_debug_header_size = sizeof(oh);
 
-GC_API size_t GC_CALL GC_get_debug_header_size(void) {
+MANAGED_STACK_ADDRESS_BOEHM_GC_API size_t MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_debug_header_size(void) {
   return sizeof(oh);
 }
 
-GC_API void GC_CALL GC_debug_register_displacement(size_t offset)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_displacement(size_t offset)
 {
   LOCK();
-  GC_register_displacement_inner(offset);
-  GC_register_displacement_inner((word)sizeof(oh) + offset);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner(offset);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_register_displacement_inner((word)sizeof(oh) + offset);
   UNLOCK();
 }
 
-#ifdef GC_ADD_CALLER
-# if defined(HAVE_DLADDR) && defined(GC_HAVE_RETURN_ADDR_PARENT)
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
+# if defined(HAVE_DLADDR) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_RETURN_ADDR_PARENT)
 #   include <dlfcn.h>
 
-    STATIC void GC_caller_func_offset(word ad, const char **symp, int *offp)
+    STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_caller_func_offset(word ad, const char **symp, int *offp)
     {
       Dl_info caller;
 
@@ -510,12 +510,12 @@ GC_API void GC_CALL GC_debug_register_displacement(size_t offset)
       }
     }
 # else
-#   define GC_caller_func_offset(ad, symp, offp) (void)(*(symp) = "unknown")
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_caller_func_offset(ad, symp, offp) (void)(*(symp) = "unknown")
 # endif
-#endif /* GC_ADD_CALLER */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER */
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc(size_t lb,
-                                                     GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(size_t lb,
+                                                     MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
     void * result;
 
@@ -524,46 +524,46 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc(size_t lb,
     /* later be successfully passed to free(). We always do the latter. */
 #   if defined(_FORTIFY_SOURCE) && !defined(__clang__)
       /* Workaround to avoid "exceeds maximum object size" gcc warning. */
-      result = GC_malloc(lb < GC_SIZE_MAX - DEBUG_BYTES ? lb + DEBUG_BYTES
-                                                        : GC_SIZE_MAX >> 1);
+      result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(lb < MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX - DEBUG_BYTES ? lb + DEBUG_BYTES
+                                                        : MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX >> 1);
 #   else
-      result = GC_malloc(SIZET_SAT_ADD(lb, DEBUG_BYTES));
+      result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(SIZET_SAT_ADD(lb, DEBUG_BYTES));
 #   endif
-#   ifdef GC_ADD_CALLER
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
       if (s == NULL) {
-        GC_caller_func_offset(ra, &s, &i);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_caller_func_offset(ra, &s, &i);
       }
 #   endif
-    return store_debug_info(result, lb, "GC_debug_malloc", OPT_RA s, i);
+    return store_debug_info(result, lb, "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc", OPT_RA s, i);
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL
-    GC_debug_malloc_ignore_off_page(size_t lb, GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+    MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_ignore_off_page(size_t lb, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
-    void * result = GC_malloc_ignore_off_page(SIZET_SAT_ADD(lb, DEBUG_BYTES));
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page(SIZET_SAT_ADD(lb, DEBUG_BYTES));
 
-    return store_debug_info(result, lb, "GC_debug_malloc_ignore_off_page",
+    return store_debug_info(result, lb, "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_ignore_off_page",
                             OPT_RA s, i);
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL
-    GC_debug_malloc_atomic_ignore_off_page(size_t lb, GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+    MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_ignore_off_page(size_t lb, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
-    void * result = GC_malloc_atomic_ignore_off_page(
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_ignore_off_page(
                                 SIZET_SAT_ADD(lb, DEBUG_BYTES));
 
     return store_debug_info(result, lb,
-                            "GC_debug_malloc_atomic_ignore_off_page",
+                            "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_ignore_off_page",
                             OPT_RA s, i);
 }
 
-STATIC void * GC_debug_generic_malloc(size_t lb, int k, GC_EXTRA_PARAMS)
+STATIC void * MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc(size_t lb, int k, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
-    void * result = GC_generic_malloc_aligned(SIZET_SAT_ADD(lb, DEBUG_BYTES),
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_aligned(SIZET_SAT_ADD(lb, DEBUG_BYTES),
                                               k, 0 /* flags */,
                                               0 /* align_m1 */);
 
-    return store_debug_info(result, lb, "GC_debug_generic_malloc",
+    return store_debug_info(result, lb, "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc",
                             OPT_RA s, i);
 }
 
@@ -571,78 +571,78 @@ STATIC void * GC_debug_generic_malloc(size_t lb, int k, GC_EXTRA_PARAMS)
   /* An allocation function for internal use.  Normally internally      */
   /* allocated objects do not have debug information.  But in this      */
   /* case, we need to make sure that all objects have debug headers.    */
-  GC_INNER void * GC_debug_generic_malloc_inner(size_t lb, int k,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc_inner(size_t lb, int k,
                                                 unsigned flags)
   {
     void * result;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    result = GC_generic_malloc_inner(SIZET_SAT_ADD(lb, DEBUG_BYTES), k, flags);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    result = MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner(SIZET_SAT_ADD(lb, DEBUG_BYTES), k, flags);
     if (NULL == result) {
-        GC_err_printf("GC internal allocation (%lu bytes) returning NULL\n",
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("GC internal allocation (%lu bytes) returning NULL\n",
                        (unsigned long) lb);
         return NULL;
     }
-    if (!GC_debugging_started) {
-        GC_start_debugging_inner();
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_start_debugging_inner();
     }
-    ADD_CALL_CHAIN(result, GC_RETURN_ADDR);
-    return GC_store_debug_info_inner(result, (word)lb, "INTERNAL", 0);
+    ADD_CALL_CHAIN(result, MANAGED_STACK_ADDRESS_BOEHM_GC_RETURN_ADDR);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_store_debug_info_inner(result, (word)lb, "INTERNAL", 0);
   }
 #endif /* DBG_HDRS_ALL */
 
 #ifndef CPPCHECK
-  GC_API void * GC_CALL GC_debug_malloc_stubborn(size_t lb, GC_EXTRA_PARAMS)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_stubborn(size_t lb, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
   {
-    return GC_debug_malloc(lb, OPT_RA s, i);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(lb, OPT_RA s, i);
   }
 
-  GC_API void GC_CALL GC_debug_change_stubborn(const void *p)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_change_stubborn(const void *p)
   {
     UNUSED_ARG(p);
   }
 #endif /* !CPPCHECK */
 
-GC_API void GC_CALL GC_debug_end_stubborn_change(const void *p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_end_stubborn_change(const void *p)
 {
-    const void * q = GC_base_C(p);
+    const void * q = MANAGED_STACK_ADDRESS_BOEHM_GC_base_C(p);
 
     if (NULL == q) {
-        ABORT_ARG1("GC_debug_end_stubborn_change: bad arg", ": %p", p);
+        ABORT_ARG1("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_end_stubborn_change: bad arg", ": %p", p);
     }
-    GC_end_stubborn_change(q);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_end_stubborn_change(q);
 }
 
-GC_API void GC_CALL GC_debug_ptr_store_and_dirty(void *p, const void *q)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_ptr_store_and_dirty(void *p, const void *q)
 {
-    *(void **)GC_is_visible(p) = GC_is_valid_displacement(
+    *(void **)MANAGED_STACK_ADDRESS_BOEHM_GC_is_visible(p) = MANAGED_STACK_ADDRESS_BOEHM_GC_is_valid_displacement(
                                         (/* no const */ void *)(word)q);
-    GC_debug_end_stubborn_change(p);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_debug_end_stubborn_change(p);
     REACHABLE_AFTER_DIRTY(q);
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc_atomic(size_t lb,
-                                                            GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(size_t lb,
+                                                            MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
-    void * result = GC_malloc_atomic(SIZET_SAT_ADD(lb, DEBUG_BYTES));
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic(SIZET_SAT_ADD(lb, DEBUG_BYTES));
 
-    return store_debug_info(result, lb, "GC_debug_malloc_atomic",
+    return store_debug_info(result, lb, "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic",
                             OPT_RA s, i);
 }
 
-GC_API GC_ATTR_MALLOC char * GC_CALL GC_debug_strdup(const char *str,
-                                                     GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC char * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_strdup(const char *str,
+                                                     MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
   char *copy;
   size_t lb;
   if (str == NULL) {
-    if (GC_find_leak)
-      GC_err_printf("strdup(NULL) behavior is undefined\n");
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("strdup(NULL) behavior is undefined\n");
     return NULL;
   }
 
   lb = strlen(str) + 1;
-  copy = (char *)GC_debug_malloc_atomic(lb, OPT_RA s, i);
+  copy = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(lb, OPT_RA s, i);
   if (copy == NULL) {
 #   ifndef MSWINCE
       errno = ENOMEM;
@@ -653,14 +653,14 @@ GC_API GC_ATTR_MALLOC char * GC_CALL GC_debug_strdup(const char *str,
   return copy;
 }
 
-GC_API GC_ATTR_MALLOC char * GC_CALL GC_debug_strndup(const char *str,
-                                                size_t size, GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC char * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_strndup(const char *str,
+                                                size_t size, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
   char *copy;
   size_t len = strlen(str); /* str is expected to be non-NULL  */
   if (len > size)
     len = size;
-  copy = (char *)GC_debug_malloc_atomic(len + 1, OPT_RA s, i);
+  copy = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(len + 1, OPT_RA s, i);
   if (copy == NULL) {
 #   ifndef MSWINCE
       errno = ENOMEM;
@@ -673,14 +673,14 @@ GC_API GC_ATTR_MALLOC char * GC_CALL GC_debug_strndup(const char *str,
   return copy;
 }
 
-#ifdef GC_REQUIRE_WCSDUP
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP
 # include <wchar.h> /* for wcslen() */
 
-  GC_API GC_ATTR_MALLOC wchar_t * GC_CALL GC_debug_wcsdup(const wchar_t *str,
-                                                          GC_EXTRA_PARAMS)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC wchar_t * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_wcsdup(const wchar_t *str,
+                                                          MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
   {
     size_t lb = (wcslen(str) + 1) * sizeof(wchar_t);
-    wchar_t *copy = (wchar_t *)GC_debug_malloc_atomic(lb, OPT_RA s, i);
+    wchar_t *copy = (wchar_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(lb, OPT_RA s, i);
     if (copy == NULL) {
 #     ifndef MSWINCE
         errno = ENOMEM;
@@ -690,36 +690,36 @@ GC_API GC_ATTR_MALLOC char * GC_CALL GC_debug_strndup(const char *str,
     BCOPY(str, copy, lb);
     return copy;
   }
-#endif /* GC_REQUIRE_WCSDUP */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP */
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc_uncollectable(size_t lb,
-                                                        GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_uncollectable(size_t lb,
+                                                        MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
-    void * result = GC_malloc_uncollectable(
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable(
                                 SIZET_SAT_ADD(lb, UNCOLLECTABLE_DEBUG_BYTES));
 
-    return store_debug_info(result, lb, "GC_debug_malloc_uncollectable",
+    return store_debug_info(result, lb, "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_uncollectable",
                             OPT_RA s, i);
 }
 
-#ifdef GC_ATOMIC_UNCOLLECTABLE
-  GC_API GC_ATTR_MALLOC void * GC_CALL
-        GC_debug_malloc_atomic_uncollectable(size_t lb, GC_EXTRA_PARAMS)
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+        MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_uncollectable(size_t lb, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
   {
-    void * result = GC_malloc_atomic_uncollectable(
+    void * result = MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_uncollectable(
                                 SIZET_SAT_ADD(lb, UNCOLLECTABLE_DEBUG_BYTES));
 
     return store_debug_info(result, lb,
-                            "GC_debug_malloc_atomic_uncollectable",
+                            "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_uncollectable",
                             OPT_RA s, i);
   }
-#endif /* GC_ATOMIC_UNCOLLECTABLE */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE */
 
-#ifndef GC_FREED_MEM_MARKER
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_FREED_MEM_MARKER
 # if CPP_WORDSZ == 32
-#   define GC_FREED_MEM_MARKER 0xdeadbeef
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_FREED_MEM_MARKER 0xdeadbeef
 # else
-#   define GC_FREED_MEM_MARKER GC_WORD_C(0xEFBEADDEdeadbeef)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_FREED_MEM_MARKER MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(0xEFBEADDEdeadbeef)
 # endif
 #endif
 
@@ -727,20 +727,20 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc_uncollectable(size_t lb,
 # include "private/gc_alloc_ptrs.h"
 #endif
 
-GC_API void GC_CALL GC_debug_free(void * p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free(void * p)
 {
     ptr_t base;
     if (0 == p) return;
 
-    base = (ptr_t)GC_base(p);
+    base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(p);
     if (NULL == base) {
 #     if defined(REDIRECT_MALLOC) \
-         && ((defined(NEED_CALLINFO) && defined(GC_HAVE_BUILTIN_BACKTRACE)) \
-             || defined(GC_LINUX_THREADS) || defined(GC_SOLARIS_THREADS) \
+         && ((defined(NEED_CALLINFO) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_BUILTIN_BACKTRACE)) \
+             || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS) \
              || defined(MSWIN32))
         /* In some cases, we should ignore objects that do not belong   */
-        /* to the GC heap.  See the comment in GC_free.                 */
-        if (!GC_is_heap_ptr(p)) return;
+        /* to the GC heap.  See the comment in MANAGED_STACK_ADDRESS_BOEHM_GC_free.                 */
+        if (!MANAGED_STACK_ADDRESS_BOEHM_GC_is_heap_ptr(p)) return;
 #     endif
       ABORT_ARG1("Invalid pointer passed to free()", ": %p", p);
     }
@@ -750,23 +750,23 @@ GC_API void GC_CALL GC_debug_free(void * p)
         /* or libdl.                                                    */
 #     endif
       /* TODO: Suppress the warning for objects allocated by            */
-      /* GC_memalign and friends (these ones do not have the debugging  */
+      /* MANAGED_STACK_ADDRESS_BOEHM_GC_memalign and friends (these ones do not have the debugging  */
       /* counterpart).                                                  */
-      GC_err_printf(
-               "GC_debug_free called on pointer %p w/o debugging info\n", p);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf(
+               "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free called on pointer %p w/o debugging info\n", p);
     } else {
 #     ifndef SHORT_DBG_HDRS
-        ptr_t clobbered = GC_check_annotated_obj((oh *)base);
-        word sz = GC_size(base);
+        ptr_t clobbered = MANAGED_STACK_ADDRESS_BOEHM_GC_check_annotated_obj((oh *)base);
+        word sz = MANAGED_STACK_ADDRESS_BOEHM_GC_size(base);
         if (clobbered != 0) {
-          GC_SET_HAVE_ERRORS(); /* no "release" barrier is needed */
+          MANAGED_STACK_ADDRESS_BOEHM_GC_SET_HAVE_ERRORS(); /* no "release" barrier is needed */
           if (((oh *)base) -> oh_sz == sz) {
-            GC_print_smashed_obj(
-                  "GC_debug_free: found previously deallocated (?) object at",
+            MANAGED_STACK_ADDRESS_BOEHM_GC_print_smashed_obj(
+                  "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free: found previously deallocated (?) object at",
                   p, clobbered);
             return; /* ignore double free */
           } else {
-            GC_print_smashed_obj("GC_debug_free: found smashed location at",
+            MANAGED_STACK_ADDRESS_BOEHM_GC_print_smashed_obj("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free: found smashed location at",
                                  p, clobbered);
           }
         }
@@ -774,137 +774,137 @@ GC_API void GC_CALL GC_debug_free(void * p)
         ((oh *)base) -> oh_sz = sz;
 #     endif /* !SHORT_DBG_HDRS */
     }
-    if (GC_find_leak
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak
 #       ifndef SHORT_DBG_HDRS
-          && ((word)p - (word)base != sizeof(oh) || !GC_findleak_delay_free)
+          && ((word)p - (word)base != sizeof(oh) || !MANAGED_STACK_ADDRESS_BOEHM_GC_findleak_delay_free)
 #       endif
         ) {
-      GC_free(base);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_free(base);
     } else {
       hdr * hhdr = HDR(p);
       if (hhdr -> hb_obj_kind == UNCOLLECTABLE
-#         ifdef GC_ATOMIC_UNCOLLECTABLE
+#         ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
             || hhdr -> hb_obj_kind == AUNCOLLECTABLE
 #         endif
           ) {
-        GC_free(base);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_free(base);
       } else {
         word i;
         word sz = hhdr -> hb_sz;
         word obj_sz = BYTES_TO_WORDS(sz - sizeof(oh));
 
         for (i = 0; i < obj_sz; ++i)
-          ((word *)p)[i] = GC_FREED_MEM_MARKER;
-        GC_ASSERT((word *)p + i == (word *)(base + sz));
+          ((word *)p)[i] = MANAGED_STACK_ADDRESS_BOEHM_GC_FREED_MEM_MARKER;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word *)p + i == (word *)(base + sz));
         /* Update the counter even though the real deallocation */
         /* is deferred.                                         */
         LOCK();
 #       ifdef LINT2
-          GC_incr_bytes_freed((size_t)sz);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_incr_bytes_freed((size_t)sz);
 #       else
-          GC_bytes_freed += sz;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_freed += sz;
 #       endif
         UNLOCK();
       }
-    } /* !GC_find_leak */
+    } /* !MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak */
 }
 
 #if defined(THREADS) && defined(DBG_HDRS_ALL)
   /* Used internally; we assume it's called correctly.    */
-  GC_INNER void GC_debug_free_inner(void * p)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free_inner(void * p)
   {
-    ptr_t base = (ptr_t)GC_base(p);
-    GC_ASSERT((word)p - (word)base == sizeof(oh));
+    ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(p);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)p - (word)base == sizeof(oh));
 #   ifdef LINT2
-      if (!base) ABORT("Invalid GC_debug_free_inner argument");
+      if (!base) ABORT("Invalid MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free_inner argument");
 #   endif
 #   ifndef SHORT_DBG_HDRS
       /* Invalidate size */
-      ((oh *)base) -> oh_sz = GC_size(base);
+      ((oh *)base) -> oh_sz = MANAGED_STACK_ADDRESS_BOEHM_GC_size(base);
 #   endif
-    GC_free_inner(base);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_free_inner(base);
   }
 #endif
 
-GC_API void * GC_CALL GC_debug_realloc(void * p, size_t lb, GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc(void * p, size_t lb, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
     void * base;
     void * result;
     hdr * hhdr;
 
     if (p == 0) {
-      return GC_debug_malloc(lb, OPT_RA s, i);
+      return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(lb, OPT_RA s, i);
     }
     if (0 == lb) /* and p != NULL */ {
-      GC_debug_free(p);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free(p);
       return NULL;
     }
 
-#   ifdef GC_ADD_CALLER
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
       if (s == NULL) {
-        GC_caller_func_offset(ra, &s, &i);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_caller_func_offset(ra, &s, &i);
       }
 #   endif
-    base = GC_base(p);
+    base = MANAGED_STACK_ADDRESS_BOEHM_GC_base(p);
     if (base == 0) {
         ABORT_ARG1("Invalid pointer passed to realloc()", ": %p", p);
     }
     if ((word)p - (word)base != sizeof(oh)) {
-        GC_err_printf(
-              "GC_debug_realloc called on pointer %p w/o debugging info\n", p);
-        return GC_realloc(p, lb);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf(
+              "MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc called on pointer %p w/o debugging info\n", p);
+        return MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(p, lb);
     }
     hhdr = HDR(base);
     switch (hhdr -> hb_obj_kind) {
       case NORMAL:
-        result = GC_debug_malloc(lb, OPT_RA s, i);
+        result = MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(lb, OPT_RA s, i);
         break;
       case PTRFREE:
-        result = GC_debug_malloc_atomic(lb, OPT_RA s, i);
+        result = MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(lb, OPT_RA s, i);
         break;
       case UNCOLLECTABLE:
-        result = GC_debug_malloc_uncollectable(lb, OPT_RA s, i);
+        result = MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_uncollectable(lb, OPT_RA s, i);
         break;
-#     ifdef GC_ATOMIC_UNCOLLECTABLE
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
         case AUNCOLLECTABLE:
-          result = GC_debug_malloc_atomic_uncollectable(lb, OPT_RA s, i);
+          result = MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_uncollectable(lb, OPT_RA s, i);
           break;
 #     endif
       default:
         result = NULL; /* initialized to prevent warning. */
-        ABORT_RET("GC_debug_realloc: encountered bad kind");
+        ABORT_RET("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc: encountered bad kind");
     }
 
     if (result != NULL) {
       size_t old_sz;
 #     ifdef SHORT_DBG_HDRS
-        old_sz = GC_size(base) - sizeof(oh);
+        old_sz = MANAGED_STACK_ADDRESS_BOEHM_GC_size(base) - sizeof(oh);
 #     else
         old_sz = ((oh *)base) -> oh_sz;
 #     endif
       if (old_sz > 0)
         BCOPY(p, result, old_sz < lb ? old_sz : lb);
-      GC_debug_free(p);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free(p);
     }
     return result;
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL
-    GC_debug_generic_or_special_malloc(size_t lb, int k, GC_EXTRA_PARAMS)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+    MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_or_special_malloc(size_t lb, int k, MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRA_PARAMS)
 {
     switch (k) {
         case PTRFREE:
-            return GC_debug_malloc_atomic(lb, OPT_RA s, i);
+            return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic(lb, OPT_RA s, i);
         case NORMAL:
-            return GC_debug_malloc(lb, OPT_RA s, i);
+            return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(lb, OPT_RA s, i);
         case UNCOLLECTABLE:
-            return GC_debug_malloc_uncollectable(lb, OPT_RA s, i);
-#     ifdef GC_ATOMIC_UNCOLLECTABLE
+            return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_uncollectable(lb, OPT_RA s, i);
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
         case AUNCOLLECTABLE:
-            return GC_debug_malloc_atomic_uncollectable(lb, OPT_RA s, i);
+            return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_atomic_uncollectable(lb, OPT_RA s, i);
 #     endif
         default:
-            return GC_debug_generic_malloc(lb, k, OPT_RA s, i);
+            return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_generic_malloc(lb, k, OPT_RA s, i);
     }
 }
 
@@ -912,50 +912,50 @@ GC_API GC_ATTR_MALLOC void * GC_CALL
 
 /* List of smashed (clobbered) locations.  We defer printing these,     */
 /* since we can't always print them nicely with the allocation lock     */
-/* held.  We put them here instead of in GC_arrays, since it may be     */
+/* held.  We put them here instead of in MANAGED_STACK_ADDRESS_BOEHM_GC_arrays, since it may be     */
 /* useful to be able to look at them with the debugger.                 */
 #ifndef MAX_SMASHED
 # define MAX_SMASHED 20
 #endif
-STATIC ptr_t GC_smashed[MAX_SMASHED] = {0};
-STATIC unsigned GC_n_smashed = 0;
+STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_smashed[MAX_SMASHED] = {0};
+STATIC unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed = 0;
 
-STATIC void GC_add_smashed(ptr_t smashed)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_add_smashed(ptr_t smashed)
 {
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_marked(GC_base(smashed)));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(MANAGED_STACK_ADDRESS_BOEHM_GC_base(smashed)));
     /* FIXME: Prevent adding an object while printing smashed list.     */
-    GC_smashed[GC_n_smashed] = smashed;
-    if (GC_n_smashed < MAX_SMASHED - 1) ++GC_n_smashed;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_smashed[MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed] = smashed;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed < MAX_SMASHED - 1) ++MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed;
       /* In case of overflow, we keep the first MAX_SMASHED-1   */
       /* entries plus the last one.                             */
-    GC_SET_HAVE_ERRORS();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_SET_HAVE_ERRORS();
 }
 
 /* Print all objects on the list.  Clear the list.      */
-STATIC void GC_print_all_smashed_proc(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed_proc(void)
 {
     unsigned i;
 
-    GC_ASSERT(I_DONT_HOLD_LOCK());
-    if (GC_n_smashed == 0) return;
-    GC_err_printf("GC_check_heap_block: found %u smashed heap objects:\n",
-                  GC_n_smashed);
-    for (i = 0; i < GC_n_smashed; ++i) {
-        ptr_t base = (ptr_t)GC_base(GC_smashed[i]);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK());
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed == 0) return;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_block: found %u smashed heap objects:\n",
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed);
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed; ++i) {
+        ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(MANAGED_STACK_ADDRESS_BOEHM_GC_smashed[i]);
 
 #       ifdef LINT2
-          if (!base) ABORT("Invalid GC_smashed element");
+          if (!base) ABORT("Invalid MANAGED_STACK_ADDRESS_BOEHM_GC_smashed element");
 #       endif
-        GC_print_smashed_obj("", base + sizeof(oh), GC_smashed[i]);
-        GC_smashed[i] = 0;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_print_smashed_obj("", base + sizeof(oh), MANAGED_STACK_ADDRESS_BOEHM_GC_smashed[i]);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_smashed[i] = 0;
     }
-    GC_n_smashed = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_smashed = 0;
 }
 
 /* Check all marked objects in the given block for validity     */
-/* Avoid GC_apply_to_each_object for performance reasons.       */
-STATIC void GC_CALLBACK GC_check_heap_block(struct hblk *hbp, GC_word dummy)
+/* Avoid MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_each_object for performance reasons.       */
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_block(struct hblk *hbp, MANAGED_STACK_ADDRESS_BOEHM_GC_word dummy)
 {
     struct hblkhdr * hhdr = HDR(hbp);
     word sz = hhdr -> hb_sz;
@@ -972,25 +972,25 @@ STATIC void GC_CALLBACK GC_check_heap_block(struct hblk *hbp, GC_word dummy)
     /* go through all words in block */
     for (bit_no = 0; (word)p <= (word)plim;
          bit_no += MARK_BIT_OFFSET(sz), p += sz) {
-      if (mark_bit_from_hdr(hhdr, bit_no) && GC_HAS_DEBUG_INFO((ptr_t)p)) {
-        ptr_t clobbered = GC_check_annotated_obj((oh *)p);
+      if (mark_bit_from_hdr(hhdr, bit_no) && MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO((ptr_t)p)) {
+        ptr_t clobbered = MANAGED_STACK_ADDRESS_BOEHM_GC_check_annotated_obj((oh *)p);
         if (clobbered != 0)
-          GC_add_smashed(clobbered);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_add_smashed(clobbered);
       }
     }
 }
 
 /* This assumes that all accessible objects are marked.         */
 /* Normally called by collector.                                */
-STATIC void GC_check_heap_proc(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_proc(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
-  GC_STATIC_ASSERT((sizeof(oh) & (GC_GRANULE_BYTES-1)) == 0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT((sizeof(oh) & (MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1)) == 0);
   /* FIXME: Should we check for twice that alignment?   */
-  GC_apply_to_all_blocks(GC_check_heap_block, 0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap_block, 0);
 }
 
-GC_INNER GC_bool GC_check_leaked(ptr_t base)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_check_leaked(ptr_t base)
 {
   word i;
   word obj_sz;
@@ -1000,38 +1000,38 @@ GC_INNER GC_bool GC_check_leaked(ptr_t base)
 #     if defined(KEEP_BACK_PTRS) || defined(MAKE_BACK_GRAPH)
         (*(word *)base & 1) != 0 &&
 #     endif
-      GC_has_other_debug_info(base) >= 0)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(base) >= 0)
     return TRUE; /* object has leaked */
 
   /* Validate freed object's content. */
   p = (word *)(base + sizeof(oh));
   obj_sz = BYTES_TO_WORDS(HDR(base)->hb_sz - sizeof(oh));
   for (i = 0; i < obj_sz; ++i)
-    if (p[i] != GC_FREED_MEM_MARKER) {
-        GC_set_mark_bit(base); /* do not reclaim it in this cycle */
-        GC_add_smashed((ptr_t)(&p[i])); /* alter-after-free detected */
+    if (p[i] != MANAGED_STACK_ADDRESS_BOEHM_GC_FREED_MEM_MARKER) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_set_mark_bit(base); /* do not reclaim it in this cycle */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_smashed((ptr_t)(&p[i])); /* alter-after-free detected */
         break; /* don't report any other smashed locations in the object */
     }
 
-  return FALSE; /* GC_debug_free() has been called */
+  return FALSE; /* MANAGED_STACK_ADDRESS_BOEHM_GC_debug_free() has been called */
 }
 
 #endif /* !SHORT_DBG_HDRS */
 
-#ifndef GC_NO_FINALIZATION
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
 
 struct closure {
-    GC_finalization_proc cl_fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc cl_fn;
     void * cl_data;
 };
 
-STATIC void * GC_make_closure(GC_finalization_proc fn, void * data)
+STATIC void * MANAGED_STACK_ADDRESS_BOEHM_GC_make_closure(MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc fn, void * data)
 {
     struct closure * result =
 #     ifdef DBG_HDRS_ALL
-        (struct closure *)GC_debug_malloc(sizeof(struct closure), GC_EXTRAS);
+        (struct closure *)MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(sizeof(struct closure), MANAGED_STACK_ADDRESS_BOEHM_GC_EXTRAS);
 #     else
-        (struct closure *)GC_malloc(sizeof(struct closure));
+        (struct closure *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct closure));
 #     endif
     if (result != NULL) {
       result -> cl_fn = fn;
@@ -1042,27 +1042,27 @@ STATIC void * GC_make_closure(GC_finalization_proc fn, void * data)
 
 /* An auxiliary fns to make finalization work correctly with displaced  */
 /* pointers introduced by the debugging allocators.                     */
-STATIC void GC_CALLBACK GC_debug_invoke_finalizer(void * obj, void * data)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer(void * obj, void * data)
 {
     struct closure * cl = (struct closure *) data;
     (*(cl -> cl_fn))((void *)((char *)obj + sizeof(oh)), cl -> cl_data);
 }
 
-/* Special finalizer_proc value to detect GC_register_finalizer() failure. */
-#define OFN_UNSET ((GC_finalization_proc)~(GC_funcptr_uint)0)
+/* Special finalizer_proc value to detect MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer() failure. */
+#define OFN_UNSET ((MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc)~(MANAGED_STACK_ADDRESS_BOEHM_GC_funcptr_uint)0)
 
 /* Set ofn and ocd to reflect the values we got back.   */
-static void store_old(void *obj, GC_finalization_proc my_old_fn,
-                      struct closure *my_old_cd, GC_finalization_proc *ofn,
+static void store_old(void *obj, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc my_old_fn,
+                      struct closure *my_old_cd, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc *ofn,
                       void **ocd)
 {
     if (0 != my_old_fn) {
       if (my_old_fn == OFN_UNSET) {
-        /* GC_register_finalizer() failed; (*ofn) and (*ocd) are unchanged. */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer() failed; (*ofn) and (*ocd) are unchanged. */
         return;
       }
-      if (my_old_fn != GC_debug_invoke_finalizer) {
-        GC_err_printf("Debuggable object at %p had a non-debug finalizer\n",
+      if (my_old_fn != MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Debuggable object at %p had a non-debug finalizer\n",
                       obj);
         /* This should probably be fatal. */
       } else {
@@ -1075,14 +1075,14 @@ static void store_old(void *obj, GC_finalization_proc my_old_fn,
     }
 }
 
-GC_API void GC_CALL GC_debug_register_finalizer(void * obj,
-                                        GC_finalization_proc fn,
-                                        void * cd, GC_finalization_proc *ofn,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer(void * obj,
+                                        MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc fn,
+                                        void * cd, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc *ofn,
                                         void * *ocd)
 {
-    GC_finalization_proc my_old_fn = OFN_UNSET;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc my_old_fn = OFN_UNSET;
     void * my_old_cd = NULL; /* to avoid "might be uninitialized" warning */
-    ptr_t base = (ptr_t)GC_base(obj);
+    ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(obj);
     if (NULL == base) {
         /* We won't collect it, hence finalizer wouldn't be run. */
         if (ocd) *ocd = 0;
@@ -1090,28 +1090,28 @@ GC_API void GC_CALL GC_debug_register_finalizer(void * obj,
         return;
     }
     if ((ptr_t)obj - base != sizeof(oh)) {
-        GC_err_printf("GC_debug_register_finalizer called with"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer called with"
                       " non-base-pointer %p\n", obj);
     }
     if (0 == fn) {
-      GC_register_finalizer(base, 0, 0, &my_old_fn, &my_old_cd);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer(base, 0, 0, &my_old_fn, &my_old_cd);
     } else {
-      cd = GC_make_closure(fn, cd);
+      cd = MANAGED_STACK_ADDRESS_BOEHM_GC_make_closure(fn, cd);
       if (cd == 0) return; /* out of memory; *ofn and *ocd are unchanged */
-      GC_register_finalizer(base, GC_debug_invoke_finalizer,
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer(base, MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer,
                             cd, &my_old_fn, &my_old_cd);
     }
     store_old(obj, my_old_fn, (struct closure *)my_old_cd, ofn, ocd);
 }
 
-GC_API void GC_CALL GC_debug_register_finalizer_no_order
-                                    (void * obj, GC_finalization_proc fn,
-                                     void * cd, GC_finalization_proc *ofn,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_no_order
+                                    (void * obj, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc fn,
+                                     void * cd, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc *ofn,
                                      void * *ocd)
 {
-    GC_finalization_proc my_old_fn = OFN_UNSET;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc my_old_fn = OFN_UNSET;
     void * my_old_cd = NULL;
-    ptr_t base = (ptr_t)GC_base(obj);
+    ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(obj);
     if (NULL == base) {
         /* We won't collect it, hence finalizer wouldn't be run. */
         if (ocd) *ocd = 0;
@@ -1119,28 +1119,28 @@ GC_API void GC_CALL GC_debug_register_finalizer_no_order
         return;
     }
     if ((ptr_t)obj - base != sizeof(oh)) {
-        GC_err_printf("GC_debug_register_finalizer_no_order called with"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_no_order called with"
                       " non-base-pointer %p\n", obj);
     }
     if (0 == fn) {
-      GC_register_finalizer_no_order(base, 0, 0, &my_old_fn, &my_old_cd);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_no_order(base, 0, 0, &my_old_fn, &my_old_cd);
     } else {
-      cd = GC_make_closure(fn, cd);
+      cd = MANAGED_STACK_ADDRESS_BOEHM_GC_make_closure(fn, cd);
       if (cd == 0) return; /* out of memory */
-      GC_register_finalizer_no_order(base, GC_debug_invoke_finalizer,
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_no_order(base, MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer,
                                      cd, &my_old_fn, &my_old_cd);
     }
     store_old(obj, my_old_fn, (struct closure *)my_old_cd, ofn, ocd);
 }
 
-GC_API void GC_CALL GC_debug_register_finalizer_unreachable
-                                    (void * obj, GC_finalization_proc fn,
-                                     void * cd, GC_finalization_proc *ofn,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_unreachable
+                                    (void * obj, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc fn,
+                                     void * cd, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc *ofn,
                                      void * *ocd)
 {
-    GC_finalization_proc my_old_fn = OFN_UNSET;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc my_old_fn = OFN_UNSET;
     void * my_old_cd = NULL;
-    ptr_t base = (ptr_t)GC_base(obj);
+    ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(obj);
     if (NULL == base) {
         /* We won't collect it, hence finalizer wouldn't be run. */
         if (ocd) *ocd = 0;
@@ -1148,28 +1148,28 @@ GC_API void GC_CALL GC_debug_register_finalizer_unreachable
         return;
     }
     if ((ptr_t)obj - base != sizeof(oh)) {
-        GC_err_printf("GC_debug_register_finalizer_unreachable called with"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_unreachable called with"
                       " non-base-pointer %p\n", obj);
     }
     if (0 == fn) {
-      GC_register_finalizer_unreachable(base, 0, 0, &my_old_fn, &my_old_cd);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_unreachable(base, 0, 0, &my_old_fn, &my_old_cd);
     } else {
-      cd = GC_make_closure(fn, cd);
+      cd = MANAGED_STACK_ADDRESS_BOEHM_GC_make_closure(fn, cd);
       if (cd == 0) return; /* out of memory */
-      GC_register_finalizer_unreachable(base, GC_debug_invoke_finalizer,
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_unreachable(base, MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer,
                                         cd, &my_old_fn, &my_old_cd);
     }
     store_old(obj, my_old_fn, (struct closure *)my_old_cd, ofn, ocd);
 }
 
-GC_API void GC_CALL GC_debug_register_finalizer_ignore_self
-                                    (void * obj, GC_finalization_proc fn,
-                                     void * cd, GC_finalization_proc *ofn,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_ignore_self
+                                    (void * obj, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc fn,
+                                     void * cd, MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc *ofn,
                                      void * *ocd)
 {
-    GC_finalization_proc my_old_fn = OFN_UNSET;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalization_proc my_old_fn = OFN_UNSET;
     void * my_old_cd = NULL;
-    ptr_t base = (ptr_t)GC_base(obj);
+    ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(obj);
     if (NULL == base) {
         /* We won't collect it, hence finalizer wouldn't be run. */
         if (ocd) *ocd = 0;
@@ -1177,41 +1177,41 @@ GC_API void GC_CALL GC_debug_register_finalizer_ignore_self
         return;
     }
     if ((ptr_t)obj - base != sizeof(oh)) {
-        GC_err_printf("GC_debug_register_finalizer_ignore_self called with"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_register_finalizer_ignore_self called with"
                       " non-base-pointer %p\n", obj);
     }
     if (0 == fn) {
-      GC_register_finalizer_ignore_self(base, 0, 0, &my_old_fn, &my_old_cd);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_ignore_self(base, 0, 0, &my_old_fn, &my_old_cd);
     } else {
-      cd = GC_make_closure(fn, cd);
+      cd = MANAGED_STACK_ADDRESS_BOEHM_GC_make_closure(fn, cd);
       if (cd == 0) return; /* out of memory */
-      GC_register_finalizer_ignore_self(base, GC_debug_invoke_finalizer,
+      MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_ignore_self(base, MANAGED_STACK_ADDRESS_BOEHM_GC_debug_invoke_finalizer,
                                         cd, &my_old_fn, &my_old_cd);
     }
     store_old(obj, my_old_fn, (struct closure *)my_old_cd, ofn, ocd);
 }
 
-# ifndef GC_TOGGLE_REFS_NOT_NEEDED
-    GC_API int GC_CALL GC_debug_toggleref_add(void *obj, int is_strong_ref)
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TOGGLE_REFS_NOT_NEEDED
+    MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_toggleref_add(void *obj, int is_strong_ref)
     {
-      ptr_t base = (ptr_t)GC_base(obj);
+      ptr_t base = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base(obj);
 
       if ((ptr_t)obj - base != sizeof(oh)) {
-        GC_err_printf("GC_debug_toggleref_add called with"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_debug_toggleref_add called with"
                       " non-base-pointer %p\n", obj);
       }
-      return GC_toggleref_add(base, is_strong_ref);
+      return MANAGED_STACK_ADDRESS_BOEHM_GC_toggleref_add(base, is_strong_ref);
     }
-# endif /* !GC_TOGGLE_REFS_NOT_NEEDED */
+# endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_TOGGLE_REFS_NOT_NEEDED */
 
-#endif /* !GC_NO_FINALIZATION */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION */
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_debug_malloc_replacement(size_t lb)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc_replacement(size_t lb)
 {
-    return GC_debug_malloc(lb, GC_DBG_EXTRAS);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc(lb, MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS);
 }
 
-GC_API void * GC_CALL GC_debug_realloc_replacement(void *p, size_t lb)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc_replacement(void *p, size_t lb)
 {
-    return GC_debug_realloc(p, lb, GC_DBG_EXTRAS);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_debug_realloc(p, lb, MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_EXTRAS);
 }

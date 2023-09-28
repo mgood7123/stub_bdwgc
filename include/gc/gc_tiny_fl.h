@@ -11,8 +11,8 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_TINY_FL_H
-#define GC_TINY_FL_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FL_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FL_H
 
 /* Constants and data structures for "tiny" free lists.  These are      */
 /* used for thread-local allocation or in-lined allocators.             */
@@ -25,7 +25,7 @@
 /* and such changes should be avoided.  Hence we keep this as simple    */
 /* as possible.                                                         */
 
-/* We always set GC_GRANULE_BYTES to twice the length of a pointer.     */
+/* We always set MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES to twice the length of a pointer.     */
 /* This means that all allocation requests are rounded up to the next   */
 /* multiple of 16 on 64-bit architectures or 8 on 32-bit architectures. */
 /* This appears to be a reasonable compromise between fragmentation     */
@@ -40,40 +40,40 @@
 /* very small objects with smaller alignment.  But that would cost us   */
 /* mark bit space, so we no longer do so.                               */
 
-/* GC_GRANULE_BYTES should not be overridden in any instances of the GC */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES should not be overridden in any instances of the GC */
 /* library that may be shared between applications, since it affects    */
 /* the binary interface to the library.                                 */
-#ifndef GC_GRANULE_BYTES
-# define GC_GRANULE_WORDS 2
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_WORDS 2
 # if defined(__LP64__) || defined (_LP64) || defined(_WIN64) \
         || defined(__alpha__) || defined(__arch64__) \
         || defined(__powerpc64__) || defined(__s390x__) \
         || (defined(__x86_64__) && !defined(__ILP32__))
-#   define GC_GRANULE_BYTES (GC_GRANULE_WORDS * 8 /* sizeof(void*) */)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES (MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_WORDS * 8 /* sizeof(void*) */)
 # else
-#   define GC_GRANULE_BYTES (GC_GRANULE_WORDS * 4 /* sizeof(void*) */)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES (MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_WORDS * 4 /* sizeof(void*) */)
 # endif
-#endif /* !GC_GRANULE_BYTES */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES */
 
-#if GC_GRANULE_WORDS == 2
-# define GC_WORDS_TO_GRANULES(n) ((n)>>1)
+#if MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_WORDS == 2
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_WORDS_TO_GRANULES(n) ((n)>>1)
 #else
-# define GC_WORDS_TO_GRANULES(n) ((n)*sizeof(void *)/GC_GRANULE_BYTES)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_WORDS_TO_GRANULES(n) ((n)*sizeof(void *)/MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES)
 #endif
 
-/* A "tiny" free list header contains GC_TINY_FREELISTS pointers to     */
+/* A "tiny" free list header contains MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS pointers to     */
 /* singly linked lists of objects of different sizes, the i-th one      */
 /* containing objects i granules in size.  Note that there is a list    */
 /* of size zero objects.                                                */
-#ifndef GC_TINY_FREELISTS
-# if GC_GRANULE_BYTES == 16
-#   define GC_TINY_FREELISTS 25
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES == 16
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS 25
 # else
-#   define GC_TINY_FREELISTS 33 /* Up to and including 256 bytes */
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS 33 /* Up to and including 256 bytes */
 # endif
-#endif /* !GC_TINY_FREELISTS */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS */
 
-/* The i-th free list corresponds to size i*GC_GRANULE_BYTES    */
+/* The i-th free list corresponds to size i*MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES    */
 /* Internally to the collector, the index can be computed with  */
 /* ALLOC_REQUEST_GRANS().  Externally, we don't know whether    */
 /* DONT_ADD_BYTE_AT_END is set, but the client should know.     */
@@ -81,6 +81,6 @@
 /* Convert a free list index to the actual size of objects      */
 /* on that list, including extra space we added.  Not an        */
 /* inverse of the above.                                        */
-#define GC_RAW_BYTES_FROM_INDEX(i) ((i) * GC_GRANULE_BYTES)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_RAW_BYTES_FROM_INDEX(i) ((i) * MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES)
 
-#endif /* GC_TINY_FL_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FL_H */

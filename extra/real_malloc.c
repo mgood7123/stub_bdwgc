@@ -32,7 +32,7 @@ void * real_malloc(size_t size)
 
 # else
 
-extern int GC_quiet;
+extern int MANAGED_STACK_ADDRESS_BOEHM_GC_quiet;
         /* ANSI C doesn't allow translation units to be empty.  */
         /* So we guarantee this one is nonempty.                */
 

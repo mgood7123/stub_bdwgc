@@ -1,38 +1,38 @@
 .TH BDWGC 3 "23 Aug 2023"
 .SH NAME
-GC_malloc, GC_malloc_atomic, GC_free, GC_realloc, GC_enable_incremental,
-GC_register_finalizer, GC_malloc_ignore_off_page,
-GC_malloc_atomic_ignore_off_page, GC_set_warn_proc \- Garbage collecting
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic, MANAGED_STACK_ADDRESS_BOEHM_GC_free, MANAGED_STACK_ADDRESS_BOEHM_GC_realloc, MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental,
+MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page,
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_ignore_off_page, MANAGED_STACK_ADDRESS_BOEHM_GC_set_warn_proc \- Garbage collecting
 malloc replacement
 .SH SYNOPSIS
 #include <gc/gc.h>
 .br
-void * GC_malloc(size_t size);
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(size_t size);
 .br
-void * GC_malloc_atomic(size_t size);
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic(size_t size);
 .br
-void GC_free(void *ptr);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_free(void *ptr);
 .br
-void * GC_realloc(void *ptr, size_t size);
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(void *ptr, size_t size);
 .br
-void GC_enable_incremental(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental(void);
 .br
-void * GC_malloc_ignore_off_page(size_t size);
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page(size_t size);
 .br
-void * GC_malloc_atomic_ignore_off_page(size_t size);
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_ignore_off_page(size_t size);
 .br
-void GC_set_warn_proc(void (*proc)(char *, GC_word));
+void MANAGED_STACK_ADDRESS_BOEHM_GC_set_warn_proc(void (*proc)(char *, MANAGED_STACK_ADDRESS_BOEHM_GC_word));
 .br
 .sp
 cc ... -lgc
 .LP
 .SH DESCRIPTION
-.I GC_malloc
+.I MANAGED_STACK_ADDRESS_BOEHM_GC_malloc
 and
-.I GC_free
+.I MANAGED_STACK_ADDRESS_BOEHM_GC_free
 are plug-in replacements for standard malloc and free.  However,
 .I
-GC_malloc
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc
 will attempt to reclaim inaccessible space automatically by invoking
 a conservative garbage collector at appropriate points.  The collector
 traverses all data structures accessible by following pointers from the
@@ -40,12 +40,12 @@ machines registers, stack(s), data, and bss segments.  Inaccessible structures
 will be reclaimed.  A machine word is considered to be a valid pointer if
 it is an address inside an object allocated by
 .I
-GC_malloc
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc
 or friends.
 .LP
-In most cases it is preferable to call the macros GC_MALLOC, GC_FREE, etc.
-instead of calling GC_malloc and friends directly.  This allows debugging
-versions of the routines to be substituted by defining GC_DEBUG before
+In most cases it is preferable to call the macros MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC, MANAGED_STACK_ADDRESS_BOEHM_GC_FREE, etc.
+instead of calling MANAGED_STACK_ADDRESS_BOEHM_GC_malloc and friends directly.  This allows debugging
+versions of the routines to be substituted by defining MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG before
 including gc.h.
 .LP
 See the documentation in the include files gc_cpp.h and gc_allocator.h,
@@ -58,23 +58,23 @@ is either itself garbage collected, or at least traced by the collector.
 .LP
 Unlike the standard implementations of malloc,
 .I
-GC_malloc
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc
 clears the newly allocated storage.
 .I
-GC_malloc_atomic
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic
 does not.  Furthermore, it informs the collector that the resulting object
 will never contain any pointers, and should therefore not be scanned by the
 collector.
 .LP
 .I
-GC_free
+MANAGED_STACK_ADDRESS_BOEHM_GC_free
 can be used to deallocate objects, but its use is optional, and generally
 discouraged.
 .I
-GC_realloc
+MANAGED_STACK_ADDRESS_BOEHM_GC_realloc
 has the standard realloc semantics.  It preserves pointer-free-ness.
 .I
-GC_register_finalizer
+MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer
 allows for registration of functions that are invoked when an object becomes
 inaccessible.
 .LP
@@ -85,10 +85,10 @@ like an address.)  This may make it hard to allocate very large objects.
 An attempt to do so may generate a warning.
 .LP
 .I
-GC_malloc_ignore_off_page
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_ignore_off_page
 and
 .I
-GC_malloc_atomic_ignore_off_page
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_ignore_off_page
 inform the collector that the client code will always maintain a pointer to
 near the beginning (i.e. within the first heap block) of the object, and that
 pointers beyond that can be ignored by the collector.  This makes it much
@@ -106,12 +106,12 @@ The collector may, on rare occasion, produce warning messages.  On UNIX
 machines these appear on stderr.  Warning messages can be filtered,
 redirected, or ignored with
 .I
-GC_set_warn_proc
+MANAGED_STACK_ADDRESS_BOEHM_GC_set_warn_proc
 This is recommended for production code.  See gc.h for details.
 .LP
 Fully portable code should call
 .I
-GC_INIT
+MANAGED_STACK_ADDRESS_BOEHM_GC_INIT
 from the primordial thread of the main program before making any other
 GC calls.  On most platforms this does nothing and the collector is
 initialized on first use.  On a few platforms explicit initialization is
@@ -119,14 +119,14 @@ necessary.  And it can never hurt.
 .LP
 Debugging versions of many of the above routines are provided as macros.
 Their names are identical to the above, but consist of all capital letters.
-If GC_DEBUG is defined before gc.h is included, these routines do additional
+If MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG is defined before gc.h is included, these routines do additional
 checking, and allow the leak detecting version of the collector to produce
-slightly more useful output.  Without GC_DEBUG defined, they behave exactly
+slightly more useful output.  Without MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG defined, they behave exactly
 like the lower-case versions.
 .LP
 On some machines, collection will be performed incrementally after a call to
 .I
-GC_enable_incremental.
+MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental.
 This may temporarily write protect pages in the heap.  See the README file for
 more information on how this interacts with system calls that write to the
 heap.

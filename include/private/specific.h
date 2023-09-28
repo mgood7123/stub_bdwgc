@@ -25,10 +25,10 @@
  * by adding a lock.
  */
 
-#ifndef GC_SPECIFIC_H
-#define GC_SPECIFIC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_SPECIFIC_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_SPECIFIC_H
 
-#if !defined(GC_THREAD_LOCAL_ALLOC_H)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREAD_LOCAL_ALLOC_H)
 # error specific.h should be included from thread_local_alloc.h
 #endif
 
@@ -41,7 +41,7 @@ EXTERN_C_BEGIN
 /* Currently allocated objects leak on thread exit.     */
 /* That's hard to fix, but OK if we allocate garbage    */
 /* collected memory.                                    */
-#define MALLOC_CLEAR(n) GC_INTERNAL_MALLOC(n, NORMAL)
+#define MALLOC_CLEAR(n) MANAGED_STACK_ADDRESS_BOEHM_GC_INTERNAL_MALLOC(n, NORMAL)
 
 #define TS_CACHE_SIZE 1024
 #define CACHE_HASH(n) ((((n) >> 8) ^ (n)) & (TS_CACHE_SIZE - 1))
@@ -50,12 +50,12 @@ EXTERN_C_BEGIN
 #define HASH(p) \
           ((unsigned)((((word)(p)) >> 8) ^ (word)(p)) & (TS_HASH_SIZE - 1))
 
-#ifdef GC_ASSERTIONS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
   /* Thread-local storage is not guaranteed to be scanned by GC.        */
   /* We hide values stored in "specific" entries for a test purpose.    */
-  typedef GC_hidden_pointer ts_entry_value_t;
-# define TS_HIDE_VALUE(p) GC_HIDE_NZ_POINTER(p)
-# define TS_REVEAL_PTR(p) GC_REVEAL_NZ_POINTER(p)
+  typedef MANAGED_STACK_ADDRESS_BOEHM_GC_hidden_pointer ts_entry_value_t;
+# define TS_HIDE_VALUE(p) MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_NZ_POINTER(p)
+# define TS_REVEAL_PTR(p) MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_NZ_POINTER(p)
 #else
   typedef void * ts_entry_value_t;
 # define TS_HIDE_VALUE(p) (p)
@@ -87,7 +87,7 @@ typedef struct thread_specific_entry {
 /* or at least thread stack separation, is at least 4 KB.               */
 /* Must be defined so that it never returns 0.  (Page 0 can't really be */
 /* part of any stack, since that would make 0 a valid stack pointer.)   */
-#define quick_thread_id() (((word)GC_approx_sp()) >> 12)
+#define quick_thread_id() (((word)MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp()) >> 12)
 
 #define INVALID_QTID ((word)0)
 #define INVALID_THREADID ((pthread_t)0)
@@ -104,33 +104,33 @@ typedef struct thread_specific_data {
     pthread_mutex_t lock;
 } tsd;
 
-typedef tsd * GC_key_t;
+typedef tsd * MANAGED_STACK_ADDRESS_BOEHM_GC_key_t;
 
-#define GC_key_create(key, d) GC_key_create_inner(key)
-GC_INNER int GC_key_create_inner(tsd ** key_ptr);
-GC_INNER int GC_setspecific(tsd * key, void * value);
-#define GC_remove_specific(key) \
-                        GC_remove_specific_after_fork(key, pthread_self())
-GC_INNER void GC_remove_specific_after_fork(tsd * key, pthread_t t);
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_key_create(key, d) MANAGED_STACK_ADDRESS_BOEHM_GC_key_create_inner(key)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_key_create_inner(tsd ** key_ptr);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_setspecific(tsd * key, void * value);
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_remove_specific(key) \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_remove_specific_after_fork(key, pthread_self())
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_specific_after_fork(tsd * key, pthread_t t);
 
 /* An internal version of getspecific that assumes a cache miss.        */
-GC_INNER void * GC_slow_getspecific(tsd * key, word qtid,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void * MANAGED_STACK_ADDRESS_BOEHM_GC_slow_getspecific(tsd * key, word qtid,
                                     tse * volatile * cache_entry);
 
-GC_INLINE void * GC_getspecific(tsd * key)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void * MANAGED_STACK_ADDRESS_BOEHM_GC_getspecific(tsd * key)
 {
     word qtid = quick_thread_id();
     tse * volatile * entry_ptr = &(key -> cache[CACHE_HASH(qtid)]);
     tse * entry = *entry_ptr;   /* Must be loaded only once.    */
 
-    GC_ASSERT(qtid != INVALID_QTID);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(qtid != INVALID_QTID);
     if (EXPECT(entry -> qtid == qtid, TRUE)) {
-      GC_ASSERT(entry -> thread == pthread_self());
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(entry -> thread == pthread_self());
       return TS_REVEAL_PTR(entry -> value);
     }
-    return GC_slow_getspecific(key, qtid, entry_ptr);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_slow_getspecific(key, qtid, entry_ptr);
 }
 
 EXTERN_C_END
 
-#endif /* GC_SPECIFIC_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_SPECIFIC_H */

@@ -18,10 +18,10 @@ int main(void) {
     char *p[N_TESTS];
     unsigned i;
 
-    GC_set_find_leak(1); /* for new collect versions not compiled       */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(1); /* for new collect versions not compiled       */
                          /* with -DFIND_LEAK.                           */
 
-    GC_INIT();  /* Needed if thread-local allocation is enabled.        */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();  /* Needed if thread-local allocation is enabled.        */
                 /* FIXME: This is not ideal.                            */
 
     p[0] = (char *)_aligned_malloc(70 /* size */, 16);

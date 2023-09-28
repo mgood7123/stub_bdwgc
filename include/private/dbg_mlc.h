@@ -22,8 +22,8 @@
  * included from header files that are frequently included by clients.
  */
 
-#ifndef GC_DBG_MLC_H
-#define GC_DBG_MLC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_MLC_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_MLC_H
 
 #include "gc_priv.h"
 #ifdef KEEP_BACK_PTRS
@@ -36,8 +36,8 @@ EXTERN_C_BEGIN
 # define START_FLAG (word)0xfedcedcb
 # define END_FLAG (word)0xbcdecdef
 #else
-# define START_FLAG GC_WORD_C(0xFEDCEDCBfedcedcb)
-# define END_FLAG GC_WORD_C(0xBCDECDEFbcdecdef)
+# define START_FLAG MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(0xFEDCEDCBfedcedcb)
+# define END_FLAG MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(0xBCDECDEFbcdecdef)
 #endif
         /* Stored both one past the end of user object, and one before  */
         /* the end of the object as seen by the allocator.              */
@@ -78,15 +78,15 @@ typedef struct {
     /* never to overwrite such a value.                         */
 #   if ALIGNMENT == 1
       /* Fudge back pointer to be even. */
-#     define HIDE_BACK_PTR(p) GC_HIDE_POINTER(~(word)1 & (word)(p))
+#     define HIDE_BACK_PTR(p) MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_POINTER(~(word)1 & (word)(p))
 #   else
-#     define HIDE_BACK_PTR(p) GC_HIDE_POINTER(p)
+#     define HIDE_BACK_PTR(p) MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_POINTER(p)
 #   endif
 #   ifdef KEEP_BACK_PTRS
-      GC_hidden_pointer oh_back_ptr;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_hidden_pointer oh_back_ptr;
 #   endif
 #   ifdef MAKE_BACK_GRAPH
-      GC_hidden_pointer oh_bg_ptr;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_hidden_pointer oh_bg_ptr;
 #   endif
 #   if defined(KEEP_BACK_PTRS) != defined(MAKE_BACK_GRAPH)
       /* Keep double-pointer-sized alignment.   */
@@ -125,17 +125,22 @@ typedef struct {
 /* PRINT_CALL_CHAIN prints the call chain stored in an object   */
 /* to stderr.  It requires that we do not hold the lock.        */
 #if defined(SAVE_CALL_CHAIN)
-# define ADD_CALL_CHAIN(base, ra) GC_save_callers(((oh *)(base)) -> oh_ci)
-# define PRINT_CALL_CHAIN(base) GC_print_callers(((oh *)(base)) -> oh_ci)
-#elif defined(GC_ADD_CALLER)
+  struct callinfo;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(struct callinfo info[NFRAMES]);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers(struct callinfo info[NFRAMES]);
+# define ADD_CALL_CHAIN(base, ra) MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(((oh *)(base)) -> oh_ci)
+# define PRINT_CALL_CHAIN(base) MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers(((oh *)(base)) -> oh_ci)
+#elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER)
+  struct callinfo;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers(struct callinfo info[NFRAMES]);
 # define ADD_CALL_CHAIN(base, ra) ((oh *)(base)) -> oh_ci[0].ci_pc = (ra)
-# define PRINT_CALL_CHAIN(base) GC_print_callers(((oh *)(base)) -> oh_ci)
+# define PRINT_CALL_CHAIN(base) MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers(((oh *)(base)) -> oh_ci)
 #else
 # define ADD_CALL_CHAIN(base, ra)
 # define PRINT_CALL_CHAIN(base)
 #endif
 
-#ifdef GC_ADD_CALLER
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
 # define OPT_RA ra,
 #else
 # define OPT_RA
@@ -145,31 +150,31 @@ typedef struct {
 /* p is assumed to point to a legitimate object in our part     */
 /* of the heap.                                                 */
 #ifdef SHORT_DBG_HDRS
-# define GC_has_other_debug_info(p) 1
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(p) 1
 #else
-  GC_INNER int GC_has_other_debug_info(ptr_t p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(ptr_t p);
 #endif
 
 #if defined(KEEP_BACK_PTRS) || defined(MAKE_BACK_GRAPH)
 # if defined(SHORT_DBG_HDRS) && !defined(CPPCHECK)
-#   error Non-ptr stored in object results in GC_HAS_DEBUG_INFO malfunction
+#   error Non-ptr stored in object results in MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO malfunction
     /* We may mistakenly conclude that p has a debugging wrapper.       */
 # endif
 # if defined(PARALLEL_MARK) && defined(KEEP_BACK_PTRS)
-#   define GC_HAS_DEBUG_INFO(p) \
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p) \
                 ((AO_load((volatile AO_t *)(p)) & 1) != 0 \
-                 && GC_has_other_debug_info(p) > 0)
-                        /* Atomic load is used as GC_store_back_pointer */
+                 && MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(p) > 0)
+                        /* Atomic load is used as MANAGED_STACK_ADDRESS_BOEHM_GC_store_back_pointer */
                         /* stores oh_back_ptr atomically (p might point */
                         /* to the field); this prevents a TSan warning. */
 # else
-#   define GC_HAS_DEBUG_INFO(p) \
-                ((*(word *)(p) & 1) && GC_has_other_debug_info(p) > 0)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p) \
+                ((*(word *)(p) & 1) && MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(p) > 0)
 # endif
 #else
-# define GC_HAS_DEBUG_INFO(p) (GC_has_other_debug_info(p) > 0)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p) (MANAGED_STACK_ADDRESS_BOEHM_GC_has_other_debug_info(p) > 0)
 #endif /* !KEEP_BACK_PTRS && !MAKE_BACK_GRAPH */
 
 EXTERN_C_END
 
-#endif /* GC_DBG_MLC_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_DBG_MLC_H */

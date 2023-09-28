@@ -12,10 +12,10 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_HEADERS_H
-#define GC_HEADERS_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_HEADERS_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_HEADERS_H
 
-#if !defined(GC_PRIVATE_H) && !defined(CPPCHECK)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H) && !defined(CPPCHECK)
 # error gc_hdrs.h should be included from gc_priv.h
 #endif
 
@@ -65,10 +65,10 @@ typedef struct hblkhdr hdr;
 /* #define COUNT_HDR_CACHE_HITS  */
 
 #ifdef COUNT_HDR_CACHE_HITS
-  extern word GC_hdr_cache_hits; /* used for debugging/profiling */
-  extern word GC_hdr_cache_misses;
-# define HC_HIT() (void)(++GC_hdr_cache_hits)
-# define HC_MISS() (void)(++GC_hdr_cache_misses)
+  extern word MANAGED_STACK_ADDRESS_BOEHM_GC_hdr_cache_hits; /* used for debugging/profiling */
+  extern word MANAGED_STACK_ADDRESS_BOEHM_GC_hdr_cache_misses;
+# define HC_HIT() (void)(++MANAGED_STACK_ADDRESS_BOEHM_GC_hdr_cache_hits)
+# define HC_MISS() (void)(++MANAGED_STACK_ADDRESS_BOEHM_GC_hdr_cache_misses)
 #else
 # define HC_HIT() /* empty */
 # define HC_MISS() /* empty */
@@ -95,18 +95,18 @@ typedef struct hce {
 #define HCE_HDR(h) ((hce) -> hce_hdr)
 
 #ifdef PRINT_BLACK_LIST
-  GC_INNER hdr * GC_header_cache_miss(ptr_t p, hdr_cache_entry *hce,
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER hdr * MANAGED_STACK_ADDRESS_BOEHM_GC_header_cache_miss(ptr_t p, hdr_cache_entry *hce,
                                       ptr_t source);
 # define HEADER_CACHE_MISS(p, hce, source) \
-          GC_header_cache_miss(p, hce, source)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_header_cache_miss(p, hce, source)
 #else
-  GC_INNER hdr * GC_header_cache_miss(ptr_t p, hdr_cache_entry *hce);
-# define HEADER_CACHE_MISS(p, hce, source) GC_header_cache_miss(p, hce)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER hdr * MANAGED_STACK_ADDRESS_BOEHM_GC_header_cache_miss(ptr_t p, hdr_cache_entry *hce);
+# define HEADER_CACHE_MISS(p, hce, source) MANAGED_STACK_ADDRESS_BOEHM_GC_header_cache_miss(p, hce)
 #endif
 
 /* Set hhdr to the header for p.  Analogous to GET_HDR below,           */
 /* except that in the case of large objects, it gets the header for     */
-/* the object beginning if GC_all_interior_pointers is set.             */
+/* the object beginning if MANAGED_STACK_ADDRESS_BOEHM_GC_all_interior_pointers is set.             */
 /* Returns zero if p points to somewhere other than the first page      */
 /* of an object, and it is not a valid pointer to the object.           */
 #define HC_GET_HDR(p, hhdr, source) \
@@ -141,19 +141,19 @@ typedef struct bi {
 # endif
 } bottom_index;
 
-/* bottom_index GC_all_nils; - really part of GC_arrays */
+/* bottom_index MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils; - really part of MANAGED_STACK_ADDRESS_BOEHM_GC_arrays */
 
-/* extern bottom_index * GC_top_index []; - really part of GC_arrays */
+/* extern bottom_index * MANAGED_STACK_ADDRESS_BOEHM_GC_top_index []; - really part of MANAGED_STACK_ADDRESS_BOEHM_GC_arrays */
                                 /* Each entry points to a bottom_index. */
                                 /* On a 32 bit machine, it points to    */
                                 /* the index for a set of high order    */
                                 /* bits equal to the index.  For longer */
                                 /* addresses, we hash the high order    */
                                 /* bits to compute the index in         */
-                                /* GC_top_index, and each entry points  */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_top_index, and each entry points  */
                                 /* to a hash chain.                     */
                                 /* The last entry in each chain is      */
-                                /* GC_all_nils.                         */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils.                         */
 
 
 #define MAX_JUMP (HBLKSIZE-1)
@@ -161,11 +161,11 @@ typedef struct bi {
 #define HDR_FROM_BI(bi, p) \
                 (bi)->index[((word)(p) >> LOG_HBLKSIZE) & (BOTTOM_SZ - 1)]
 #ifndef HASH_TL
-# define BI(p) (GC_top_index \
+# define BI(p) (MANAGED_STACK_ADDRESS_BOEHM_GC_top_index \
               [(word)(p) >> (LOG_BOTTOM_SZ + LOG_HBLKSIZE)])
 # define HDR_INNER(p) HDR_FROM_BI(BI(p),p)
 # ifdef SMALL_CONFIG
-#     define HDR(p) GC_find_header((ptr_t)(p))
+#     define HDR(p) MANAGED_STACK_ADDRESS_BOEHM_GC_find_header((ptr_t)(p))
 # else
 #     define HDR(p) HDR_INNER(p)
 # endif
@@ -180,8 +180,8 @@ typedef struct bi {
 # define GET_BI(p, bottom_indx) \
         do { \
           REGISTER word hi = (word)(p) >> (LOG_BOTTOM_SZ + LOG_HBLKSIZE); \
-          REGISTER bottom_index * _bi = GC_top_index[TL_HASH(hi)]; \
-          while (_bi -> key != hi && _bi != GC_all_nils) \
+          REGISTER bottom_index * _bi = MANAGED_STACK_ADDRESS_BOEHM_GC_top_index[TL_HASH(hi)]; \
+          while (_bi -> key != hi && _bi != MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils) \
               _bi = _bi -> hash_link; \
           (bottom_indx) = _bi; \
         } while (0)
@@ -201,10 +201,10 @@ typedef struct bi {
         do { \
           REGISTER bottom_index * bi; \
           GET_BI(p, bi); \
-          GC_ASSERT(bi != GC_all_nils); \
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(bi != MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils); \
           HDR_FROM_BI(bi, p) = (hhdr); \
         } while (0)
-# define HDR(p) GC_find_header((ptr_t)(p))
+# define HDR(p) MANAGED_STACK_ADDRESS_BOEHM_GC_find_header((ptr_t)(p))
 #endif
 
 /* Is the result a forwarding address to someplace closer to the        */
@@ -217,4 +217,4 @@ typedef struct bi {
 
 EXTERN_C_END
 
-#endif /* GC_HEADERS_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_HEADERS_H */

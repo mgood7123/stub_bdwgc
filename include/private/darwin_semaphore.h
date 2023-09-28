@@ -15,12 +15,12 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_DARWIN_SEMAPHORE_H
-#define GC_DARWIN_SEMAPHORE_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_SEMAPHORE_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_SEMAPHORE_H
 
 #include "gc_priv.h"
 
-#if !defined(GC_DARWIN_THREADS) && !defined(GC_WIN32_THREADS)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_THREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS)
 # error darwin_semaphore.h included for improper target
 #endif
 
@@ -40,7 +40,7 @@ typedef struct {
     int value;
 } sem_t;
 
-GC_INLINE int sem_init(sem_t *sem, int pshared, int value) {
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int sem_init(sem_t *sem, int pshared, int value) {
     if (pshared != 0) {
         errno = EPERM; /* unsupported */
         return -1;
@@ -55,7 +55,7 @@ GC_INLINE int sem_init(sem_t *sem, int pshared, int value) {
     return 0;
 }
 
-GC_INLINE int sem_post(sem_t *sem) {
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int sem_post(sem_t *sem) {
     if (pthread_mutex_lock(&sem->mutex) != 0)
       return -1;
     sem->value++;
@@ -66,7 +66,7 @@ GC_INLINE int sem_post(sem_t *sem) {
     return pthread_mutex_unlock(&sem->mutex) != 0 ? -1 : 0;
 }
 
-GC_INLINE int sem_wait(sem_t *sem) {
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int sem_wait(sem_t *sem) {
     if (pthread_mutex_lock(&sem->mutex) != 0)
       return -1;
     while (sem->value == 0) {
@@ -79,7 +79,7 @@ GC_INLINE int sem_wait(sem_t *sem) {
     return pthread_mutex_unlock(&sem->mutex) != 0 ? -1 : 0;
 }
 
-GC_INLINE int sem_destroy(sem_t *sem) {
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int sem_destroy(sem_t *sem) {
     return pthread_cond_destroy(&sem->cond) != 0
            || pthread_mutex_destroy(&sem->mutex) != 0 ? -1 : 0;
 }

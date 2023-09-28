@@ -12,28 +12,28 @@
  *
  */
 
-// This file provides the implementation of GC_throw_bad_alloc() which
+// This file provides the implementation of MANAGED_STACK_ADDRESS_BOEHM_GC_throw_bad_alloc() which
 // is invoked by GC operator "new" in case of an out-of-memory event.
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#ifndef GC_BUILD
-# define GC_BUILD
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 #endif
 
-#define GC_DONT_INCL_WINDOWS_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_INCL_WINDOWS_H
 #include "gc/gc.h"
 
 #include <new> // for bad_alloc, precedes include of gc_cpp.h
 
-#if defined(GC_NEW_ABORTS_ON_OOM) || defined(_LIBCPP_NO_EXCEPTIONS)
-# define GC_ALLOCATOR_THROW_OR_ABORT() GC_abort_on_oom()
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NEW_ABORTS_ON_OOM) || defined(_LIBCPP_NO_EXCEPTIONS)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ALLOCATOR_THROW_OR_ABORT() MANAGED_STACK_ADDRESS_BOEHM_GC_abort_on_oom()
 #else
-# define GC_ALLOCATOR_THROW_OR_ABORT() throw std::bad_alloc()
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ALLOCATOR_THROW_OR_ABORT() throw std::bad_alloc()
 #endif
 
-GC_API void GC_CALL GC_throw_bad_alloc() {
-  GC_ALLOCATOR_THROW_OR_ABORT();
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_throw_bad_alloc() {
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ALLOCATOR_THROW_OR_ABORT();
 }

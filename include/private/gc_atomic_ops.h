@@ -14,29 +14,29 @@
 /* This is a private GC header which provides an implementation of      */
 /* libatomic_ops subset primitives sufficient for GC assuming that GCC  */
 /* atomic intrinsics are available (and have correct implementation).   */
-/* This is enabled by defining GC_BUILTIN_ATOMIC macro.  Otherwise,     */
+/* This is enabled by defining MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC macro.  Otherwise,     */
 /* libatomic_ops library is used to define the primitives.              */
 
-#ifndef GC_ATOMIC_OPS_H
-#define GC_ATOMIC_OPS_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_OPS_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_OPS_H
 
-#ifdef GC_BUILTIN_ATOMIC
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC
 
-# include "gc/gc.h" /* for GC_[signed_]word */
+# include "gc/gc.h" /* for MANAGED_STACK_ADDRESS_BOEHM_GC_word */
 
 # ifdef __cplusplus
     extern "C" {
 # endif
 
-  typedef GC_word AO_t;
+  typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word AO_t;
 
-# ifdef GC_PRIVATE_H /* have GC_INLINE */
-#   define AO_INLINE GC_INLINE
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H /* have MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE */
+#   define AO_INLINE MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE
 # else
 #   define AO_INLINE static __inline
 # endif
 
-# if !defined(THREAD_SANITIZER) && !defined(GC_PRIVATE_H)
+# if !defined(THREAD_SANITIZER) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H)
     /* Similar to that in gcconfig.h.   */
 #   if defined(__has_feature)
 #     if __has_feature(thread_sanitizer)
@@ -45,7 +45,7 @@
 #   elif defined(__SANITIZE_THREAD__)
 #     define THREAD_SANITIZER
 #   endif
-# endif /* !THREAD_SANITIZER && !GC_PRIVATE_H */
+# endif /* !THREAD_SANITIZER && !MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H */
 
   typedef unsigned char AO_TS_t;
 # define AO_TS_CLEAR 0
@@ -80,8 +80,6 @@
 # define AO_HAVE_fetch_and_add
 # define AO_fetch_and_add1(p) AO_fetch_and_add(p, 1)
 # define AO_HAVE_fetch_and_add1
-# define AO_fetch_and_sub1(p) AO_fetch_and_add(p, (AO_t)(GC_signed_word)-1)
-# define AO_HAVE_fetch_and_sub1
 
 # define AO_or(p, v) (void)__atomic_or_fetch(p, v, __ATOMIC_RELAXED)
 # define AO_HAVE_or
@@ -144,6 +142,6 @@
 #   error AO_load or AO_store is missing; probably old version of atomic_ops
 # endif
 
-#endif /* !GC_BUILTIN_ATOMIC */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC */
 
-#endif /* GC_ATOMIC_OPS_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_OPS_H */

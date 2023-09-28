@@ -17,15 +17,15 @@
 
 /*
  * This file contains the functions:
- *      ptr_t GC_build_flXXX(h, old_fl)
- *      void GC_new_hblk(size, kind)
+ *      ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_flXXX(h, old_fl)
+ *      void MANAGED_STACK_ADDRESS_BOEHM_GC_new_hblk(size, kind)
  */
 
 #ifndef SMALL_CONFIG
   /* Build a free list for size 2 (words) cleared objects inside        */
   /* hblk h.  Set the last link to be ofl.  Return a pointer to the     */
   /* first free list entry.                                             */
-  STATIC ptr_t GC_build_fl_clear2(struct hblk *h, ptr_t ofl)
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl_clear2(struct hblk *h, ptr_t ofl)
   {
     word * p = (word *)(h -> hb_body);
     word * lim = (word *)(h + 1);
@@ -45,7 +45,7 @@
   }
 
   /* The same for size 4 cleared objects.       */
-  STATIC ptr_t GC_build_fl_clear4(struct hblk *h, ptr_t ofl)
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl_clear4(struct hblk *h, ptr_t ofl)
   {
     word * p = (word *)(h -> hb_body);
     word * lim = (word *)(h + 1);
@@ -56,7 +56,7 @@
     p[3] = 0;
     p += 4;
     for (; (word)p < (word)lim; p += 4) {
-        GC_PREFETCH_FOR_WRITE((ptr_t)(p + 64));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)(p + 64));
         p[0] = (word)(p-4);
         p[1] = 0;
         CLEAR_DOUBLE(p+2);
@@ -65,7 +65,7 @@
   }
 
   /* The same for size 2 uncleared objects.     */
-  STATIC ptr_t GC_build_fl2(struct hblk *h, ptr_t ofl)
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl2(struct hblk *h, ptr_t ofl)
   {
     word * p = (word *)(h -> hb_body);
     word * lim = (word *)(h + 1);
@@ -81,7 +81,7 @@
   }
 
   /* The same for size 4 uncleared objects.     */
-  STATIC ptr_t GC_build_fl4(struct hblk *h, ptr_t ofl)
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl4(struct hblk *h, ptr_t ofl)
   {
     word * p = (word *)(h -> hb_body);
     word * lim = (word *)(h + 1);
@@ -90,7 +90,7 @@
     p[4] = (word)p;
     p += 8;
     for (; (word)p < (word)lim; p += 8) {
-        GC_PREFETCH_FOR_WRITE((ptr_t)(p + 64));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)(p + 64));
         p[0] = (word)(p-4);
         p[4] = (word)p;
     }
@@ -104,7 +104,7 @@
 /* This could be called without the allocation lock, if we ensure that  */
 /* there is no concurrent collection which might reclaim objects that   */
 /* we have not yet allocated.                                           */
-GC_INNER ptr_t GC_build_fl(struct hblk *h, size_t sz, GC_bool clear,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl(struct hblk *h, size_t sz, MANAGED_STACK_ADDRESS_BOEHM_GC_bool clear,
                            ptr_t list)
 {
   word *p, *prev;
@@ -114,23 +114,23 @@ GC_INNER ptr_t GC_build_fl(struct hblk *h, size_t sz, GC_bool clear,
   /* If we were more serious about it, these should go inside   */
   /* the loops.  But write prefetches usually don't seem to     */
   /* matter much.                                               */
-    GC_PREFETCH_FOR_WRITE((ptr_t)h);
-    GC_PREFETCH_FOR_WRITE((ptr_t)h + 128);
-    GC_PREFETCH_FOR_WRITE((ptr_t)h + 256);
-    GC_PREFETCH_FOR_WRITE((ptr_t)h + 378);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)h);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)h + 128);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)h + 256);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE((ptr_t)h + 378);
 # ifndef SMALL_CONFIG
     /* Handle small objects sizes more efficiently.  For larger objects */
     /* the difference is less significant.                              */
     switch (sz) {
         case 2: if (clear) {
-                    return GC_build_fl_clear2(h, list);
+                    return MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl_clear2(h, list);
                 } else {
-                    return GC_build_fl2(h, list);
+                    return MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl2(h, list);
                 }
         case 4: if (clear) {
-                    return GC_build_fl_clear4(h, list);
+                    return MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl_clear4(h, list);
                 } else {
-                    return GC_build_fl4(h, list);
+                    return MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl4(h, list);
                 }
         default:
                 break;
@@ -167,22 +167,22 @@ GC_INNER ptr_t GC_build_fl(struct hblk *h, size_t sz, GC_bool clear,
 /* free list for objects of that size.  Set all mark bits           */
 /* if objects are uncollectible.  Will fail to do anything if we    */
 /* are out of memory.                                               */
-GC_INNER void GC_new_hblk(size_t gran, int k)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_new_hblk(size_t gran, int k)
 {
   struct hblk *h;       /* the new heap block */
 
-  GC_STATIC_ASSERT(sizeof(struct hblk) == HBLKSIZE);
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(sizeof(struct hblk) == HBLKSIZE);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   /* Allocate a new heap block. */
-  h = GC_allochblk(GRANULES_TO_BYTES(gran), k, 0 /* flags */, 0);
+  h = MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk(GRANULES_TO_BYTES(gran), k, 0 /* flags */, 0);
   if (EXPECT(NULL == h, FALSE)) return; /* out of memory */
 
   /* Mark all objects if appropriate. */
-  if (IS_UNCOLLECTABLE(k)) GC_set_hdr_marks(HDR(h));
+  if (IS_UNCOLLECTABLE(k)) MANAGED_STACK_ADDRESS_BOEHM_GC_set_hdr_marks(HDR(h));
 
   /* Build the free list */
-  GC_obj_kinds[k].ok_freelist[gran] =
-        GC_build_fl(h, GRANULES_TO_WORDS(gran),
-                    GC_debugging_started || GC_obj_kinds[k].ok_init,
-                    (ptr_t)GC_obj_kinds[k].ok_freelist[gran]);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[k].ok_freelist[gran] =
+        MANAGED_STACK_ADDRESS_BOEHM_GC_build_fl(h, GRANULES_TO_WORDS(gran),
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started || MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[k].ok_init,
+                    (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[k].ok_freelist[gran]);
 }

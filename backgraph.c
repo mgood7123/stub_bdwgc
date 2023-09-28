@@ -51,7 +51,7 @@ typedef struct back_edges_struct {
 #       define RETAIN 1 /* Directly points to a reachable object;       */
                         /* retain for next GC.                          */
   unsigned short height_gc_no;
-                /* If height > 0, then the GC_gc_no value when it       */
+                /* If height > 0, then the MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no value when it       */
                 /* was computed.  If it was computed this cycle, then   */
                 /* it is current.  If it was computed during the        */
                 /* last cycle, then it represents the old height,       */
@@ -75,7 +75,7 @@ typedef struct back_edges_struct {
 /* if this were production code.                                        */
 #define MAX_BACK_EDGE_STRUCTS 100000
 static back_edges *back_edge_space = 0;
-STATIC int GC_n_back_edge_structs = 0;
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_n_back_edge_structs = 0;
                                 /* Serves as pointer to never used      */
                                 /* back_edges space.                    */
 static back_edges *avail_back_edges = 0;
@@ -84,13 +84,13 @@ static back_edges *avail_back_edges = 0;
 
 static back_edges * new_back_edges(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (0 == back_edge_space) {
     size_t bytes_to_get = ROUNDUP_PAGESIZE_IF_MMAP(MAX_BACK_EDGE_STRUCTS
                                                    * sizeof(back_edges));
 
-    GC_ASSERT(GC_page_size != 0);
-    back_edge_space = (back_edges *)GC_os_get_mem(bytes_to_get);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size != 0);
+    back_edge_space = (back_edges *)MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(bytes_to_get);
     if (NULL == back_edge_space)
       ABORT("Insufficient memory for back edges");
   }
@@ -100,11 +100,11 @@ static back_edges * new_back_edges(void)
     result -> cont = 0;
     return result;
   }
-  if (GC_n_back_edge_structs >= MAX_BACK_EDGE_STRUCTS - 1) {
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_back_edge_structs >= MAX_BACK_EDGE_STRUCTS - 1) {
     ABORT("Needed too much space for back edges: adjust "
           "MAX_BACK_EDGE_STRUCTS");
   }
-  return back_edge_space + (GC_n_back_edge_structs++);
+  return back_edge_space + (MANAGED_STACK_ADDRESS_BOEHM_GC_n_back_edge_structs++);
 }
 
 /* Deallocate p and its associated continuation structures.     */
@@ -128,31 +128,31 @@ static size_t n_in_progress = 0;
 
 static void push_in_progress(ptr_t p)
 {
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (n_in_progress >= in_progress_size) {
     ptr_t * new_in_progress_space;
 
-    GC_ASSERT(GC_page_size != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size != 0);
     if (NULL == in_progress_space) {
       in_progress_size = ROUNDUP_PAGESIZE_IF_MMAP(INITIAL_IN_PROGRESS
                                                         * sizeof(ptr_t))
                                 / sizeof(ptr_t);
       new_in_progress_space =
-                (ptr_t *)GC_os_get_mem(in_progress_size * sizeof(ptr_t));
+                (ptr_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(in_progress_size * sizeof(ptr_t));
     } else {
       in_progress_size *= 2;
       new_in_progress_space =
-                (ptr_t *)GC_os_get_mem(in_progress_size * sizeof(ptr_t));
+                (ptr_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(in_progress_size * sizeof(ptr_t));
       if (new_in_progress_space != NULL)
         BCOPY(in_progress_space, new_in_progress_space,
               n_in_progress * sizeof(ptr_t));
     }
 #   ifndef GWW_VDB
-      GC_scratch_recycle_no_gww(in_progress_space,
+      MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_no_gww(in_progress_space,
                                 n_in_progress * sizeof(ptr_t));
 #   elif defined(LINT2)
       /* TODO: implement GWW-aware recycling as in alloc_mark_stack */
-      GC_noop1((word)in_progress_space);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)in_progress_space);
 #   endif
     in_progress_space = new_in_progress_space;
   }
@@ -162,7 +162,7 @@ static void push_in_progress(ptr_t p)
   in_progress_space[n_in_progress++] = p;
 }
 
-static GC_bool is_in_progress(const char *p)
+static MANAGED_STACK_ADDRESS_BOEHM_GC_bool is_in_progress(const char *p)
 {
   size_t i;
   for (i = 0; i < n_in_progress; ++i) {
@@ -171,25 +171,25 @@ static GC_bool is_in_progress(const char *p)
   return FALSE;
 }
 
-GC_INLINE void pop_in_progress(ptr_t p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void pop_in_progress(ptr_t p)
 {
-# ifndef GC_ASSERTIONS
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
     UNUSED_ARG(p);
 # endif
   --n_in_progress;
-  GC_ASSERT(in_progress_space[n_in_progress] == p);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(in_progress_space[n_in_progress] == p);
 }
 
 #define GET_OH_BG_PTR(p) \
-                (ptr_t)GC_REVEAL_POINTER(((oh *)(p)) -> oh_bg_ptr)
-#define SET_OH_BG_PTR(p,q) (((oh *)(p)) -> oh_bg_ptr = GC_HIDE_POINTER(q))
+                (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_POINTER(((oh *)(p)) -> oh_bg_ptr)
+#define SET_OH_BG_PTR(p,q) (((oh *)(p)) -> oh_bg_ptr = MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_POINTER(q))
 
 /* Ensure that p has a back_edges structure associated with it. */
 static void ensure_struct(ptr_t p)
 {
   ptr_t old_back_ptr = GET_OH_BG_PTR(p);
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (!((word)old_back_ptr & FLAG_MANY)) {
     back_edges *be = new_back_edges();
     be -> flags = 0;
@@ -200,8 +200,8 @@ static void ensure_struct(ptr_t p)
       be -> edges[0] = old_back_ptr;
     }
     be -> height = HEIGHT_UNKNOWN;
-    be -> height_gc_no = (unsigned short)(GC_gc_no - 1);
-    GC_ASSERT((word)be >= (word)back_edge_space);
+    be -> height_gc_no = (unsigned short)(MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no - 1);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)be >= (word)back_edge_space);
     SET_OH_BG_PTR(p, (word)be | FLAG_MANY);
   }
 }
@@ -214,9 +214,9 @@ static void add_edge(ptr_t p, ptr_t q)
     back_edges * be, *be_cont;
     word i;
 
-    GC_ASSERT(p == GC_base(p) && q == GC_base(q));
-    GC_ASSERT(I_HOLD_LOCK());
-    if (!GC_HAS_DEBUG_INFO(q) || !GC_HAS_DEBUG_INFO(p)) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(p == MANAGED_STACK_ADDRESS_BOEHM_GC_base(p) && q == MANAGED_STACK_ADDRESS_BOEHM_GC_base(q));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(q) || !MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p)) {
       /* This is really a misinterpreted free list link, since we saw   */
       /* a pointer to a free list.  Don't overwrite it!                 */
       return;
@@ -275,16 +275,16 @@ static void add_edge(ptr_t p, ptr_t q)
     be_cont -> edges[i] = p;
     be -> n_edges++;
 #   ifdef DEBUG_PRINT_BIG_N_EDGES
-      if (GC_print_stats == VERBOSE && be -> n_edges == 100) {
-        GC_err_printf("The following object has big in-degree:\n");
-        GC_print_heap_obj(q);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats == VERBOSE && be -> n_edges == 100) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("The following object has big in-degree:\n");
+        MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj(q);
       }
 #   endif
 }
 
 typedef void (*per_object_func)(ptr_t p, size_t n_bytes, word gc_descr);
 
-static GC_CALLBACK void per_object_helper(struct hblk *h, GC_word fn_ptr)
+static MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK void per_object_helper(struct hblk *h, MANAGED_STACK_ADDRESS_BOEHM_GC_word fn_ptr)
 {
   hdr * hhdr = HDR(h);
   size_t sz = (size_t)hhdr->hb_sz;
@@ -298,18 +298,18 @@ static GC_CALLBACK void per_object_helper(struct hblk *h, GC_word fn_ptr)
   } while (i + sz <= BYTES_TO_WORDS(HBLKSIZE));
 }
 
-GC_INLINE void GC_apply_to_each_object(per_object_func fn)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_each_object(per_object_func fn)
 {
-  GC_apply_to_all_blocks(per_object_helper, (word)(&fn));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(per_object_helper, (word)(&fn));
 }
 
 static void reset_back_edge(ptr_t p, size_t n_bytes, word gc_descr)
 {
   UNUSED_ARG(n_bytes);
   UNUSED_ARG(gc_descr);
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   /* Skip any free list links, or dropped blocks */
-  if (GC_HAS_DEBUG_INFO(p)) {
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p)) {
     ptr_t old_back_ptr = GET_OH_BG_PTR(p);
     if ((word)old_back_ptr & FLAG_MANY) {
       back_edges *be = (back_edges *)((word)old_back_ptr & ~(word)FLAG_MANY);
@@ -318,7 +318,7 @@ static void reset_back_edge(ptr_t p, size_t n_bytes, word gc_descr)
         SET_OH_BG_PTR(p, 0);
       } else {
 
-        GC_ASSERT(GC_is_marked(p));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(p));
 
         /* Back edges may point to objects that will not be retained.   */
         /* Delete them for now, but remember the height.                */
@@ -329,7 +329,7 @@ static void reset_back_edge(ptr_t p, size_t n_bytes, word gc_descr)
             be -> cont = 0;
           }
 
-        GC_ASSERT(GC_is_marked(p));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(p));
 
         /* We only retain things for one GC cycle at a time.            */
           be -> flags &= (unsigned short)~RETAIN;
@@ -346,7 +346,7 @@ static void add_back_edges(ptr_t p, size_t n_bytes, word gc_descr)
   ptr_t current_p = p + sizeof(oh);
 
   /* For now, fix up non-length descriptors conservatively.     */
-    if((gc_descr & GC_DS_TAGS) != GC_DS_LENGTH) {
+    if((gc_descr & MANAGED_STACK_ADDRESS_BOEHM_GC_DS_TAGS) != MANAGED_STACK_ADDRESS_BOEHM_GC_DS_LENGTH) {
       gc_descr = n_bytes;
     }
 
@@ -355,9 +355,9 @@ static void add_back_edges(ptr_t p, size_t n_bytes, word gc_descr)
 
     LOAD_WORD_OR_CONTINUE(current, current_p);
     FIXUP_POINTER(current);
-    if (current > GC_least_real_heap_addr
-        && current < GC_greatest_real_heap_addr) {
-      ptr_t target = (ptr_t)GC_base((void *)current);
+    if (current > MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr
+        && current < MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr) {
+      ptr_t target = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_base((void *)current);
 
       if (target != NULL)
         add_edge(p, target);
@@ -367,10 +367,10 @@ static void add_back_edges(ptr_t p, size_t n_bytes, word gc_descr)
 
 /* Rebuild the representation of the backward reachability graph.       */
 /* Does not examine mark bits.  Can be called before GC.                */
-GC_INNER void GC_build_back_graph(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_build_back_graph(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
-  GC_apply_to_each_object(add_back_edges);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_each_object(add_back_edges);
 }
 
 /* Return an approximation to the length of the longest simple path     */
@@ -382,7 +382,7 @@ static word backwards_height(ptr_t p)
   ptr_t pred = GET_OH_BG_PTR(p);
   back_edges *be;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (NULL == pred)
     return 1;
   if (((word)pred & FLAG_MANY) == 0) {
@@ -395,7 +395,7 @@ static word backwards_height(ptr_t p)
     return result;
   }
   be = (back_edges *)((word)pred & ~(word)FLAG_MANY);
-  if (be -> height >= 0 && be -> height_gc_no == (unsigned short)GC_gc_no)
+  if (be -> height >= 0 && be -> height_gc_no == (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no)
       return (word)(be -> height);
   /* Ignore back edges in DFS */
     if (be -> height == HEIGHT_IN_PROGRESS) return 0;
@@ -428,8 +428,8 @@ static word backwards_height(ptr_t p)
 
         /* Execute the following once for each predecessor pred of p    */
         /* in the points-to graph.                                      */
-        if (GC_is_marked(pred) && ((word)GET_OH_BG_PTR(p) & FLAG_MANY) == 0) {
-          GC_COND_LOG_PRINTF("Found bogus pointer from %p to %p\n",
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(pred) && ((word)GET_OH_BG_PTR(p) & FLAG_MANY) == 0) {
+          MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Found bogus pointer from %p to %p\n",
                              (void *)pred, (void *)p);
             /* Reachable object "points to" unreachable one.            */
             /* Could be caused by our lax treatment of GC descriptors.  */
@@ -443,25 +443,25 @@ static word backwards_height(ptr_t p)
   }
 
   be -> height = (signed_word)result;
-  be -> height_gc_no = (unsigned short)GC_gc_no;
+  be -> height_gc_no = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
   return result;
 }
 
-STATIC word GC_max_height = 0;
-STATIC ptr_t GC_deepest_obj = NULL;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_max_height = 0;
+STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj = NULL;
 
 /* Compute the maximum height of every unreachable predecessor p of a   */
 /* reachable object.  Arrange to save the heights of all such objects p */
 /* so that they can be used in calculating the height of objects in the */
 /* next GC.                                                             */
-/* Set GC_max_height to be the maximum height we encounter, and         */
-/* GC_deepest_obj to be the corresponding object.                       */
+/* Set MANAGED_STACK_ADDRESS_BOEHM_GC_max_height to be the maximum height we encounter, and         */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj to be the corresponding object.                       */
 static void update_max_height(ptr_t p, size_t n_bytes, word gc_descr)
 {
   UNUSED_ARG(n_bytes);
   UNUSED_ARG(gc_descr);
-  GC_ASSERT(I_HOLD_LOCK());
-  if (GC_is_marked(p) && GC_HAS_DEBUG_INFO(p)) {
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(p) && MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(p)) {
     word p_height = 0;
     ptr_t p_deepest_obj = 0;
     ptr_t back_ptr;
@@ -503,7 +503,7 @@ static void update_max_height(ptr_t p, size_t n_bytes, word gc_descr)
 
         /* Execute the following once for each predecessor pred of p    */
         /* in the points-to graph.                                      */
-        if (!GC_is_marked(pred) && GC_HAS_DEBUG_INFO(pred)) {
+        if (!MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(pred) && MANAGED_STACK_ADDRESS_BOEHM_GC_HAS_DEBUG_INFO(pred)) {
           word this_height = backwards_height(pred);
           if (this_height > p_height) {
             p_height = this_height;
@@ -522,47 +522,47 @@ static void update_max_height(ptr_t p, size_t n_bytes, word gc_descr)
         }
         be -> flags |= RETAIN;
         be -> height = (signed_word)p_height;
-        be -> height_gc_no = (unsigned short)GC_gc_no;
+        be -> height_gc_no = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
     }
-    if (p_height > GC_max_height) {
-        GC_max_height = p_height;
-        GC_deepest_obj = p_deepest_obj;
+    if (p_height > MANAGED_STACK_ADDRESS_BOEHM_GC_max_height) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_max_height = p_height;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj = p_deepest_obj;
     }
   }
 }
 
-STATIC word GC_max_max_height = 0;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_max_max_height = 0;
 
-GC_INNER void GC_traverse_back_graph(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_traverse_back_graph(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
-  GC_max_height = 0;
-  GC_apply_to_each_object(update_max_height);
-  if (0 != GC_deepest_obj)
-    GC_set_mark_bit(GC_deepest_obj);  /* Keep it until we can print it. */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_max_height = 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_each_object(update_max_height);
+  if (0 != MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_mark_bit(MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj);  /* Keep it until we can print it. */
 }
 
-void GC_print_back_graph_stats(void)
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_back_graph_stats(void)
 {
-  GC_ASSERT(I_HOLD_LOCK());
-  GC_printf("Maximum backwards height of reachable objects"
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Maximum backwards height of reachable objects"
             " at GC #%lu is %lu\n",
-            (unsigned long)GC_gc_no, (unsigned long)GC_max_height);
-  if (GC_max_height > GC_max_max_height) {
-    ptr_t obj = GC_deepest_obj;
+            (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no, (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_max_height);
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_max_height > MANAGED_STACK_ADDRESS_BOEHM_GC_max_max_height) {
+    ptr_t obj = MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj;
 
-    GC_max_max_height = GC_max_height;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_max_max_height = MANAGED_STACK_ADDRESS_BOEHM_GC_max_height;
     UNLOCK();
-    GC_err_printf(
+    MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf(
             "The following unreachable object is last in a longest chain "
             "of unreachable objects:\n");
-    GC_print_heap_obj(obj);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj(obj);
     LOCK();
   }
-  GC_COND_LOG_PRINTF("Needed max total of %d back-edge structs\n",
-                     GC_n_back_edge_structs);
-  GC_apply_to_each_object(reset_back_edge);
-  GC_deepest_obj = 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Needed max total of %d back-edge structs\n",
+                     MANAGED_STACK_ADDRESS_BOEHM_GC_n_back_edge_structs);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_each_object(reset_back_edge);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_deepest_obj = 0;
 }
 
 #endif /* MAKE_BACK_GRAPH */

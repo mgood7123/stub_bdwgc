@@ -17,19 +17,19 @@
 #if defined(THREAD_LOCAL_ALLOC)
 
 #if !defined(THREADS) && !defined(CPPCHECK)
-# error Invalid config - THREAD_LOCAL_ALLOC requires GC_THREADS
+# error Invalid config - THREAD_LOCAL_ALLOC requires MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #endif
 
 #include "private/thread_local_alloc.h"
 
 #if defined(USE_COMPILER_TLS)
-  __thread GC_ATTR_TLS_FAST
+  __thread MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_TLS_FAST
 #elif defined(USE_WIN32_COMPILER_TLS)
-  __declspec(thread) GC_ATTR_TLS_FAST
+  __declspec(thread) MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_TLS_FAST
 #endif
-GC_key_t GC_thread_key;
+MANAGED_STACK_ADDRESS_BOEHM_GC_key_t MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key;
 
-static GC_bool keys_initialized;
+static MANAGED_STACK_ADDRESS_BOEHM_GC_bool keys_initialized;
 
 /* Return a single nonempty freelist fl to the global one pointed to    */
 /* by gfl.                                                              */
@@ -41,12 +41,12 @@ static void return_single_freelist(void *fl, void **gfl)
     } else {
       void *q, **qptr;
 
-      GC_ASSERT(GC_size(fl) == GC_size(*gfl));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_size(fl) == MANAGED_STACK_ADDRESS_BOEHM_GC_size(*gfl));
       /* Concatenate: */
         qptr = &(obj_link(fl));
         while ((word)(q = *qptr) >= HBLKSIZE)
           qptr = &(obj_link(q));
-        GC_ASSERT(0 == q);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == q);
         *qptr = *gfl;
         *gfl = fl;
     }
@@ -57,7 +57,7 @@ static void return_freelists(void **fl, void **gfl)
 {
     int i;
 
-    for (i = 1; i < GC_TINY_FREELISTS; ++i) {
+    for (i = 1; i < MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS; ++i) {
         if ((word)(fl[i]) >= HBLKSIZE) {
           return_single_freelist(fl[i], &gfl[i]);
         }
@@ -67,7 +67,7 @@ static void return_freelists(void **fl, void **gfl)
     }
     /* The 0 granule freelist really contains 1 granule objects.        */
     if ((word)fl[0] >= HBLKSIZE
-#       ifdef GC_GCJ_SUPPORT
+#       ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
           && fl[0] != ERROR_FL
 #       endif
        ) {
@@ -78,11 +78,11 @@ static void return_freelists(void **fl, void **gfl)
 #ifdef USE_PTHREAD_SPECIFIC
   /* Re-set the TLS value on thread cleanup to allow thread-local       */
   /* allocations to happen in the TLS destructors.                      */
-  /* GC_unregister_my_thread (and similar routines) will finally set    */
-  /* the GC_thread_key to NULL preventing this destructor from being    */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_unregister_my_thread (and similar routines) will finally set    */
+  /* the MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key to NULL preventing this destructor from being    */
   /* called repeatedly.                                                 */
   static void reset_thread_key(void* v) {
-    pthread_setspecific(GC_thread_key, v);
+    pthread_setspecific(MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key, v);
   }
 #else
 # define reset_thread_key 0
@@ -90,79 +90,79 @@ static void return_freelists(void **fl, void **gfl)
 
 /* Each thread structure must be initialized.   */
 /* This call must be made from the new thread.  */
-GC_INNER void GC_init_thread_local(GC_tlfs p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_init_thread_local(MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs p)
 {
     int i, j, res;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     if (!EXPECT(keys_initialized, TRUE)) {
 #       ifdef USE_CUSTOM_SPECIFIC
           /* Ensure proper alignment of a "pushed" GC symbol.   */
-          GC_ASSERT((word)(&GC_thread_key) % sizeof(word) == 0);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)(&MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key) % sizeof(word) == 0);
 #       endif
-        res = GC_key_create(&GC_thread_key, reset_thread_key);
+        res = MANAGED_STACK_ADDRESS_BOEHM_GC_key_create(&MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key, reset_thread_key);
         if (COVERT_DATAFLOW(res) != 0) {
             ABORT("Failed to create key for local allocator");
         }
         keys_initialized = TRUE;
     }
-    res = GC_setspecific(GC_thread_key, p);
+    res = MANAGED_STACK_ADDRESS_BOEHM_GC_setspecific(MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key, p);
     if (COVERT_DATAFLOW(res) != 0) {
         ABORT("Failed to set thread specific allocation pointers");
     }
-    for (j = 0; j < GC_TINY_FREELISTS; ++j) {
+    for (j = 0; j < MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS; ++j) {
         for (i = 0; i < THREAD_FREELISTS_KINDS; ++i) {
             p -> _freelists[i][j] = (void *)(word)1;
         }
-#       ifdef GC_GCJ_SUPPORT
+#       ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
             p -> gcj_freelists[j] = (void *)(word)1;
 #       endif
     }
     /* The size 0 free lists are handled like the regular free lists,   */
     /* to ensure that the explicit deallocation works.  However,        */
     /* allocation of a size 0 "gcj" object is always an error.          */
-#   ifdef GC_GCJ_SUPPORT
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
         p -> gcj_freelists[0] = ERROR_FL;
 #   endif
 }
 
-GC_INNER void GC_destroy_thread_local(GC_tlfs p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_destroy_thread_local(MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs p)
 {
     int k;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_getspecific(GC_thread_key) == p);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_getspecific(MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key) == p);
     /* We currently only do this from the thread itself.        */
-    GC_STATIC_ASSERT(THREAD_FREELISTS_KINDS <= MAXOBJKINDS);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(THREAD_FREELISTS_KINDS <= MAXOBJKINDS);
     for (k = 0; k < THREAD_FREELISTS_KINDS; ++k) {
-        if (k == (int)GC_n_kinds)
+        if (k == (int)MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds)
             break; /* kind is not created */
-        return_freelists(p -> _freelists[k], GC_obj_kinds[k].ok_freelist);
+        return_freelists(p -> _freelists[k], MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[k].ok_freelist);
     }
-#   ifdef GC_GCJ_SUPPORT
-        return_freelists(p -> gcj_freelists, (void **)GC_gcjobjfreelist);
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
+        return_freelists(p -> gcj_freelists, (void **)MANAGED_STACK_ADDRESS_BOEHM_GC_gcjobjfreelist);
 #   endif
 }
 
-STATIC void *GC_get_tlfs(void)
+STATIC void *MANAGED_STACK_ADDRESS_BOEHM_GC_get_tlfs(void)
 {
 # if !defined(USE_PTHREAD_SPECIFIC) && !defined(USE_WIN32_SPECIFIC)
-    GC_key_t k = GC_thread_key;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_key_t k = MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key;
 
     if (EXPECT(0 == k, FALSE)) {
-      /* We have not yet run GC_init_parallel.  That means we also  */
-      /* are not locking, so GC_malloc_kind_global is fairly cheap. */
+      /* We have not yet run MANAGED_STACK_ADDRESS_BOEHM_GC_init_parallel.  That means we also  */
+      /* are not locking, so MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind_global is fairly cheap. */
       return NULL;
     }
-    return GC_getspecific(k);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_getspecific(k);
 # else
     if (EXPECT(!keys_initialized, FALSE)) return NULL;
 
-    return GC_getspecific(GC_thread_key);
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_getspecific(MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key);
 # endif
 }
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_malloc_kind(size_t bytes, int kind)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind(size_t bytes, int kind)
 {
     size_t granules;
     void *tsd;
@@ -170,35 +170,35 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_malloc_kind(size_t bytes, int kind)
 
 #   if MAXOBJKINDS > THREAD_FREELISTS_KINDS
       if (EXPECT(kind >= THREAD_FREELISTS_KINDS, FALSE)) {
-        return GC_malloc_kind_global(bytes, kind);
+        return MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind_global(bytes, kind);
       }
 #   endif
-    tsd = GC_get_tlfs();
+    tsd = MANAGED_STACK_ADDRESS_BOEHM_GC_get_tlfs();
     if (EXPECT(NULL == tsd, FALSE)) {
-        return GC_malloc_kind_global(bytes, kind);
+        return MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind_global(bytes, kind);
     }
-    GC_ASSERT(GC_is_initialized);
-    GC_ASSERT(GC_is_thread_tsd_valid(tsd));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_thread_tsd_valid(tsd));
     granules = ALLOC_REQUEST_GRANS(bytes);
 #   if defined(CPPCHECK)
 #     define MALLOC_KIND_PTRFREE_INIT (void*)1
 #   else
 #     define MALLOC_KIND_PTRFREE_INIT NULL
 #   endif
-    GC_FAST_MALLOC_GRANS(result, granules,
-                         ((GC_tlfs)tsd) -> _freelists[kind], DIRECT_GRANULES,
-                         kind, GC_malloc_kind_global(bytes, kind),
+    MANAGED_STACK_ADDRESS_BOEHM_GC_FAST_MALLOC_GRANS(result, granules,
+                         ((MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs)tsd) -> _freelists[kind], DIRECT_GRANULES,
+                         kind, MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind_global(bytes, kind),
                          (void)(kind == PTRFREE ? MALLOC_KIND_PTRFREE_INIT
                                                : (obj_link(result) = 0)));
 #   ifdef LOG_ALLOCS
-      GC_log_printf("GC_malloc_kind(%lu, %d) returned %p, recent GC #%lu\n",
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_kind(%lu, %d) returned %p, recent GC #%lu\n",
                     (unsigned long)bytes, kind, result,
-                    (unsigned long)GC_gc_no);
+                    (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no);
 #   endif
     return result;
 }
 
-#ifdef GC_GCJ_SUPPORT
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
 
 # include "gc/gc_gcj.h"
 
@@ -222,21 +222,21 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_malloc_kind(size_t bytes, int kind)
 /* incremental GC should be enabled before we fork a second thread.     */
 /* Unlike the other thread local allocation calls, we assume that the   */
 /* collector has been explicitly initialized.                           */
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_gcj_malloc(size_t bytes,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_gcj_malloc(size_t bytes,
                                     void * ptr_to_struct_containing_descr)
 {
-  if (EXPECT(GC_incremental, FALSE)) {
-    return GC_core_gcj_malloc(bytes, ptr_to_struct_containing_descr, 0);
+  if (EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_incremental, FALSE)) {
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_core_gcj_malloc(bytes, ptr_to_struct_containing_descr, 0);
   } else {
     size_t granules = ALLOC_REQUEST_GRANS(bytes);
     void *result;
     void **tiny_fl;
 
-    GC_ASSERT(GC_gcjobjfreelist != NULL);
-    tiny_fl = ((GC_tlfs)GC_getspecific(GC_thread_key))->gcj_freelists;
-    GC_FAST_MALLOC_GRANS(result, granules, tiny_fl, DIRECT_GRANULES,
-                         GC_gcj_kind,
-                         GC_core_gcj_malloc(bytes,
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_gcjobjfreelist != NULL);
+    tiny_fl = ((MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs)MANAGED_STACK_ADDRESS_BOEHM_GC_getspecific(MANAGED_STACK_ADDRESS_BOEHM_GC_thread_key))->gcj_freelists;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_FAST_MALLOC_GRANS(result, granules, tiny_fl, DIRECT_GRANULES,
+                         MANAGED_STACK_ADDRESS_BOEHM_GC_gcj_kind,
+                         MANAGED_STACK_ADDRESS_BOEHM_GC_core_gcj_malloc(bytes,
                                             ptr_to_struct_containing_descr,
                                             0 /* flags */),
                          {AO_compiler_barrier();
@@ -263,50 +263,50 @@ GC_API GC_ATTR_MALLOC void * GC_CALL GC_gcj_malloc(size_t bytes,
   }
 }
 
-#endif /* GC_GCJ_SUPPORT */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT */
 
 /* The thread support layer must arrange to mark thread-local   */
 /* free lists explicitly, since the link field is often         */
 /* invisible to the marker.  It knows how to find all threads;  */
 /* we take care of an individual thread freelist structure.     */
-GC_INNER void GC_mark_thread_local_fls_for(GC_tlfs p)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_mark_thread_local_fls_for(MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs p)
 {
     ptr_t q;
     int i, j;
 
-    for (j = 0; j < GC_TINY_FREELISTS; ++j) {
+    for (j = 0; j < MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS; ++j) {
       for (i = 0; i < THREAD_FREELISTS_KINDS; ++i) {
         /* Load the pointer atomically as it might be updated   */
-        /* concurrently by GC_FAST_MALLOC_GRANS.                */
+        /* concurrently by MANAGED_STACK_ADDRESS_BOEHM_GC_FAST_MALLOC_GRANS.                */
         q = (ptr_t)AO_load((volatile AO_t *)&p->_freelists[i][j]);
         if ((word)q > HBLKSIZE)
-          GC_set_fl_marks(q);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_set_fl_marks(q);
       }
-#     ifdef GC_GCJ_SUPPORT
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
         if (EXPECT(j > 0, TRUE)) {
           q = (ptr_t)AO_load((volatile AO_t *)&p->gcj_freelists[j]);
           if ((word)q > HBLKSIZE)
-            GC_set_fl_marks(q);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_set_fl_marks(q);
         }
 #     endif
     }
 }
 
-#if defined(GC_ASSERTIONS)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS)
     /* Check that all thread-local free-lists in p are completely marked. */
-    void GC_check_tls_for(GC_tlfs p)
+    void MANAGED_STACK_ADDRESS_BOEHM_GC_check_tls_for(MANAGED_STACK_ADDRESS_BOEHM_GC_tlfs p)
     {
         int i, j;
 
-        for (j = 1; j < GC_TINY_FREELISTS; ++j) {
+        for (j = 1; j < MANAGED_STACK_ADDRESS_BOEHM_GC_TINY_FREELISTS; ++j) {
           for (i = 0; i < THREAD_FREELISTS_KINDS; ++i) {
-            GC_check_fl_marks(&p->_freelists[i][j]);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_check_fl_marks(&p->_freelists[i][j]);
           }
-#         ifdef GC_GCJ_SUPPORT
-            GC_check_fl_marks(&p->gcj_freelists[j]);
+#         ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
+            MANAGED_STACK_ADDRESS_BOEHM_GC_check_fl_marks(&p->gcj_freelists[j]);
 #         endif
         }
     }
-#endif /* GC_ASSERTIONS */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 
 #endif /* THREAD_LOCAL_ALLOC */

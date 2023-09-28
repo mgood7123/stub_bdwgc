@@ -25,7 +25,7 @@ libgcc_s.so.1.  Alternatively, you can configure with --disable-shared.
 SOLARIS THREADS:
 
 Unless --disable-threads option is given, threads support is on by default in
-configure.  This causes the collector to be compiled with -D GC_THREADS
+configure.  This causes the collector to be compiled with -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 ensuring thread safety.  This assumes use of the pthread_ interface; old-style
 Solaris threads are no longer supported.  Thread-local allocation is on by
 default.  Parallel marking is on by default (it could be disabled manually
@@ -33,7 +33,7 @@ by configure --disable-parallel-mark option).
 
 It is also essential that gc.h be included in files that call pthread_create,
 pthread_join, pthread_detach, or dlopen.  gc.h macro defines these to also do
-GC bookkeeping, etc.  gc.h must be included with GC_THREADS macro defined
+GC bookkeeping, etc.  gc.h must be included with MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS macro defined
 first, otherwise these replacements are not visible.  A collector built in
 this way may only be used by programs that are linked with the threads library.
 
@@ -42,8 +42,8 @@ temporarily.  In some unlikely cases, this can result in unpleasant heap
 growth.  But it seems better than the race/deadlock issues we had before.
 
 If threads are used on an x86 processor with malloc redirected to
-GC_malloc, it is necessary to call GC_INIT explicitly before forking the
-first thread.  (This avoids a deadlock arising from calling GC_thr_init
+MANAGED_STACK_ADDRESS_BOEHM_GC_malloc, it is necessary to call MANAGED_STACK_ADDRESS_BOEHM_GC_INIT explicitly before forking the
+first thread.  (This avoids a deadlock arising from calling MANAGED_STACK_ADDRESS_BOEHM_GC_thr_init
 with the allocation lock held.)
 
 There could be an issue when using gc_cpp.h in conjunction with Solaris

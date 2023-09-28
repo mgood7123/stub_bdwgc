@@ -50,21 +50,21 @@ jobs:
     language: c
     env:
     - CSA_CHECK=true
-    - CFLAGS_EXTRA="-D ALL_INTERIOR_POINTERS -D CHECKSUMS -D DBG_HDRS_ALL -D DEBUG_THREADS -D ENABLE_TRACE -D GC_ALWAYS_MULTITHREADED -D GC_ASSERTIONS -D GC_ATOMIC_UNCOLLECTABLE -D GC_ENABLE_SUSPEND_THREAD -D GC_GCJ_SUPPORT -D GC_PRINT_BACK_HEIGHT -D GC_THREADS -D HANDLE_FORK -D JAVA_FINALIZATION -D KEEP_BACK_PTRS -D MAKE_BACK_GRAPH -D PARALLEL_MARK -D PRINT_BLACK_LIST -D THREAD_LOCAL_ALLOC -D USE_MMAP -D USE_MUNMAP"
+    - CFLAGS_EXTRA="-D ALL_INTERIOR_POINTERS -D CHECKSUMS -D DBG_HDRS_ALL -D DEBUG_THREADS -D ENABLE_TRACE -D MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED -D MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS -D MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE -D MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD -D MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -D MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_BACK_HEIGHT -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -D HANDLE_FORK -D JAVA_FINALIZATION -D KEEP_BACK_PTRS -D MAKE_BACK_GRAPH -D PARALLEL_MARK -D PRINT_BLACK_LIST -D THREAD_LOCAL_ALLOC -D USE_MMAP -D USE_MUNMAP"
   - dist: xenial
     env:
     - CPPCHECK_ENABLE="--enable=unusedFunction -I libatomic_ops/src extra/gc.c tests/*.c"
   - dist: xenial
     env:
-    - CPPCHECK_ENABLE="--enable=unusedFunction --force -D GC_BUILTIN_ATOMIC *.cc cord/*.c cord/tests/*.c tests/*.c tests/*.cc"
+    - CPPCHECK_ENABLE="--enable=unusedFunction --force -D MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC *.cc cord/*.c cord/tests/*.c tests/*.c tests/*.cc"
     - CPPCHECK_OUT_FILTER="Z"
     - NO_CLONE_LIBATOMIC_OPS=true
   - dist: xenial
     env:
-    - CPPCHECK_ENABLE="-j4 --enable=information,performance,portability,style,warning --force -U GC_PRIVATE_H -I libatomic_ops/src *.c"
+    - CPPCHECK_ENABLE="-j4 --enable=information,performance,portability,style,warning --force -U MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H -I libatomic_ops/src *.c"
   - dist: xenial
     env:
-    - CPPCHECK_ENABLE="-j4 --enable=information,performance,portability,style,warning --force -U GC_PRIVATE_H -I libatomic_ops/src *.cc cord/*.c cord/tests/*.c extra/AmigaOS.c extra/MacOS.c extra/msvc_dbg.c extra/symbian.cpp tests/*.c tests/*.cc tools/*.c"
+    - CPPCHECK_ENABLE="-j4 --enable=information,performance,portability,style,warning --force -U MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H -I libatomic_ops/src *.cc cord/*.c cord/tests/*.c extra/AmigaOS.c extra/MacOS.c extra/msvc_dbg.c extra/symbian.cpp tests/*.c tests/*.cc tools/*.c"
   - arch: arm64
     compiler: clang
   - arch: arm64
@@ -185,7 +185,7 @@ jobs:
     - CC=clang-12
     - CXX=clang++-12
     - CFLAGS_EXTRA="-O3 -flto -D _FORTIFY_SOURCE=2 -D NO_RETRY_SIGNALS"
-    - CONF_OPTIONS="--enable-gc-assertions --enable-cplusplus --enable-dynamic-pointer-mask"
+    - CONF_OPTIONS="--enable-gc-assertions --enable-cplusplus"
   - addons:
       apt:
         packages:
@@ -281,11 +281,11 @@ jobs:
     - NO_CLONE_LIBATOMIC_OPS=true
   - compiler: gcc
     env:
-    - CFLAGS_EXTRA="-D DEBUG_ADD_DEL_ROOTS -D DEBUG_THREADS -D GC_DEBUG -D GC_LOG_TO_FILE_ALWAYS"
+    - CFLAGS_EXTRA="-D DEBUG_ADD_DEL_ROOTS -D DEBUG_THREADS -D MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG -D MANAGED_STACK_ADDRESS_BOEHM_GC_LOG_TO_FILE_ALWAYS"
     - CONF_OPTIONS="--enable-cplusplus"
   - compiler: gcc
     env:
-    - CFLAGS_EXTRA="-D BSD_TIME -D DEFAULT_STACK_MAYBE_SMALL -D ENABLE_TRACE -D EMPTY_GETENV_RESULTS -D GC_ALWAYS_MULTITHREADED -D GC_NETBSD_THREADS_WORKAROUND -D CPPCHECK"
+    - CFLAGS_EXTRA="-D BSD_TIME -D DEFAULT_STACK_MAYBE_SMALL -D ENABLE_TRACE -D EMPTY_GETENV_RESULTS -D MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED -D MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS_WORKAROUND -D CPPCHECK"
     - CONF_OPTIONS="--enable-cplusplus --enable-gc-assertions"
   - compiler: clang
     env:
@@ -320,7 +320,7 @@ jobs:
     env:
     - CONF_CFLAGS="-O3 -D AO_USE_PTHREAD_DEFS -D RANDOM_ONE_CPU_CORE"
     - CONF_OPTIONS="--with-libatomic-ops=yes --enable-cplusplus"
-    - CFLAGS_EXTRA="-D GC_NO_FINALIZATION"
+    - CFLAGS_EXTRA="-D MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION"
     - NO_CLONE_LIBATOMIC_OPS=true
   - addons:
       apt:
@@ -333,7 +333,7 @@ jobs:
     - NO_CLONE_LIBATOMIC_OPS=true
   - compiler: gcc
     env:
-    - CFLAGS_EXTRA="-funsigned-char -D _FORTIFY_SOURCE=2 -D DONT_ADD_BYTE_AT_END -D GC_TIME_LIMIT=3"
+    - CFLAGS_EXTRA="-funsigned-char -D _FORTIFY_SOURCE=2 -D DONT_ADD_BYTE_AT_END -D MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT=3"
     - CONF_OPTIONS="--enable-gc-assertions --enable-cplusplus"
   - addons:
       apt:
@@ -353,7 +353,7 @@ jobs:
     - CONF_OPTIONS="--enable-gc-assertions --enable-cplusplus --enable-handle-fork=manual"
   - compiler: gcc
     env:
-    - CFLAGS_EXTRA="-D PROC_VDB -D GC_NO_SYS_FAULT_H -D NO_INCREMENTAL -D DEBUG_DIRTY_BITS"
+    - CFLAGS_EXTRA="-D PROC_VDB -D MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SYS_FAULT_H -D NO_INCREMENTAL -D DEBUG_DIRTY_BITS"
     - CONF_OPTIONS="--enable-cplusplus --disable-docs"
   - compiler: clang
     env:
@@ -373,7 +373,7 @@ jobs:
     - CONF_OPTIONS="--enable-cplusplus"
   - compiler: gcc
     env:
-    - CFLAGS_EXTRA="-std=c11 -D _FORTIFY_SOURCE=2 -D GC_NO_SIGSETJMP"
+    - CFLAGS_EXTRA="-std=c11 -D _FORTIFY_SOURCE=2 -D MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP"
     - CONF_OPTIONS="--disable-threads --enable-gc-assertions"
     - NO_CLONE_LIBATOMIC_OPS=true
   - compiler: clang
@@ -445,7 +445,7 @@ jobs:
   - compiler: gcc
     env:
     - CONF_OPTIONS="--disable-static --disable-threads --enable-cplusplus"
-    - CFLAGS_EXTRA="-O3 -march=native -D GC_PREFER_MPROTECT_VDB"
+    - CFLAGS_EXTRA="-O3 -march=native -D MANAGED_STACK_ADDRESS_BOEHM_GC_PREFER_MPROTECT_VDB"
     - NO_CLONE_LIBATOMIC_OPS=true
   - os: osx
     env:
@@ -562,6 +562,12 @@ jobs:
     dist: focal
     env:
     - CFLAGS_EXTRA="-fsanitize=thread -D NO_INCREMENTAL -fno-omit-frame-pointer -D TEST_FORK_WITHOUT_ATFORK"
+    - CONF_OPTIONS="--enable-gc-assertions --enable-handle-fork=manual"
+    - NO_CLONE_LIBATOMIC_OPS=true
+  - compiler: clang
+    dist: focal
+    env:
+    - CFLAGS_EXTRA="-fsanitize=thread -D NO_INCREMENTAL -fno-omit-frame-pointer -D TEST_FORK_WITHOUT_ATFORK"
     - CONF_OPTIONS="--enable-gc-assertions --enable-gc-debug --enable-handle-fork=manual --enable-large-config --without-libatomic-ops"
   - compiler: clang
     dist: xenial
@@ -584,7 +590,7 @@ jobs:
         - gcc-multilib
     compiler: clang
     env:
-    - CFLAGS_EXTRA="-m32 -D _FORTIFY_SOURCE=2 -D GC_DISABLE_INCREMENTAL -std=gnu11"
+    - CFLAGS_EXTRA="-m32 -D _FORTIFY_SOURCE=2 -D MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL -std=gnu11"
     - CONF_OPTIONS="--enable-gc-assertions --enable-gc-debug"
     - NO_CLONE_LIBATOMIC_OPS=true
   - compiler: gcc
@@ -775,7 +781,7 @@ script:
 - if [[ "$CPPCHECK_ENABLE" != "" ]]; then
     if [[ "$CPPCHECK_OUT_FILTER" == "" ]]; then CPPCHECK_OUT_FILTER="c "; fi;
     set -o pipefail; ~/cppcheck/cppcheck --error-exitcode=2
-        -U CORD_API -U GC_API -D CPPCHECK -I include $CPPCHECK_ENABLE |
+        -U CORD_API -U MANAGED_STACK_ADDRESS_BOEHM_GC_API -D CPPCHECK -I include $CPPCHECK_ENABLE |
         grep --line-buffered "$CPPCHECK_OUT_FILTER";
   fi
 - if [[ "$TESTS_CUSTOM_RUN" == true ]]; then

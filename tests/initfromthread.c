@@ -11,7 +11,7 @@
  * modified is included with the above copyright notice.
  */
 
-/* Make sure 'GC_INIT' can be called from threads other than the initial
+/* Make sure 'MANAGED_STACK_ADDRESS_BOEHM_GC_INIT' can be called from threads other than the initial
  * thread.
  */
 
@@ -19,16 +19,16 @@
 # include "config.h"
 #endif
 
-#ifndef GC_THREADS
-# define GC_THREADS
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #endif
 
-#define GC_NO_THREAD_REDIRECTS 1
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS 1
                 /* Do not redirect thread creation and join calls.      */
 
 #include "gc.h"
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
 # include <pthread.h>
 # include <string.h>
 #else
@@ -37,7 +37,7 @@
 # endif
 # define NOSERVICE
 # include <windows.h>
-#endif /* !GC_PTHREADS */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -50,19 +50,19 @@
         } \
     } while (0)
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
   static void *thread(void *arg)
 #else
   static DWORD WINAPI thread(LPVOID arg)
 #endif
 {
-  GC_INIT();
-  CHECK_OUT_OF_MEMORY(GC_MALLOC(123));
-  CHECK_OUT_OF_MEMORY(GC_MALLOC(12345));
-# ifdef GC_PTHREADS
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+  CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(123));
+  CHECK_OUT_OF_MEMORY(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(12345));
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     return arg;
 # else
-    return (DWORD)(GC_word)arg;
+    return (DWORD)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)arg;
 # endif
 }
 
@@ -70,7 +70,7 @@
 
 int main(void)
 {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int code;
     pthread_t t;
 
@@ -86,16 +86,16 @@ int main(void)
        || ((defined(FREEBSD) || defined(LINUX) || defined(NETBSD) \
             || defined(HOST_ANDROID)) && !defined(NO_PTHREAD_GETATTR_NP) \
            && !defined(NO_PTHREAD_ATTR_GET_NP)) \
-       || (defined(GC_SOLARIS_THREADS) && !defined(_STRICT_STDC)) \
+       || (defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS) && !defined(_STRICT_STDC)) \
        || (!defined(STACKBOTTOM) && (defined(HEURISTIC1) \
           || (!defined(LINUX_STACKBOTTOM) && !defined(FREEBSD_STACKBOTTOM)))))
-    /* GC_INIT() must be called from main thread only. */
-    GC_INIT();
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_INIT() must be called from main thread only. */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 # endif
-  (void)GC_get_suspend_signal(); /* linking fails if no threads support */
-  if (GC_get_find_leak())
+  (void)MANAGED_STACK_ADDRESS_BOEHM_GC_get_suspend_signal(); /* linking fails if no threads support */
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
     printf("This test program is not designed for leak detection mode\n");
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     if ((code = pthread_create(&t, NULL, thread, NULL)) != 0) {
       fprintf(stderr, "Thread #0 creation failed: %s\n", strerror(code));
       return 1;

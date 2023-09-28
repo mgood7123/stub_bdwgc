@@ -8,18 +8,18 @@
 ******************************************************************/
 
 
-#if !defined(GC_AMIGA_DEF) && !defined(GC_AMIGA_SB) && !defined(GC_AMIGA_DS) && !defined(GC_AMIGA_AM)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DEF) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_SB) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_AM)
 # include "private/gc_priv.h"
 # include <stdio.h>
 # include <signal.h>
-# define GC_AMIGA_DEF
-# define GC_AMIGA_SB
-# define GC_AMIGA_DS
-# define GC_AMIGA_AM
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DEF
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_SB
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_AM
 #endif
 
 
-#ifdef GC_AMIGA_DEF
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DEF
 
 # ifndef __GNUC__
 #   include <exec/exec.h>
@@ -34,13 +34,13 @@
 
 
 
-#ifdef GC_AMIGA_SB
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_SB
 
 /******************************************************************
    Find the base of the stack.
 ******************************************************************/
 
-ptr_t GC_get_main_stack_base(void)
+ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_get_main_stack_base(void)
 {
     struct Process *proc = (struct Process*)SysBase->ThisTask;
 
@@ -60,12 +60,12 @@ ptr_t GC_get_main_stack_base(void)
 #endif
 
 
-#ifdef GC_AMIGA_DS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_DS
 /******************************************************************
    Register data segments.
 ******************************************************************/
 
-   void GC_register_data_segments(void)
+   void MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments(void)
    {
      struct Process     *proc;
      struct CommandLineInterface *cli;
@@ -74,7 +74,7 @@ ptr_t GC_get_main_stack_base(void)
 
 #     ifdef __GNUC__
         ULONG dataSegSize;
-        GC_bool found_segment = FALSE;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bool found_segment = FALSE;
         extern char __data_size[];
 
         dataSegSize=__data_size+8;
@@ -106,15 +106,15 @@ ptr_t GC_get_main_stack_base(void)
 
         for (data = (ULONG *)BADDR(myseglist); data != NULL;
              data = (ULONG *)BADDR(data[0])) {
-          if ((ULONG)GC_register_data_segments < (ULONG)(&data[1])
-              || (ULONG)GC_register_data_segments > (ULONG)(&data[1])
+          if ((ULONG)MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments < (ULONG)(&data[1])
+              || (ULONG)MANAGED_STACK_ADDRESS_BOEHM_GC_register_data_segments > (ULONG)(&data[1])
                                                     + data[-1]) {
 #             ifdef __GNUC__
                 if (dataSegSize == data[-1]) {
                   found_segment = TRUE;
                 }
 #             endif
-              GC_add_roots_inner((char *)&data[1],
+              MANAGED_STACK_ADDRESS_BOEHM_GC_add_roots_inner((char *)&data[1],
                                  ((char *)&data[1]) + data[-1], FALSE);
           }
         } /* for */
@@ -129,26 +129,26 @@ ptr_t GC_get_main_stack_base(void)
 
 
 
-#ifdef GC_AMIGA_AM
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_AM
 
-#ifndef GC_AMIGA_FASTALLOC
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC
 
-void *GC_amiga_allocwrapper(size_t size,void *(*AllocFunction)(size_t size2)){
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper(size_t size,void *(*AllocFunction)(size_t size2)){
         return (*AllocFunction)(size);
 }
 
-void *(*GC_amiga_allocwrapper_do)(size_t size,void *(*AllocFunction)(size_t size2))
-        =GC_amiga_allocwrapper;
+void *(*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do)(size_t size,void *(*AllocFunction)(size_t size2))
+        =MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper;
 
 #else
 
 
 
 
-void *GC_amiga_allocwrapper_firsttime(size_t size,void *(*AllocFunction)(size_t size2));
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_firsttime(size_t size,void *(*AllocFunction)(size_t size2));
 
-void *(*GC_amiga_allocwrapper_do)(size_t size,void *(*AllocFunction)(size_t size2))
-        =GC_amiga_allocwrapper_firsttime;
+void *(*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do)(size_t size,void *(*AllocFunction)(size_t size2))
+        =MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_firsttime;
 
 
 /******************************************************************
@@ -164,25 +164,25 @@ void *(*GC_amiga_allocwrapper_do)(size_t size,void *(*AllocFunction)(size_t size
 
 /* List-header for all allocated memory. */
 
-struct GC_Amiga_AllocedMemoryHeader{
+struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader{
         ULONG size;
-        struct GC_Amiga_AllocedMemoryHeader *next;
+        struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *next;
 };
-struct GC_Amiga_AllocedMemoryHeader *GC_AMIGAMEM=(struct GC_Amiga_AllocedMemoryHeader *)(int)~(NULL);
+struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGAMEM=(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *)(int)~(NULL);
 
 
 
 /* Type of memory. Once in the execution of a program, this might change to MEMF_ANY|MEMF_CLEAR */
 
-ULONG GC_AMIGA_MEMF = MEMF_FAST | MEMF_CLEAR;
+ULONG MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF = MEMF_FAST | MEMF_CLEAR;
 
 
-/* Prevents GC_amiga_get_mem from allocating memory if this one is TRUE. */
-#ifndef GC_AMIGA_ONLYFAST
-BOOL GC_amiga_dontalloc=FALSE;
+/* Prevents MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_get_mem from allocating memory if this one is TRUE. */
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
+BOOL MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc=FALSE;
 #endif
 
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
 int succ=0,succ2=0;
 int nsucc=0,nsucc2=0;
 int nullretries=0;
@@ -206,20 +206,20 @@ int ncur151=0;
 
 /* Free everything at program-end. */
 
-void GC_amiga_free_all_mem(void){
-        struct GC_Amiga_AllocedMemoryHeader *gc_am=(struct GC_Amiga_AllocedMemoryHeader *)(~(int)(GC_AMIGAMEM));
+void MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_free_all_mem(void){
+        struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *gc_am=(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *)(~(int)(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGAMEM));
 
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
         printf("\n\n"
                 "%d bytes of chip-mem, and %d bytes of fast-mem where allocated from the OS.\n",
                 allochip,allocfast
         );
         printf(
-                "%d bytes of chip-mem were returned from the GC_AMIGA_FASTALLOC supported allocating functions.\n",
+                "%d bytes of chip-mem were returned from the MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC supported allocating functions.\n",
                 chipa
         );
         printf("\n");
-        printf("GC_gcollect was called %d times to avoid returning NULL or start allocating with the MEMF_ANY flag.\n",numcollects);
+        printf("MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect was called %d times to avoid returning NULL or start allocating with the MEMF_ANY flag.\n",numcollects);
         printf("%d of them was a success. (the others had to use allocation from the OS.)\n",nullretries);
         printf("\n");
         printf("Succeeded forcing %d gc-allocations (%d bytes) of chip-mem to be fast-mem.\n",succ,succ2);
@@ -238,13 +238,13 @@ void GC_amiga_free_all_mem(void){
 #endif
 
         while(gc_am!=NULL){
-                struct GC_Amiga_AllocedMemoryHeader *temp = gc_am->next;
+                struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *temp = gc_am->next;
                 FreeMem(gc_am,gc_am->size);
-                gc_am=(struct GC_Amiga_AllocedMemoryHeader *)(~(int)(temp));
+                gc_am=(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *)(~(int)(temp));
         }
 }
 
-#ifndef GC_AMIGA_ONLYFAST
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
 
 /* All memory with address lower than this one is chip-mem. */
 
@@ -261,33 +261,33 @@ size_t latestsize;
 #endif
 
 
-#ifdef GC_AMIGA_FASTALLOC
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC
 
 /*
  * The actual function that is called with the GET_MEM macro.
  *
  */
 
-void *GC_amiga_get_mem(size_t size){
-        struct GC_Amiga_AllocedMemoryHeader *gc_am;
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_get_mem(size_t size){
+        struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *gc_am;
 
-#ifndef GC_AMIGA_ONLYFAST
-        if(GC_amiga_dontalloc==TRUE){
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
+        if(MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc==TRUE){
                 return NULL;
         }
 
         /* We really don't want to use chip-mem, but if we must, then as little as possible. */
-        if(GC_AMIGA_MEMF==(MEMF_ANY|MEMF_CLEAR) && size>100000 && latestsize<50000) return NULL;
+        if(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF==(MEMF_ANY|MEMF_CLEAR) && size>100000 && latestsize<50000) return NULL;
 #endif
 
-        gc_am=AllocMem((ULONG)(size + sizeof(struct GC_Amiga_AllocedMemoryHeader)),GC_AMIGA_MEMF);
+        gc_am=AllocMem((ULONG)(size + sizeof(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader)),MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF);
         if(gc_am==NULL) return NULL;
 
-        gc_am->next=GC_AMIGAMEM;
-        gc_am->size=size + sizeof(struct GC_Amiga_AllocedMemoryHeader);
-        GC_AMIGAMEM=(struct GC_Amiga_AllocedMemoryHeader *)(~(int)(gc_am));
+        gc_am->next=MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGAMEM;
+        gc_am->size=size + sizeof(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGAMEM=(struct MANAGED_STACK_ADDRESS_BOEHM_GC_Amiga_AllocedMemoryHeader *)(~(int)(gc_am));
 
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
         if((char *)gc_am<chipmax){
                 allochip+=size;
         }else{
@@ -302,20 +302,20 @@ void *GC_amiga_get_mem(size_t size){
 #endif
 
 
-#ifndef GC_AMIGA_ONLYFAST
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
 
 /* Tries very hard to force GC to find fast-mem to return. Done recursively
  * to hold the rejected memory-pointers reachable from the collector in an
  * easy way.
  *
  */
-#ifdef GC_AMIGA_RETRY
-void *GC_amiga_rec_alloc(size_t size,void *(*AllocFunction)(size_t size2),const int rec){
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_rec_alloc(size_t size,void *(*AllocFunction)(size_t size2),const int rec){
         void *ret;
 
         ret=(*AllocFunction)(size);
 
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
         if((char *)ret>chipmax || ret==NULL){
                 if(ret==NULL){
                         nsucc++;
@@ -340,7 +340,7 @@ void *GC_amiga_rec_alloc(size_t size,void *(*AllocFunction)(size_t size2),const 
 #endif
 
         if (((char *)ret)<=chipmax && ret!=NULL && (rec<(size>500000?9:size/5000))){
-                ret=GC_amiga_rec_alloc(size,AllocFunction,rec+1);
+                ret=MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_rec_alloc(size,AllocFunction,rec+1);
         }
 
         return ret;
@@ -353,10 +353,10 @@ void *GC_amiga_rec_alloc(size_t size,void *(*AllocFunction)(size_t size2),const 
  */
 
 
-void *GC_amiga_allocwrapper_any(size_t size,void *(*AllocFunction)(size_t size2)){
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_any(size_t size,void *(*AllocFunction)(size_t size2)){
         void *ret;
 
-        GC_amiga_dontalloc=TRUE; /* Pretty tough thing to do, but it's indeed necessary. */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc=TRUE; /* Pretty tough thing to do, but it's indeed necessary. */
         latestsize=size;
 
         ret=(*AllocFunction)(size);
@@ -364,10 +364,10 @@ void *GC_amiga_allocwrapper_any(size_t size,void *(*AllocFunction)(size_t size2)
         if(((char *)ret) <= chipmax){
                 if(ret==NULL){
                         /* Give GC access to allocate memory. */
-#ifdef GC_AMIGA_GC
-                        if(!GC_dont_gc){
-                                GC_gcollect();
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC
+                        if(!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc){
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                                 numcollects++;
 #endif
                                 ret=(*AllocFunction)(size);
@@ -375,35 +375,35 @@ void *GC_amiga_allocwrapper_any(size_t size,void *(*AllocFunction)(size_t size2)
                         if(ret==NULL)
 #endif
                         {
-                                GC_amiga_dontalloc=FALSE;
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc=FALSE;
                                 ret=(*AllocFunction)(size);
                                 if(ret==NULL){
                                         WARN("Out of Memory!  Returning NIL!\n", 0);
                                 }
                         }
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                         else{
                                 nullretries++;
                         }
                         if(ret!=NULL && (char *)ret<=chipmax) chipa+=size;
 #endif
                 }
-#ifdef GC_AMIGA_RETRY
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_RETRY
                 else{
                         void *ret2;
                         /* We got chip-mem. Better try again and again and again etc., we might get fast-mem sooner or later... */
                         /* Using gctest to check the effectiveness of doing this, does seldom give a very good result. */
                         /* However, real programs doesn't normally rapidly allocate and deallocate. */
                         if(
-                                AllocFunction!=GC_malloc_uncollectable
-#ifdef GC_ATOMIC_UNCOLLECTABLE
-                                && AllocFunction!=GC_malloc_atomic_uncollectable
+                                AllocFunction!=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE
+                                && AllocFunction!=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_uncollectable
 #endif
                         ){
-                                ret2=GC_amiga_rec_alloc(size,AllocFunction,0);
+                                ret2=MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_rec_alloc(size,AllocFunction,0);
                         }else{
                                 ret2=(*AllocFunction)(size);
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                                 if((char *)ret2<chipmax || ret2==NULL){
                                         nsucc++;
                                         nsucc2+=size;
@@ -416,45 +416,45 @@ void *GC_amiga_allocwrapper_any(size_t size,void *(*AllocFunction)(size_t size2)
 #endif
                         }
                         if(((char *)ret2)>chipmax){
-                                GC_free(ret);
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_free(ret);
                                 ret=ret2;
                         }else{
-                                GC_free(ret2);
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_free(ret2);
                         }
                 }
 #endif
         }
 
 #   if defined(CPPCHECK)
-      if (GC_amiga_dontalloc) /* variable is actually used by AllocFunction */
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc) /* variable is actually used by AllocFunction */
 #   endif
-        GC_amiga_dontalloc=FALSE;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_dontalloc=FALSE;
 
         return ret;
 }
 
 
 
-void (*GC_amiga_toany)(void)=NULL;
+void (*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany)(void)=NULL;
 
-void GC_amiga_set_toany(void (*func)(void)){
-        GC_amiga_toany=func;
+void MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_set_toany(void (*func)(void)){
+        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany=func;
 }
 
-#endif /* !GC_AMIGA_ONLYFAST */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST */
 
 
-void *GC_amiga_allocwrapper_fast(size_t size,void *(*AllocFunction)(size_t size2)){
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_fast(size_t size,void *(*AllocFunction)(size_t size2)){
         void *ret;
 
         ret=(*AllocFunction)(size);
 
         if(ret==NULL){
                 /* Enable chip-mem allocation. */
-#ifdef GC_AMIGA_GC
-                if(!GC_dont_gc){
-                        GC_gcollect();
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC
+                if(!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc){
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                         numcollects++;
 #endif
                         ret=(*AllocFunction)(size);
@@ -462,14 +462,14 @@ void *GC_amiga_allocwrapper_fast(size_t size,void *(*AllocFunction)(size_t size2
                 if(ret==NULL)
 #endif
                 {
-#ifndef GC_AMIGA_ONLYFAST
-                        GC_AMIGA_MEMF=MEMF_ANY | MEMF_CLEAR;
-                        if(GC_amiga_toany!=NULL) (*GC_amiga_toany)();
-                        GC_amiga_allocwrapper_do=GC_amiga_allocwrapper_any;
-                        return GC_amiga_allocwrapper_any(size,AllocFunction);
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF=MEMF_ANY | MEMF_CLEAR;
+                        if(MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany!=NULL) (*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany)();
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do=MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_any;
+                        return MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_any(size,AllocFunction);
 #endif
                 }
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                 else{
                         nullretries++;
                 }
@@ -479,15 +479,15 @@ void *GC_amiga_allocwrapper_fast(size_t size,void *(*AllocFunction)(size_t size2
         return ret;
 }
 
-void *GC_amiga_allocwrapper_firsttime(size_t size,void *(*AllocFunction)(size_t size2)){
-        atexit(&GC_amiga_free_all_mem);
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_firsttime(size_t size,void *(*AllocFunction)(size_t size2)){
+        atexit(&MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_free_all_mem);
         chipmax=(char *)SysBase->MaxLocMem; /* For people still having SysBase in chip-mem, this might speed up a bit. */
-        GC_amiga_allocwrapper_do=GC_amiga_allocwrapper_fast;
-        return GC_amiga_allocwrapper_fast(size,AllocFunction);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do=MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_fast;
+        return MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_fast(size,AllocFunction);
 }
 
 
-#endif /* GC_AMIGA_FASTALLOC */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC */
 
 
 
@@ -495,35 +495,35 @@ void *GC_amiga_allocwrapper_firsttime(size_t size,void *(*AllocFunction)(size_t 
  * The wrapped realloc function.
  *
  */
-void *GC_amiga_realloc(void *old_object,size_t new_size_in_bytes){
-#ifndef GC_AMIGA_FASTALLOC
-        return GC_realloc(old_object,new_size_in_bytes);
+void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_realloc(void *old_object,size_t new_size_in_bytes){
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC
+        return MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(old_object,new_size_in_bytes);
 #else
         void *ret;
         latestsize=new_size_in_bytes;
-        ret=GC_realloc(old_object,new_size_in_bytes);
+        ret=MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(old_object,new_size_in_bytes);
         if(ret==NULL && new_size_in_bytes != 0
-           && GC_AMIGA_MEMF==(MEMF_FAST | MEMF_CLEAR)){
+           && MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF==(MEMF_FAST | MEMF_CLEAR)){
                 /* Out of fast-mem. */
-#ifdef GC_AMIGA_GC
-                if(!GC_dont_gc){
-                        GC_gcollect();
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_GC
+                if(!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc){
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                         numcollects++;
 #endif
-                        ret=GC_realloc(old_object,new_size_in_bytes);
+                        ret=MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(old_object,new_size_in_bytes);
                 }
                 if(ret==NULL)
 #endif
                 {
-#ifndef GC_AMIGA_ONLYFAST
-                        GC_AMIGA_MEMF=MEMF_ANY | MEMF_CLEAR;
-                        if(GC_amiga_toany!=NULL) (*GC_amiga_toany)();
-                        GC_amiga_allocwrapper_do=GC_amiga_allocwrapper_any;
-                        ret=GC_realloc(old_object,new_size_in_bytes);
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_ONLYFAST
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MEMF=MEMF_ANY | MEMF_CLEAR;
+                        if(MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany!=NULL) (*MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_toany)();
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_do=MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_allocwrapper_any;
+                        ret=MANAGED_STACK_ADDRESS_BOEHM_GC_realloc(old_object,new_size_in_bytes);
 #endif
                 }
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
                 else{
                         nullretries++;
                 }
@@ -532,7 +532,7 @@ void *GC_amiga_realloc(void *old_object,size_t new_size_in_bytes){
         if(ret==NULL && new_size_in_bytes != 0){
                 WARN("Out of Memory!  Returning NIL!\n", 0);
         }
-#ifdef GC_AMIGA_PRINTSTATS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_PRINTSTATS
         if(((char *)ret)<chipmax && ret!=NULL){
                 chipa+=new_size_in_bytes;
         }
@@ -541,4 +541,4 @@ void *GC_amiga_realloc(void *old_object,size_t new_size_in_bytes){
 #endif
 }
 
-#endif /* GC_AMIGA_AM */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_AM */

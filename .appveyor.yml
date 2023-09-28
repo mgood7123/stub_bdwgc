@@ -13,16 +13,16 @@ environment:
   - TARGET: cmake
     CMAKE_OPTIONS: -Dbuild_tests=ON -Denable_cplusplus=ON -Denable_throw_bad_alloc_library=OFF -Denable_gc_assertions=ON -Denable_gc_debug=ON -Denable_threads=OFF
   - TARGET: cmake
-    CFLAGS_EXTRA: -DNO_MSGBOX_ON_ERROR -DNO_MPROTECT_VDB -DGC_READ_ENV_FILE
+    CFLAGS_EXTRA: -DNO_MSGBOX_ON_ERROR -DNO_MPROTECT_VDB -DMANAGED_STACK_ADDRESS_BOEHM_GC_READ_ENV_FILE
     CMAKE_CONFIG: Release
-    CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Release -Dbuild_tests=ON -Denable_cplusplus=ON -Denable_large_config=ON -Ddisable_gc_debug=ON -Denable_dynamic_pointer_mask=ON
+    CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Release -Dbuild_tests=ON -Denable_cplusplus=ON -Denable_large_config=ON -Ddisable_gc_debug=ON
   - TARGET: cmake
     CMAKE_CONFIG: Release
     CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=MinSizeRel -Denable_parallel_mark=OFF
   - TARGET: cmake
     CMAKE_OPTIONS: -Denable_gc_assertions=ON -Denable_thread_local_alloc=OFF -Ddisable_single_obj_compilation=ON
   - TARGET: cmake
-    CFLAGS_EXTRA: -DGC_DISABLE_INCREMENTAL
+    CFLAGS_EXTRA: -DMANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
     CMAKE_OPTIONS: -Denable_gc_assertions=ON -Denable_gcj_support=OFF -Denable_parallel_mark=OFF -Denable_thread_local_alloc=OFF
   - TARGET: cmake
     CMAKE_OPTIONS: -A Win32 -Dbuild_tests=ON -Denable_cplusplus=ON -Denable_gc_assertions=ON -Denable_large_config=ON
@@ -44,20 +44,20 @@ environment:
     ARCH: x64
     NMAKE_OPTIONS: disable_threads=1
   - TARGET: djgpp-no-make
-    CFLAGS_EXTRA: -O3 -DALL_INTERIOR_POINTERS -DNO_EXECUTE_PERMISSION -DENABLE_DISCLAIM -DGC_ATOMIC_UNCOLLECTABLE -DGC_GCJ_SUPPORT
+    CFLAGS_EXTRA: -O3 -DALL_INTERIOR_POINTERS -DNO_EXECUTE_PERMISSION -DENABLE_DISCLAIM -DMANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE -DMANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
   - TARGET: dmc
     CFLAGS_EXTRA: -s
   - TARGET: mingw
   - TARGET: mingw
-    CFLAGS_EXTRA: -D GC_THREADS -D THREAD_LOCAL_ALLOC -D PARALLEL_MARK -D GC_ASSERTIONS -D EMPTY_GETENV_RESULTS -D GC_GCJ_SUPPORT -D USE_MUNMAP -D LARGE_CONFIG -D NO_MSGBOX_ON_ERROR
+    CFLAGS_EXTRA: -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -D THREAD_LOCAL_ALLOC -D PARALLEL_MARK -D MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS -D EMPTY_GETENV_RESULTS -D MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -D USE_MUNMAP -D LARGE_CONFIG -D NO_MSGBOX_ON_ERROR
     TEST_TARGET: check cord/de
   - TARGET: mingw
-    CFLAGS_EXTRA: -O3 -march=native -D GC_THREADS -D GC_GCJ_SUPPORT -D GC_TIME_LIMIT=10 -D WINXP_USE_PERF_COUNTER -D NO_MSGBOX_ON_ERROR -D NO_TEST_ENDTHREADEX
+    CFLAGS_EXTRA: -O3 -march=native -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -D MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -D MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT=10 -D WINXP_USE_PERF_COUNTER -D NO_MSGBOX_ON_ERROR -D NO_TEST_ENDTHREADEX
   - TARGET: mingw-shared-no-make
-    CFLAGS_EXTRA: -D GC_THREADS -D GC_ASSERTIONS -D ENABLE_DISCLAIM -D GC_GCJ_SUPPORT -D GC_PREFER_MPROTECT_VDB -D GC_CALL=__stdcall -D GC_CALLBACK=__fastcall -D CONSOLE_LOG -D NO_MSGBOX_ON_ERROR
+    CFLAGS_EXTRA: -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -D MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS -D ENABLE_DISCLAIM -D MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -D MANAGED_STACK_ADDRESS_BOEHM_GC_PREFER_MPROTECT_VDB -D MANAGED_STACK_ADDRESS_BOEHM_GC_CALL=__stdcall -D MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK=__fastcall -D CONSOLE_LOG -D NO_MSGBOX_ON_ERROR
   - TARGET: wcc
     WCC_SYSTEM: OS2
-    CFLAGS_EXTRA: -DGC_ASSERTIONS
+    CFLAGS_EXTRA: -DMANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
     ENABLE_STATIC_OPT: "ENABLE_STATIC=1"
     TEST_TARGET: check-deps
     WCC_INC_SUBDIR: os2
@@ -68,7 +68,7 @@ environment:
   - TARGET: mingw-w64
     CFLAGS_EXTRA: -D NO_MSGBOX_ON_ERROR
   - TARGET: mingw-w64
-    CFLAGS_EXTRA: -D GC_THREADS -D THREAD_LOCAL_ALLOC -D PARALLEL_MARK -D GC_ASSERTIONS -D GC_GCJ_SUPPORT -D NO_RETRY_GET_THREAD_CONTEXT
+    CFLAGS_EXTRA: -D MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -D THREAD_LOCAL_ALLOC -D PARALLEL_MARK -D MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS -D MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -D NO_RETRY_GET_THREAD_CONTEXT
   - TARGET: cygwin
     CONF_OPTIONS: --enable-cplusplus
     CFLAGS_EXTRA: -D GCTEST_PRINT_VERBOSE
@@ -81,7 +81,7 @@ environment:
   - TARGET: cygwin
     CONF_OPTIONS: --enable-cplusplus --disable-munmap --enable-gc-assertions --enable-redirect-malloc
   - TARGET: cygwin64
-    CFLAGS_EXTRA: -D GC_ALWAYS_MULTITHREADED -D LINT2 -D TEST_MANUAL_VDB
+    CFLAGS_EXTRA: -D MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED -D LINT2 -D TEST_MANUAL_VDB
     CONF_OPTIONS: --enable-cplusplus --enable-gc-assertions --disable-shared
 
 clone_depth: 50
@@ -123,7 +123,7 @@ build_script:
 - cmd: if [%TARGET%]==[mingw-shared-no-make] (
     C:\MinGW\msys\1.0\bin\bash -e -l -c
       "cd /c/projects/bdwgc
-       && gcc -I include -D GC_BUILTIN_ATOMIC -D GC_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA% -shared -o gc.dll extra/gc.c" )
+       && gcc -I include -D MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC -D MANAGED_STACK_ADDRESS_BOEHM_GC_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA% -shared -o gc.dll extra/gc.c" )
 - cmd: if [%TARGET%]==[mingw-w64] (
     C:\msys64\usr\bin\bash -e -l -c
       "cd /c/projects/bdwgc
@@ -161,11 +161,11 @@ test_script:
 - cmd: if [%TARGET%]==[mingw] (
     C:\MinGW\msys\1.0\bin\bash -e -l -c
       "cd /c/projects/bdwgc
-       && make -j -f Makefile.direct %TEST_TARGET% CC=gcc CURSES=-lgdi32 CFLAGS_EXTRA='-DGC_NOT_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA%'" )
+       && make -j -f Makefile.direct %TEST_TARGET% CC=gcc CURSES=-lgdi32 CFLAGS_EXTRA='-DMANAGED_STACK_ADDRESS_BOEHM_GC_NOT_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA%'" )
 - cmd: if [%TARGET%]==[mingw-shared-no-make] (
     C:\MinGW\msys\1.0\bin\bash -e -l -c
       "cd /c/projects/bdwgc
-       && gcc -I include -D GC_BUILTIN_ATOMIC -D GC_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA% -o gctest.exe tests/gctest.c gc.dll
+       && gcc -I include -D MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC -D MANAGED_STACK_ADDRESS_BOEHM_GC_DLL -Werror -Wall -Wextra -Wpedantic %CFLAGS_EXTRA% -o gctest.exe tests/gctest.c gc.dll
        && gctest.exe" )
 - cmd: if [%TARGET%]==[mingw-w64] (
     C:\msys64\usr\bin\bash -e -l -c

@@ -19,15 +19,15 @@
 # include "config.h"
 #endif
 
-#undef GC_BUILD
+#undef MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 
-#define GC_DONT_INCL_WINDOWS_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_INCL_WINDOWS_H
 #include "gc_cpp.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_NAMESPACE_ALLOCATOR
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_NAMESPACE_ALLOCATOR
 #include "gc/gc_allocator.h"
 using boehmgc::gc_allocator;
 using boehmgc::gc_allocator_ignore_off_page;
@@ -35,11 +35,11 @@ using boehmgc::traceable_allocator;
 
 # include "private/gcconfig.h"
 
-# ifndef GC_API_PRIV
-#   define GC_API_PRIV GC_API
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV MANAGED_STACK_ADDRESS_BOEHM_GC_API
 # endif
 extern "C" {
-  GC_API_PRIV void GC_printf(const char * format, ...);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API_PRIV void MANAGED_STACK_ADDRESS_BOEHM_GC_printf(const char * format, ...);
   /* Use GC private output to reach the same log file.  */
   /* Don't include gc_priv.h, since that may include Windows system     */
   /* header files that don't take kindly to this context.               */
@@ -53,20 +53,20 @@ extern "C" {
 # include <windows.h>
 #endif
 
-#ifdef GC_NAME_CONFLICT
-# define USE_GC GC_NS_QUALIFY(UseGC)
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_NAME_CONFLICT
+# define USE_GC MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(UseGC)
   struct foo * GC;
 #else
-# define USE_GC GC_NS_QUALIFY(GC)
+# define USE_GC MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(GC)
 #endif
 
 #define my_assert( e ) \
     if (!(e)) { \
-        GC_printf( "Assertion failure in " __FILE__ ", line %d: " #e "\n", \
+        MANAGED_STACK_ADDRESS_BOEHM_GC_printf( "Assertion failure in " __FILE__ ", line %d: " #e "\n", \
                     __LINE__ ); \
         exit(1); }
 
-#if defined(__powerpc64__) && !defined(__clang__) && GC_GNUC_PREREQ(10, 0)
+#if defined(__powerpc64__) && !defined(__clang__) && MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(10, 0)
   /* Suppress "layout of aggregates ... has changed" GCC note. */
 # define A_I_TYPE short
 #else
@@ -78,17 +78,17 @@ extern "C" {
 class A {public:
     /* An uncollectible class. */
 
-    GC_ATTR_EXPLICIT A(int iArg): i(static_cast<A_I_TYPE>(iArg)) {}
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_EXPLICIT A(int iArg): i(static_cast<A_I_TYPE>(iArg)) {}
     void Test( int iArg ) {
         my_assert( i == iArg );}
     virtual ~A() {}
     A_I_TYPE i; };
 
 
-class B: public GC_NS_QUALIFY(gc), public A { public:
+class B: public MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(gc), public A { public:
     /* A collectible class. */
 
-    GC_ATTR_EXPLICIT B( int j ): A( j ) {}
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_EXPLICIT B( int j ): A( j ) {}
     virtual ~B() {
         my_assert( deleting );}
     static void Deleting( int on ) {
@@ -103,14 +103,14 @@ int B::deleting = 0;
         C *r = new C(arg_r); \
         left = l; \
         right = r; \
-        if (GC_is_heap_ptr(this)) { \
-            GC_END_STUBBORN_CHANGE(this); \
-            GC_reachable_here(l); \
-            GC_reachable_here(r); \
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_heap_ptr(this)) { \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(this); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(l); \
+            MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(r); \
         } \
     }
 
-class C: public GC_NS_QUALIFY(gc_cleanup), public A { public:
+class C: public MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(gc_cleanup), public A { public:
     /* A collectible class with cleanup and virtual multiple inheritance. */
 
     // The class uses dynamic memory/resource allocation, so provide both
@@ -135,7 +135,7 @@ class C: public GC_NS_QUALIFY(gc_cleanup), public A { public:
         return *this;
     }
 
-    GC_ATTR_EXPLICIT C( int levelArg ): A( levelArg ), level( levelArg ) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_EXPLICIT C( int levelArg ): A( levelArg ), level( levelArg ) {
         nAllocated++;
         if (level > 0) {
             C_INIT_LEFT_RIGHT(level - 1, level - 1);
@@ -150,14 +150,14 @@ class C: public GC_NS_QUALIFY(gc_cleanup), public A { public:
         left = right = 0;
         level = -32456;}
     static void Test() {
-        if (GC_is_incremental_mode() && nFreed < (nAllocated / 5) * 4) {
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_incremental_mode() && nFreed < (nAllocated / 5) * 4) {
           // An explicit GC might be needed to reach the expected number
           // of the finalized objects.
-          GC_gcollect();
+          MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
         }
         my_assert(nFreed <= nAllocated);
-#       ifndef GC_NO_FINALIZATION
-            my_assert(nFreed >= (nAllocated / 5) * 4 || GC_get_find_leak());
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+            my_assert(nFreed >= (nAllocated / 5) * 4 || MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak());
 #       endif
     }
 
@@ -171,21 +171,21 @@ int C::nFreed = 0;
 int C::nAllocated = 0;
 
 
-class D: public GC_NS_QUALIFY(gc) { public:
+class D: public MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(gc) { public:
     /* A collectible class with a static member function to be used as
     an explicit clean-up function supplied to ::new. */
 
-    GC_ATTR_EXPLICIT D( int iArg ): i( iArg ) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_EXPLICIT D( int iArg ): i( iArg ) {
         nAllocated++;}
     static void CleanUp( void* obj, void* data ) {
         D* self = static_cast<D*>(obj);
         nFreed++;
-        my_assert(static_cast<GC_word>(self->i)
-                    == reinterpret_cast<GC_word>(data));
+        my_assert(static_cast<MANAGED_STACK_ADDRESS_BOEHM_GC_word>(self->i)
+                    == reinterpret_cast<MANAGED_STACK_ADDRESS_BOEHM_GC_word>(data));
     }
     static void Test() {
-#       ifndef GC_NO_FINALIZATION
-            my_assert(nFreed >= (nAllocated / 5) * 4 || GC_get_find_leak());
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+            my_assert(nFreed >= (nAllocated / 5) * 4 || MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak());
 #       endif
     }
 
@@ -197,7 +197,7 @@ int D::nFreed = 0;
 int D::nAllocated = 0;
 
 
-class E: public GC_NS_QUALIFY(gc_cleanup) { public:
+class E: public MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(gc_cleanup) { public:
     /* A collectible class with clean-up for use by F. */
 
     E() {
@@ -225,8 +225,8 @@ class F: public E {public:
     }
 
     static void Test() {
-#       ifndef GC_NO_FINALIZATION
-            my_assert(nFreedF >= (nAllocatedF / 5) * 4 || GC_get_find_leak());
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+            my_assert(nFreedF >= (nAllocatedF / 5) * 4 || MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak());
 #       endif
         my_assert(2 * nFreedF == nFreed);
     }
@@ -240,19 +240,19 @@ int F::nFreedF = 0;
 int F::nAllocatedF = 0;
 
 
-GC_word Disguise( void* p ) {
-    return GC_HIDE_NZ_POINTER(p);
+MANAGED_STACK_ADDRESS_BOEHM_GC_word Disguise( void* p ) {
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_NZ_POINTER(p);
 }
 
-void* Undisguise( GC_word i ) {
-    return GC_REVEAL_NZ_POINTER(i);
+void* Undisguise( MANAGED_STACK_ADDRESS_BOEHM_GC_word i ) {
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_REVEAL_NZ_POINTER(i);
 }
 
-#define GC_CHECKED_DELETE(p) \
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_CHECKED_DELETE(p) \
     { \
-      size_t freed_before = GC_get_expl_freed_bytes_since_gc(); \
-      delete p; /* the operator should invoke GC_FREE() */ \
-      size_t freed_after = GC_get_expl_freed_bytes_since_gc(); \
+      size_t freed_before = MANAGED_STACK_ADDRESS_BOEHM_GC_get_expl_freed_bytes_since_gc(); \
+      delete p; /* the operator should invoke MANAGED_STACK_ADDRESS_BOEHM_GC_FREE() */ \
+      size_t freed_after = MANAGED_STACK_ADDRESS_BOEHM_GC_get_expl_freed_bytes_since_gc(); \
       my_assert(freed_before != freed_after); \
     }
 
@@ -267,7 +267,7 @@ void* Undisguise( GC_word i ) {
     char* argv[ 3 ];
 
 #   if defined(CPPCHECK)
-      GC_noop1(reinterpret_cast<GC_word>(&WinMain));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_noop1(reinterpret_cast<MANAGED_STACK_ADDRESS_BOEHM_GC_word>(&WinMain));
 #   endif
     if (cmd != 0)
       for (argc = 1; argc < static_cast<int>(sizeof(argv) / sizeof(argv[0]));
@@ -308,35 +308,35 @@ void* Undisguise( GC_word i ) {
   int main(int argc, char* argv[]) {
 #endif
 
-    GC_set_all_interior_pointers(1);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_all_interior_pointers(1);
                         /* needed due to C++ multiple inheritance used  */
 
 #   ifdef TEST_MANUAL_VDB
-      GC_set_manual_vdb_allowed(1);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_set_manual_vdb_allowed(1);
 #   endif
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 #   ifndef NO_INCREMENTAL
-      GC_enable_incremental();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental();
 #   endif
-    if (GC_get_find_leak())
-      GC_printf("This test program is not designed for leak detection mode\n");
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
+      MANAGED_STACK_ADDRESS_BOEHM_GC_printf("This test program is not designed for leak detection mode\n");
 
     int i, iters, n;
     int *x = gc_allocator<int>().allocate(1);
     int *xio;
     xio = gc_allocator_ignore_off_page<int>().allocate(1);
-    GC_reachable_here(xio);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(xio);
     int **xptr = traceable_allocator<int *>().allocate(1);
     *x = 29;
     if (!xptr) {
-      GC_printf("Out of memory!\n");
+      MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Out of memory!\n");
       exit(69);
     }
-    GC_PTR_STORE_AND_DIRTY(xptr, x);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(xptr, x);
     x = 0;
     if (argc != 2
         || (n = atoi(argv[1])) <= 0) {
-      GC_printf("usage: cpptest <number-of-iterations>\n"
+      MANAGED_STACK_ADDRESS_BOEHM_GC_printf("usage: cpptest <number-of-iterations>\n"
                 "Assuming %d iterations\n", N_TESTS);
       n = N_TESTS;
     }
@@ -345,16 +345,16 @@ void* Undisguise( GC_word i ) {
 #   endif
 
     for (iters = 1; iters <= n; iters++) {
-        GC_printf( "Starting iteration %d\n", iters );
+        MANAGED_STACK_ADDRESS_BOEHM_GC_printf( "Starting iteration %d\n", iters );
 
             /* Allocate some uncollectible As and disguise their pointers.
             Later we'll check to see if the objects are still there.  We're
             checking to make sure these objects really are uncollectible. */
-        GC_word as[ 1000 ];
-        GC_word bs[ 1000 ];
+        MANAGED_STACK_ADDRESS_BOEHM_GC_word as[ 1000 ];
+        MANAGED_STACK_ADDRESS_BOEHM_GC_word bs[ 1000 ];
         for (i = 0; i < 1000; i++) {
-            as[ i ] = Disguise( new (GC_NS_QUALIFY(NoGC)) A(i) );
-            bs[ i ] = Disguise( new (GC_NS_QUALIFY(NoGC)) B(i) ); }
+            as[ i ] = Disguise( new (MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(NoGC)) A(i) );
+            bs[ i ] = Disguise( new (MANAGED_STACK_ADDRESS_BOEHM_GC_NS_QUALIFY(NoGC)) B(i) ); }
 
             /* Allocate a fair number of finalizable Cs, Ds, and Fs.
             Later we'll check to make sure they've gone away. */
@@ -364,15 +364,15 @@ void* Undisguise( GC_word i ) {
             D* d;
             F* f;
             d = ::new (USE_GC, D::CleanUp,
-                       reinterpret_cast<void*>(static_cast<GC_word>(i))) D(i);
-            GC_reachable_here(d);
+                       reinterpret_cast<void*>(static_cast<MANAGED_STACK_ADDRESS_BOEHM_GC_word>(i))) D(i);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(d);
             f = new F;
             F** fa = new F*[1];
             fa[0] = f;
             (void)fa;
             delete[] fa;
             if (0 == i % 10)
-                GC_CHECKED_DELETE(c);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_CHECKED_DELETE(c);
         }
 
             /* Allocate a very large number of collectible As and Bs and
@@ -381,17 +381,17 @@ void* Undisguise( GC_word i ) {
         for (i = 0; i < LARGE_CPP_ITER_CNT; i++) {
             A* a;
             a = new (USE_GC) A( i );
-            GC_reachable_here(a);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(a);
             B* b;
             b = new B( i );
             (void)b;
             b = new (USE_GC) B( i );
             if (0 == i % 10) {
                 B::Deleting( 1 );
-                GC_CHECKED_DELETE(b);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_CHECKED_DELETE(b);
                 B::Deleting( 0 );}
-#           if defined(FINALIZE_ON_DEMAND) && !defined(GC_NO_FINALIZATION)
-              GC_invoke_finalizers();
+#           if defined(FINALIZE_ON_DEMAND) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION)
+              MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers();
 #           endif
             }
 
@@ -404,16 +404,16 @@ void* Undisguise( GC_word i ) {
               // Workaround for ASan/MSan: the linker uses operator delete
               // implementation from libclang_rt instead of gc_cpp (thus
               // causing incompatible alloc/free).
-              GC_FREE(a);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_FREE(a);
 #           else
-              GC_CHECKED_DELETE(a);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_CHECKED_DELETE(a);
 #           endif
             b->Test( i );
             B::Deleting( 1 );
-            GC_CHECKED_DELETE(b);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_CHECKED_DELETE(b);
             B::Deleting( 0 );
-#           if defined(FINALIZE_ON_DEMAND) && !defined(GC_NO_FINALIZATION)
-                 GC_invoke_finalizers();
+#           if defined(FINALIZE_ON_DEMAND) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION)
+                 MANAGED_STACK_ADDRESS_BOEHM_GC_invoke_finalizers();
 #           endif
             }
 
@@ -425,6 +425,6 @@ void* Undisguise( GC_word i ) {
 
     x = *xptr;
     my_assert(29 == x[0]);
-    GC_printf("The test appears to have succeeded.\n");
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("The test appears to have succeeded.\n");
     return 0;
 }

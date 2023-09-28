@@ -3,18 +3,18 @@
 # include "config.h"
 #endif
 
-#ifndef GC_THREADS
-# define GC_THREADS
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #endif
 
-#define GC_NO_THREAD_REDIRECTS 1
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS 1
 
 #include "gc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#if (!defined(GC_PTHREADS) || defined(GC_SOLARIS_THREADS) \
+#if (!defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS) \
      || defined(__native_client__)) && !defined(SKIP_THREADKEY_TEST)
   /* FIXME: Skip this test on Solaris for now.  The test may fail on    */
   /* other targets as well.  Currently, tested only on Linux, Cygwin    */
@@ -38,7 +38,7 @@ int main(void)
 
 pthread_key_t key;
 
-#ifdef GC_SOLARIS_THREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS
   /* pthread_once_t key_once = { PTHREAD_ONCE_INIT }; */
 #else
   pthread_once_t key_once = PTHREAD_ONCE_INIT;
@@ -47,14 +47,14 @@ pthread_key_t key;
 static void * entry(void *arg)
 {
   pthread_setspecific(key,
-                      (void *)GC_HIDE_NZ_POINTER(GC_STRDUP("hello, world")));
+                      (void *)MANAGED_STACK_ADDRESS_BOEHM_GC_HIDE_NZ_POINTER(MANAGED_STACK_ADDRESS_BOEHM_GC_STRDUP("hello, world")));
   return arg;
 }
 
-static void * GC_CALLBACK on_thread_exit_inner(struct GC_stack_base * sb,
+static void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK on_thread_exit_inner(struct MANAGED_STACK_ADDRESS_BOEHM_GC_stack_base * sb,
                                                void * arg)
 {
-  int res = GC_register_my_thread (sb);
+  int res = MANAGED_STACK_ADDRESS_BOEHM_GC_register_my_thread (sb);
   pthread_t t;
   int creation_res;     /* Used to suppress a warning about     */
                         /* unchecked pthread_create() result.   */
@@ -65,17 +65,17 @@ static void * GC_CALLBACK on_thread_exit_inner(struct GC_stack_base * sb,
     fprintf(stderr, "Thread attribute init or setdetachstate failed\n");
     exit(2);
   }
-  creation_res = GC_pthread_create(&t, &attr, entry, NULL);
+  creation_res = MANAGED_STACK_ADDRESS_BOEHM_GC_pthread_create(&t, &attr, entry, NULL);
   (void)pthread_attr_destroy(&attr);
-  if (res == GC_SUCCESS)
-    GC_unregister_my_thread ();
+  if (res == MANAGED_STACK_ADDRESS_BOEHM_GC_SUCCESS)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_unregister_my_thread ();
 
-  return arg ? (void*)(GC_word)creation_res : 0;
+  return arg ? (void*)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)creation_res : 0;
 }
 
 static void on_thread_exit(void *v)
 {
-  GC_call_with_stack_base (on_thread_exit_inner, v);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_stack_base (on_thread_exit_inner, v);
 }
 
 static void make_key(void)
@@ -93,10 +93,10 @@ int main(void)
 {
   int i;
 
-  GC_INIT();
-  if (GC_get_find_leak())
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
     printf("This test program is not designed for leak detection mode\n");
-# ifdef GC_SOLARIS_THREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS
     make_key();
 # else
     pthread_once (&key_once, make_key);
@@ -104,7 +104,7 @@ int main(void)
   for (i = 0; i < NTHREADS_INNER; i++) {
     pthread_t t;
     void *res;
-    int code = GC_pthread_create(&t, NULL, entry, NULL);
+    int code = MANAGED_STACK_ADDRESS_BOEHM_GC_pthread_create(&t, NULL, entry, NULL);
 
     if (code != 0) {
       fprintf(stderr, "Thread #%d creation failed: %s\n", i, strerror(code));
@@ -113,13 +113,13 @@ int main(void)
     }
 
     if ((i & 1) != 0) {
-      code = GC_pthread_join(t, &res);
+      code = MANAGED_STACK_ADDRESS_BOEHM_GC_pthread_join(t, &res);
       if (code != 0) {
         fprintf(stderr, "Thread #%d join failed: %s\n", i, strerror(code));
         exit(2);
       }
     } else {
-      code = GC_pthread_detach(t);
+      code = MANAGED_STACK_ADDRESS_BOEHM_GC_pthread_detach(t);
       if (code != 0) {
         fprintf(stderr, "Thread #%d detach failed: %s\n", i, strerror(code));
         exit(2);

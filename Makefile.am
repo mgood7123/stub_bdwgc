@@ -14,7 +14,7 @@
 # Info (current:revision:age) for the Libtool versioning system.
 # These numbers should be updated at most once just before the release,
 # and, optionally, at most once during the development (after the release).
-LIBGC_VER_INFO = 6:1:5
+LIBMANAGED_STACK_ADDRESS_BOEHM_GC_VER_INFO = 6:1:5
 LIBGCCPP_VER_INFO = 6:0:5
 
 ## FIXME: `make distcheck' in this directory will not currently work.
@@ -49,12 +49,12 @@ pkgconfig_DATA = bdw-gc.pc
 
 lib_LTLIBRARIES += libgc.la
 
-if SINGLE_GC_OBJ
+if SINGLE_MANAGED_STACK_ADDRESS_BOEHM_GC_OBJ
 
 libgc_la_SOURCES = extra/gc.c
 
 if PTHREAD_START_STANDALONE
-AM_CPPFLAGS += -DGC_PTHREAD_START_STANDALONE
+AM_CPPFLAGS += -DMANAGED_STACK_ADDRESS_BOEHM_GC_PTHREAD_START_STANDALONE
 libgc_la_SOURCES += pthread_start.c
 endif
 
@@ -106,7 +106,7 @@ if ENABLE_DISCLAIM
 libgc_la_SOURCES += fnlz_mlc.c
 endif
 
-## End of !SINGLE_GC_OBJ
+## End of !SINGLE_MANAGED_STACK_ADDRESS_BOEHM_GC_OBJ
 endif
 
 if USE_INTERNAL_LIBATOMIC_OPS
@@ -120,7 +120,7 @@ endif
 # linuxthread semaphore (and clock_gettime) functions get linked:
 libgc_la_LIBADD = @addobjs@ $(THREADDLLIBS) $(UNWINDLIBS) $(ATOMIC_OPS_LIBS)
 libgc_la_DEPENDENCIES = @addobjs@
-libgc_la_LDFLAGS = $(extra_ldflags_libgc) -version-info $(LIBGC_VER_INFO) \
+libgc_la_LDFLAGS = $(extra_ldflags_libgc) -version-info $(LIBMANAGED_STACK_ADDRESS_BOEHM_GC_VER_INFO) \
     -no-undefined
 
 EXTRA_libgc_la_SOURCES = ia64_save_regs_in_stack.s sparc_mach_dep.S \
@@ -133,7 +133,7 @@ lib_LTLIBRARIES += libgccpp.la
 libgccpp_la_SOURCES = gc_badalc.cc gc_cpp.cc
 libgccpp_la_LIBADD = libgc.la
 libgccpp_la_LDFLAGS = -version-info $(LIBGCCPP_VER_INFO) -no-undefined
-if GC_TBA_LIBRARY
+if MANAGED_STACK_ADDRESS_BOEHM_GC_TBA_LIBRARY
 # The same as libgccpp but contains only gc_badalc.o.
 lib_LTLIBRARIES += libgctba.la
 libgctba_la_SOURCES = gc_badalc.cc
@@ -149,8 +149,8 @@ EXTRA_DIST += gc_badalc.cpp gc_cpp.cpp
 # Misc
 # ----
 
-AM_CXXFLAGS = $(WERROR_CFLAGS) @GC_CFLAGS@
-AM_CFLAGS = $(WERROR_CFLAGS) @GC_CFLAGS@
+AM_CXXFLAGS = $(WERROR_CFLAGS) @MANAGED_STACK_ADDRESS_BOEHM_GC_CFLAGS@
+AM_CFLAGS = $(WERROR_CFLAGS) @MANAGED_STACK_ADDRESS_BOEHM_GC_CFLAGS@
 
 CFLAGS += $(CFLAGS_EXTRA)
 CXXFLAGS += $(CFLAGS_EXTRA)

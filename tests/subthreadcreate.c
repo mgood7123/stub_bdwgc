@@ -1,24 +1,24 @@
 
 #ifdef HAVE_CONFIG_H
-  /* For GC_THREADS and PARALLEL_MARK */
+  /* For MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS and PARALLEL_MARK */
 # include "config.h"
 #endif
 
-#ifdef GC_THREADS
-# undef GC_NO_THREAD_REDIRECTS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
+# undef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS
 # include "gc.h"
 
 # ifdef PARALLEL_MARK
 #   define AO_REQUIRE_CAS
 # endif
 # include "private/gc_atomic_ops.h"
-#endif /* GC_THREADS */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS */
 
 #include <stdio.h>
 
 #ifdef AO_HAVE_fetch_and_add1
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
 # include <errno.h> /* for EAGAIN */
 # include <pthread.h>
 # include <string.h>
@@ -28,7 +28,7 @@
 # endif
 # define NOSERVICE
 # include <windows.h>
-#endif /* !GC_PTHREADS */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS */
 
 #if defined(__HAIKU__)
 # include <errno.h>
@@ -56,21 +56,21 @@
 volatile AO_t thread_created_cnt = 0;
 volatile AO_t thread_ended_cnt = 0;
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
   static void *entry(void *arg)
 #else
   static DWORD WINAPI entry(LPVOID arg)
 #endif
 {
     int thread_num = (int)AO_fetch_and_add1(&thread_created_cnt);
-    GC_word my_depth = (GC_word)arg + 1;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_word my_depth = (MANAGED_STACK_ADDRESS_BOEHM_GC_word)arg + 1;
 
     if (my_depth <= MAX_SUBTHREAD_DEPTH
             && thread_num < MAX_SUBTHREAD_COUNT
             && (thread_num % DECAY_DENOM) < DECAY_NUMER
             && thread_num - (int)AO_load(&thread_ended_cnt)
                 <= MAX_ALIVE_THREAD_COUNT) {
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
         int err;
         pthread_t th;
 
@@ -111,7 +111,7 @@ int main(void)
 {
 #if NTHREADS > 0
     int i, n;
-# ifdef GC_PTHREADS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
     int err;
     pthread_t th[NTHREADS_INNER];
 # else
@@ -119,10 +119,10 @@ int main(void)
 # endif
     int th_nums[NTHREADS_INNER];
 
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
     for (i = 0; i < NTHREADS_INNER; ++i) {
       th_nums[i] = (int)AO_fetch_and_add1(&thread_created_cnt);
-#     ifdef GC_PTHREADS
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
         err = pthread_create(&th[i], NULL, entry, 0);
         if (err) {
             fprintf(stderr, "Thread #%d creation failed: %s\n",
@@ -142,7 +142,7 @@ int main(void)
     }
     n = i;
     for (i = 0; i < n; ++i) {
-#     ifdef GC_PTHREADS
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
         void *res;
         err = pthread_join(th[i], &res);
         if (err) {
@@ -151,7 +151,7 @@ int main(void)
 #           if defined(__HAIKU__)
                 /* The error is just ignored (and the test is ended) to */
                 /* workaround some bug in Haiku pthread_join.           */
-                /* TODO: The thread is not deleted from GC_threads.     */
+                /* TODO: The thread is not deleted from MANAGED_STACK_ADDRESS_BOEHM_GC_threads.     */
                 if (ESRCH == err) break;
 #           endif
             exit(1);

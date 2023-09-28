@@ -20,13 +20,13 @@
  * or if conservative collector leakage is otherwise a problem (unlikely).
  * Note that this is implemented completely separately from the rest
  * of the collector, and is not linked in unless referenced.
- * This does not currently support GC_DEBUG in any interesting way.
+ * This does not currently support MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG in any interesting way.
  */
 
-#ifndef GC_TYPED_H
-#define GC_TYPED_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_TYPED_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_TYPED_H
 
-#ifndef GC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_H
 # include "gc.h"
 #endif
 
@@ -34,22 +34,22 @@
   extern "C" {
 #endif
 
-typedef GC_word * GC_bitmap;
+typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word * MANAGED_STACK_ADDRESS_BOEHM_GC_bitmap;
         /* The least significant bit of the first word is one if        */
         /* the first word in the object may be a pointer.               */
 
-#define GC_WORDSZ (8 * sizeof(GC_word))
-#define GC_get_bit(bm, index) /* index should be of unsigned type */ \
-            (((bm)[(index) / GC_WORDSZ] >> ((index) % GC_WORDSZ)) & 1)
-#define GC_set_bit(bm, index) /* index should be of unsigned type */ \
-            ((bm)[(index) / GC_WORDSZ] |= (GC_word)1 << ((index) % GC_WORDSZ))
-#define GC_WORD_OFFSET(t, f) (offsetof(t,f) / sizeof(GC_word))
-#define GC_WORD_LEN(t) (sizeof(t) / sizeof(GC_word))
-#define GC_BITMAP_SIZE(t) ((GC_WORD_LEN(t) + GC_WORDSZ - 1) / GC_WORDSZ)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ (8 * sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_get_bit(bm, index) /* index should be of unsigned type */ \
+            (((bm)[(index) / MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ] >> ((index) % MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ)) & 1)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_set_bit(bm, index) /* index should be of unsigned type */ \
+            ((bm)[(index) / MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ] |= (MANAGED_STACK_ADDRESS_BOEHM_GC_word)1 << ((index) % MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_OFFSET(t, f) (offsetof(t,f) / sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_LEN(t) (sizeof(t) / sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_word))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_BITMAP_SIZE(t) ((MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_LEN(t) + MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ - 1) / MANAGED_STACK_ADDRESS_BOEHM_GC_WORDSZ)
 
-typedef GC_word GC_descr;
+typedef MANAGED_STACK_ADDRESS_BOEHM_GC_word MANAGED_STACK_ADDRESS_BOEHM_GC_descr;
 
-GC_API GC_descr GC_CALL GC_make_descriptor(const GC_word * /* GC_bitmap bm */,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_descr MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_make_descriptor(const MANAGED_STACK_ADDRESS_BOEHM_GC_word * /* MANAGED_STACK_ADDRESS_BOEHM_GC_bitmap bm */,
                                 size_t /* len (number_of_bits_in_bitmap) */);
                 /* Return a type descriptor for the object whose layout */
                 /* is described by the argument.                        */
@@ -62,7 +62,7 @@ GC_API GC_descr GC_CALL GC_make_descriptor(const GC_word * /* GC_bitmap bm */,
                 /* pointers.                                            */
                 /* Returns a conservative approximation in the          */
                 /* (unlikely) case of insufficient memory to build      */
-                /* the descriptor.  Calls to GC_make_descriptor         */
+                /* the descriptor.  Calls to MANAGED_STACK_ADDRESS_BOEHM_GC_make_descriptor         */
                 /* may consume some amount of a finite resource.  This  */
                 /* is intended to be called once per type, not once     */
                 /* per allocation.                                      */
@@ -70,30 +70,30 @@ GC_API GC_descr GC_CALL GC_make_descriptor(const GC_word * /* GC_bitmap bm */,
 /* It is possible to generate a descriptor for a C type T with  */
 /* word aligned pointer fields f1, f2, ... as follows:                  */
 /*                                                                      */
-/* GC_descr T_descr;                                                    */
-/* GC_word T_bitmap[GC_BITMAP_SIZE(T)] = {0};                           */
-/* GC_set_bit(T_bitmap, GC_WORD_OFFSET(T,f1));                          */
-/* GC_set_bit(T_bitmap, GC_WORD_OFFSET(T,f2));                          */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_descr T_descr;                                                    */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_word T_bitmap[MANAGED_STACK_ADDRESS_BOEHM_GC_BITMAP_SIZE(T)] = {0};                           */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_set_bit(T_bitmap, MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_OFFSET(T,f1));                          */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_set_bit(T_bitmap, MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_OFFSET(T,f2));                          */
 /* ...                                                                  */
-/* T_descr = GC_make_descriptor(T_bitmap, GC_WORD_LEN(T));              */
+/* T_descr = MANAGED_STACK_ADDRESS_BOEHM_GC_make_descriptor(T_bitmap, MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_LEN(T));              */
 
-GC_API GC_ATTR_MALLOC GC_ATTR_ALLOC_SIZE(1) void * GC_CALL
-        GC_malloc_explicitly_typed(size_t /* size_in_bytes */,
-                                   GC_descr /* d */);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_ALLOC_SIZE(1) void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+        MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_explicitly_typed(size_t /* size_in_bytes */,
+                                   MANAGED_STACK_ADDRESS_BOEHM_GC_descr /* d */);
                 /* Allocate an object whose layout is described by d.   */
                 /* The size may NOT be less than the number of          */
                 /* meaningful bits in the bitmap of d multiplied by     */
-                /* sizeof GC_word.  The returned object is cleared.     */
-                /* The returned object may NOT be passed to GC_realloc. */
+                /* sizeof MANAGED_STACK_ADDRESS_BOEHM_GC_word.  The returned object is cleared.     */
+                /* The returned object may NOT be passed to MANAGED_STACK_ADDRESS_BOEHM_GC_realloc. */
 
-GC_API GC_ATTR_MALLOC GC_ATTR_ALLOC_SIZE(1) void * GC_CALL
-        GC_malloc_explicitly_typed_ignore_off_page(size_t /* size_in_bytes */,
-                                                   GC_descr /* d */);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_ALLOC_SIZE(1) void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+        MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_explicitly_typed_ignore_off_page(size_t /* size_in_bytes */,
+                                                   MANAGED_STACK_ADDRESS_BOEHM_GC_descr /* d */);
 
-GC_API GC_ATTR_MALLOC GC_ATTR_CALLOC_SIZE(1, 2) void * GC_CALL
-        GC_calloc_explicitly_typed(size_t /* nelements */,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_CALLOC_SIZE(1, 2) void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL
+        MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_explicitly_typed(size_t /* nelements */,
                                    size_t /* element_size_in_bytes */,
-                                   GC_descr /* d */);
+                                   MANAGED_STACK_ADDRESS_BOEHM_GC_descr /* d */);
         /* Allocate an array of nelements elements, each of the */
         /* given size, and with the given descriptor.           */
         /* The element size must be a multiple of the byte      */
@@ -101,57 +101,57 @@ GC_API GC_ATTR_MALLOC GC_ATTR_CALLOC_SIZE(1, 2) void * GC_CALL
         /* machine with 16-bit aligned pointers, size_in_bytes  */
         /* must be a multiple of 2.  The element size may NOT   */
         /* be less than the number of meaningful bits in the    */
-        /* bitmap of d multiplied by sizeof GC_word.            */
+        /* bitmap of d multiplied by sizeof MANAGED_STACK_ADDRESS_BOEHM_GC_word.            */
         /* Returned object is cleared.                          */
 
-#define GC_CALLOC_TYPED_DESCR_WORDS 8
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_CALLOC_TYPED_DESCR_WORDS 8
 
-#ifdef GC_BUILD
-  struct GC_calloc_typed_descr_s;
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
+  struct MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_typed_descr_s;
 #else
-  struct GC_calloc_typed_descr_s {
-    GC_word opaque[GC_CALLOC_TYPED_DESCR_WORDS];
+  struct MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_typed_descr_s {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_word opaque[MANAGED_STACK_ADDRESS_BOEHM_GC_CALLOC_TYPED_DESCR_WORDS];
   };
 #endif
 
-GC_API int GC_CALL GC_calloc_prepare_explicitly_typed(
-                        struct GC_calloc_typed_descr_s * /* pctd */,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_prepare_explicitly_typed(
+                        struct MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_typed_descr_s * /* pctd */,
                         size_t /* sizeof_ctd */, size_t /* nelements */,
-                        size_t /* element_size_in_bytes */, GC_descr);
-        /* This is same as GC_calloc_explicitly_typed but more optimal  */
+                        size_t /* element_size_in_bytes */, MANAGED_STACK_ADDRESS_BOEHM_GC_descr);
+        /* This is same as MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_explicitly_typed but more optimal  */
         /* in terms of the performance and memory usage if the client   */
         /* needs to allocate multiple typed object arrays with the      */
         /* same layout and number of elements.  The client should call  */
         /* it to be prepared for the subsequent allocations by          */
-        /* GC_calloc_do_explicitly_typed, one or many.  The result of   */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_do_explicitly_typed, one or many.  The result of   */
         /* the preparation is stored to *pctd, even in case of          */
         /* a failure.  The prepared structure could be just dropped     */
         /* when no longer needed.  Returns 0 on failure, 1 on success;  */
         /* the result could be ignored (as it is also stored to *pctd   */
-        /* and checked later by GC_calloc_do_explicitly_typed).         */
+        /* and checked later by MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_do_explicitly_typed).         */
 
-GC_API GC_ATTR_MALLOC void * GC_CALL GC_calloc_do_explicitly_typed(
-                        const struct GC_calloc_typed_descr_s * /* pctd */,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_MALLOC void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_do_explicitly_typed(
+                        const struct MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_typed_descr_s * /* pctd */,
                         size_t /* sizeof_ctd */);
         /* The actual object allocation for the prepared description.   */
 
-#ifdef GC_DEBUG
-# define GC_MALLOC_EXPLICITLY_TYPED(bytes, d) ((void)(d), GC_MALLOC(bytes))
-# define GC_MALLOC_EXPLICITLY_TYPED_IGNORE_OFF_PAGE(bytes, d) \
-                        GC_MALLOC_EXPLICITLY_TYPED(bytes, d)
-# define GC_CALLOC_EXPLICITLY_TYPED(n, bytes, d) \
-                        ((void)(d), GC_MALLOC((n) * (bytes)))
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_EXPLICITLY_TYPED(bytes, d) ((void)(d), MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(bytes))
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_EXPLICITLY_TYPED_IGNORE_OFF_PAGE(bytes, d) \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_EXPLICITLY_TYPED(bytes, d)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CALLOC_EXPLICITLY_TYPED(n, bytes, d) \
+                        ((void)(d), MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC((n) * (bytes)))
 #else
-# define GC_MALLOC_EXPLICITLY_TYPED(bytes, d) \
-                        GC_malloc_explicitly_typed(bytes, d)
-# define GC_MALLOC_EXPLICITLY_TYPED_IGNORE_OFF_PAGE(bytes, d) \
-                        GC_malloc_explicitly_typed_ignore_off_page(bytes, d)
-# define GC_CALLOC_EXPLICITLY_TYPED(n, bytes, d) \
-                        GC_calloc_explicitly_typed(n, bytes, d)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_EXPLICITLY_TYPED(bytes, d) \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_explicitly_typed(bytes, d)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_EXPLICITLY_TYPED_IGNORE_OFF_PAGE(bytes, d) \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_explicitly_typed_ignore_off_page(bytes, d)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CALLOC_EXPLICITLY_TYPED(n, bytes, d) \
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_calloc_explicitly_typed(n, bytes, d)
 #endif
 
 #ifdef __cplusplus
   } /* extern "C" */
 #endif
 
-#endif /* GC_TYPED_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_TYPED_H */

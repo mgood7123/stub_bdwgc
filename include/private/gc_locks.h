@@ -15,10 +15,10 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_LOCKS_H
-#define GC_LOCKS_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_LOCKS_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_LOCKS_H
 
-#if !defined(GC_PRIVATE_H) && !defined(CPPCHECK)
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H) && !defined(CPPCHECK)
 # error gc_locks.h should be included from gc_priv.h
 #endif
 
@@ -39,64 +39,64 @@
   EXTERN_C_BEGIN
 
 # ifdef PCR
-    GC_EXTERN PCR_Th_ML GC_allocate_ml;
-#   define UNCOND_LOCK() PCR_Th_ML_Acquire(&GC_allocate_ml)
-#   define UNCOND_UNLOCK() PCR_Th_ML_Release(&GC_allocate_ml)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN PCR_Th_ML MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml;
+#   define UNCOND_LOCK() PCR_Th_ML_Acquire(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
+#   define UNCOND_UNLOCK() PCR_Th_ML_Release(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
 # elif defined(NN_PLATFORM_CTR) || defined(NINTENDO_SWITCH)
-    extern void GC_lock(void);
-    extern void GC_unlock(void);
-#   define UNCOND_LOCK() GC_lock()
-#   define UNCOND_UNLOCK() GC_unlock()
+    extern void MANAGED_STACK_ADDRESS_BOEHM_GC_lock(void);
+    extern void MANAGED_STACK_ADDRESS_BOEHM_GC_unlock(void);
+#   define UNCOND_LOCK() MANAGED_STACK_ADDRESS_BOEHM_GC_lock()
+#   define UNCOND_UNLOCK() MANAGED_STACK_ADDRESS_BOEHM_GC_unlock()
 # endif
 
-# if (!defined(AO_HAVE_test_and_set_acquire) || defined(GC_RTEMS_PTHREADS) \
+# if (!defined(AO_HAVE_test_and_set_acquire) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_RTEMS_PTHREADS) \
        || defined(SN_TARGET_PS3) \
-       || defined(GC_WIN32_THREADS) || defined(BASE_ATOMIC_OPS_EMULATED) \
-       || defined(LINT2)) && defined(GC_PTHREADS)
+       || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) || defined(BASE_ATOMIC_OPS_EMULATED) \
+       || defined(LINT2)) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS)
 #   define USE_PTHREAD_LOCKS
 #   undef USE_SPIN_LOCK
-#   if (defined(LINT2) || defined(GC_WIN32_THREADS)) \
+#   if (defined(LINT2) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS)) \
        && !defined(NO_PTHREAD_TRYLOCK)
-      /* pthread_mutex_trylock may not win in GC_lock on Win32, */
+      /* pthread_mutex_trylock may not win in MANAGED_STACK_ADDRESS_BOEHM_GC_lock on Win32, */
       /* due to builtin support for spinning first?             */
 #     define NO_PTHREAD_TRYLOCK
 #   endif
 # endif
 
-# if defined(GC_WIN32_THREADS) && !defined(USE_PTHREAD_LOCKS) \
-     || defined(GC_PTHREADS)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) && !defined(USE_PTHREAD_LOCKS) \
+     || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS)
 #   define NO_THREAD ((unsigned long)(-1L))
                 /* != NUMERIC_THREAD_ID(pthread_self()) for any thread */
-#   ifdef GC_ASSERTIONS
-      GC_EXTERN unsigned long GC_lock_holder;
-#     define UNSET_LOCK_HOLDER() (void)(GC_lock_holder = NO_THREAD)
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder;
+#     define UNSET_LOCK_HOLDER() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder = NO_THREAD)
 #   endif
-# endif /* GC_WIN32_THREADS || GC_PTHREADS */
+# endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS || MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS */
 
-# if defined(GC_WIN32_THREADS) && !defined(USE_PTHREAD_LOCKS)
-    GC_EXTERN CRITICAL_SECTION GC_allocate_ml;
-#   ifdef GC_ASSERTIONS
-#     define SET_LOCK_HOLDER() (void)(GC_lock_holder = GetCurrentThreadId())
-#     define I_HOLD_LOCK() (!GC_need_to_lock \
-                            || GC_lock_holder == GetCurrentThreadId())
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) && !defined(USE_PTHREAD_LOCKS)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN CRITICAL_SECTION MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml;
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+#     define SET_LOCK_HOLDER() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder = GetCurrentThreadId())
+#     define I_HOLD_LOCK() (!MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock \
+                            || MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder == GetCurrentThreadId())
 #     ifdef THREAD_SANITIZER
 #       define I_DONT_HOLD_LOCK() TRUE /* Conservatively say yes */
 #     else
-#       define I_DONT_HOLD_LOCK() (!GC_need_to_lock \
-                            || GC_lock_holder != GetCurrentThreadId())
+#       define I_DONT_HOLD_LOCK() (!MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock \
+                            || MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder != GetCurrentThreadId())
 #     endif
 #     define UNCOND_LOCK() \
-                { GC_ASSERT(I_DONT_HOLD_LOCK()); \
-                  EnterCriticalSection(&GC_allocate_ml); \
+                { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK()); \
+                  EnterCriticalSection(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml); \
                   SET_LOCK_HOLDER(); }
 #     define UNCOND_UNLOCK() \
-                { GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
-                  LeaveCriticalSection(&GC_allocate_ml); }
+                { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
+                  LeaveCriticalSection(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml); }
 #   else
-#     define UNCOND_LOCK() EnterCriticalSection(&GC_allocate_ml)
-#     define UNCOND_UNLOCK() LeaveCriticalSection(&GC_allocate_ml)
-#   endif /* !GC_ASSERTIONS */
-# elif defined(GC_PTHREADS)
+#     define UNCOND_LOCK() EnterCriticalSection(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
+#     define UNCOND_UNLOCK() LeaveCriticalSection(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
+#   endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS)
     EXTERN_C_END
 #   include <pthread.h>
     EXTERN_C_BEGIN
@@ -109,7 +109,7 @@
     /* integers for each thread, though that should be true as much */
     /* as possible.                                                 */
     /* Refine to exclude platforms on which pthread_t is struct.    */
-#   if !defined(GC_WIN32_PTHREADS)
+#   if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS)
 #     define NUMERIC_THREAD_ID(id) ((unsigned long)(id))
 #     define THREAD_EQUAL(id1, id2) ((id1) == (id2))
 #     define NUMERIC_THREAD_ID_UNIQUE
@@ -136,15 +136,15 @@
       EXTERN_C_END
 #     include "psp2-support.h"
       EXTERN_C_BEGIN
-      GC_EXTERN WapiMutex GC_allocate_ml_PSP2;
-#     define UNCOND_LOCK() { int res; GC_ASSERT(I_DONT_HOLD_LOCK()); \
-                              res = PSP2_MutexLock(&GC_allocate_ml_PSP2); \
-                              GC_ASSERT(0 == res); (void)res; \
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN WapiMutex MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml_PSP2;
+#     define UNCOND_LOCK() { int res; MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK()); \
+                              res = PSP2_MutexLock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml_PSP2); \
+                              MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == res); (void)res; \
                               SET_LOCK_HOLDER(); }
-#     define UNCOND_UNLOCK() { int res; GC_ASSERT(I_HOLD_LOCK()); \
+#     define UNCOND_UNLOCK() { int res; MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); \
                               UNSET_LOCK_HOLDER(); \
-                              res = PSP2_MutexUnlock(&GC_allocate_ml_PSP2); \
-                              GC_ASSERT(0 == res); (void)res; }
+                              res = PSP2_MutexUnlock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml_PSP2); \
+                              MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == res); (void)res; }
 
 #   elif (!defined(THREAD_LOCAL_ALLOC) || defined(USE_SPIN_LOCK)) \
          && !defined(USE_PTHREAD_LOCKS) && !defined(THREAD_SANITIZER)
@@ -154,25 +154,25 @@
       /* significant wasted time.  We thus rely mostly on queued locks. */
 #     undef USE_SPIN_LOCK
 #     define USE_SPIN_LOCK
-      GC_EXTERN volatile AO_TS_t GC_allocate_lock;
-      GC_INNER void GC_lock(void);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN volatile AO_TS_t MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_lock;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_lock(void);
         /* Allocation lock holder.  Only set if acquired by client through */
-        /* GC_call_with_alloc_lock.                                        */
-#     ifdef GC_ASSERTIONS
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_alloc_lock.                                        */
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
 #       define UNCOND_LOCK() \
-              { GC_ASSERT(I_DONT_HOLD_LOCK()); \
-                if (AO_test_and_set_acquire(&GC_allocate_lock) == AO_TS_SET) \
-                  GC_lock(); \
+              { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK()); \
+                if (AO_test_and_set_acquire(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_lock) == AO_TS_SET) \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_lock(); \
                 SET_LOCK_HOLDER(); }
 #       define UNCOND_UNLOCK() \
-              { GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
-                AO_CLEAR(&GC_allocate_lock); }
+              { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
+                AO_CLEAR(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_lock); }
 #     else
 #       define UNCOND_LOCK() \
-              { if (AO_test_and_set_acquire(&GC_allocate_lock) == AO_TS_SET) \
-                  GC_lock(); }
-#       define UNCOND_UNLOCK() AO_CLEAR(&GC_allocate_lock)
-#     endif /* !GC_ASSERTIONS */
+              { if (AO_test_and_set_acquire(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_lock) == AO_TS_SET) \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_lock(); }
+#       define UNCOND_UNLOCK() AO_CLEAR(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_lock)
+#     endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 #   else /* THREAD_LOCAL_ALLOC || USE_PTHREAD_LOCKS */
 #     ifndef USE_PTHREAD_LOCKS
 #       define USE_PTHREAD_LOCKS
@@ -182,71 +182,71 @@
       EXTERN_C_END
 #     include <pthread.h>
       EXTERN_C_BEGIN
-      GC_EXTERN pthread_mutex_t GC_allocate_ml;
-#     ifdef GC_ASSERTIONS
-        GC_INNER void GC_lock(void);
-#       define UNCOND_LOCK() { GC_ASSERT(I_DONT_HOLD_LOCK()); \
-                                GC_lock(); SET_LOCK_HOLDER(); }
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN pthread_mutex_t MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml;
+#     ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+        MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_lock(void);
+#       define UNCOND_LOCK() { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_DONT_HOLD_LOCK()); \
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_lock(); SET_LOCK_HOLDER(); }
 #       define UNCOND_UNLOCK() \
-                { GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
-                  pthread_mutex_unlock(&GC_allocate_ml); }
-#     else /* !GC_ASSERTIONS */
+                { MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); UNSET_LOCK_HOLDER(); \
+                  pthread_mutex_unlock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml); }
+#     else /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 #       if defined(NO_PTHREAD_TRYLOCK)
-#         define UNCOND_LOCK() pthread_mutex_lock(&GC_allocate_ml)
+#         define UNCOND_LOCK() pthread_mutex_lock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
 #       else
-          GC_INNER void GC_lock(void);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_lock(void);
 #         define UNCOND_LOCK() \
-              { if (0 != pthread_mutex_trylock(&GC_allocate_ml)) \
-                  GC_lock(); }
+              { if (0 != pthread_mutex_trylock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)) \
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_lock(); }
 #       endif
-#       define UNCOND_UNLOCK() pthread_mutex_unlock(&GC_allocate_ml)
-#     endif /* !GC_ASSERTIONS */
+#       define UNCOND_UNLOCK() pthread_mutex_unlock(&MANAGED_STACK_ADDRESS_BOEHM_GC_allocate_ml)
+#     endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 #   endif /* USE_PTHREAD_LOCKS */
-#   ifdef GC_ASSERTIONS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
 #     define SET_LOCK_HOLDER() \
-                (void)(GC_lock_holder = NUMERIC_THREAD_ID(pthread_self()))
+                (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder = NUMERIC_THREAD_ID(pthread_self()))
 #     define I_HOLD_LOCK() \
-                (!GC_need_to_lock \
-                 || GC_lock_holder == NUMERIC_THREAD_ID(pthread_self()))
+                (!MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock \
+                 || MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder == NUMERIC_THREAD_ID(pthread_self()))
 #     if !defined(NUMERIC_THREAD_ID_UNIQUE) || defined(THREAD_SANITIZER)
 #       define I_DONT_HOLD_LOCK() TRUE /* Conservatively say yes */
 #     else
 #       define I_DONT_HOLD_LOCK() \
-                (!GC_need_to_lock \
-                 || GC_lock_holder != NUMERIC_THREAD_ID(pthread_self()))
+                (!MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock \
+                 || MANAGED_STACK_ADDRESS_BOEHM_GC_lock_holder != NUMERIC_THREAD_ID(pthread_self()))
 #     endif
-#   endif /* GC_ASSERTIONS */
-#   ifndef GC_WIN32_THREADS
-      GC_EXTERN volatile unsigned char GC_collecting;
+#   endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS
+      MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN volatile unsigned char MANAGED_STACK_ADDRESS_BOEHM_GC_collecting;
 #     ifdef AO_HAVE_char_store
-#       define ENTER_GC() AO_char_store(&GC_collecting, TRUE)
-#       define EXIT_GC() AO_char_store(&GC_collecting, FALSE)
+#       define ENTER_GC() AO_char_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_collecting, TRUE)
+#       define EXIT_GC() AO_char_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_collecting, FALSE)
 #     else
-#       define ENTER_GC() (void)(GC_collecting = TRUE)
-#       define EXIT_GC() (void)(GC_collecting = FALSE)
+#       define ENTER_GC() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_collecting = TRUE)
+#       define EXIT_GC() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_collecting = FALSE)
 #     endif
-#   endif /* !GC_WIN32_THREADS */
-# endif /* GC_PTHREADS */
-# if defined(GC_ALWAYS_MULTITHREADED) \
+#   endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS */
+# endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS */
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED) \
       && (defined(USE_PTHREAD_LOCKS) || defined(USE_SPIN_LOCK))
-#   define GC_need_to_lock TRUE
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock TRUE
 #   define set_need_to_lock() (void)0
 # else
-#   if defined(GC_ALWAYS_MULTITHREADED) && !defined(CPPCHECK)
+#   if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED) && !defined(CPPCHECK)
 #     error Runtime initialization of GC lock is needed!
 #   endif
-#   undef GC_ALWAYS_MULTITHREADED
-    GC_EXTERN GC_bool GC_need_to_lock;
+#   undef MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED
+    MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock;
 #   ifdef THREAD_SANITIZER
         /* To workaround TSan false positive (e.g., when                */
-        /* GC_pthread_create is called from multiple threads in         */
-        /* parallel), do not set GC_need_to_lock if it is already set.  */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_pthread_create is called from multiple threads in         */
+        /* parallel), do not set MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock if it is already set.  */
 #       define set_need_to_lock() \
-                (void)(*(GC_bool volatile *)&GC_need_to_lock \
+                (void)(*(MANAGED_STACK_ADDRESS_BOEHM_GC_bool volatile *)&MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock \
                         ? FALSE \
-                        : (GC_need_to_lock = TRUE))
+                        : (MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock = TRUE))
 #   else
-#       define set_need_to_lock() (void)(GC_need_to_lock = TRUE)
+#       define set_need_to_lock() (void)(MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock = TRUE)
                                         /* We are multi-threaded now.   */
 #   endif
 # endif
@@ -256,7 +256,7 @@
 #else /* !THREADS */
 #   define LOCK() (void)0
 #   define UNLOCK() (void)0
-#   ifdef GC_ASSERTIONS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
 #     define I_HOLD_LOCK() TRUE
 #     define I_DONT_HOLD_LOCK() TRUE
                 /* Used only in positive assertions or to test whether  */
@@ -267,15 +267,15 @@
 
 #if defined(UNCOND_LOCK) && !defined(LOCK)
 # if (defined(LINT2) && defined(USE_PTHREAD_LOCKS)) \
-     || defined(GC_ALWAYS_MULTITHREADED)
-    /* Instruct code analysis tools not to care about GC_need_to_lock   */
+     || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ALWAYS_MULTITHREADED)
+    /* Instruct code analysis tools not to care about MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock   */
     /* influence to LOCK/UNLOCK semantic.                               */
 #   define LOCK() UNCOND_LOCK()
 #   define UNLOCK() UNCOND_UNLOCK()
 # else
                 /* At least two thread running; need to lock.   */
-#   define LOCK() do { if (GC_need_to_lock) UNCOND_LOCK(); } while (0)
-#   define UNLOCK() do { if (GC_need_to_lock) UNCOND_UNLOCK(); } while (0)
+#   define LOCK() do { if (MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock) UNCOND_LOCK(); } while (0)
+#   define UNLOCK() do { if (MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock) UNCOND_UNLOCK(); } while (0)
 # endif
 #endif
 
@@ -284,4 +284,4 @@
 #   define EXIT_GC()
 # endif
 
-#endif /* GC_LOCKS_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_LOCKS_H */

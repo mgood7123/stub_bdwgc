@@ -84,10 +84,10 @@ operating system:
   On some platforms, this can be defined to a constant address, though
   experience has shown that to be risky. Ideally the linker will define
   a symbol (e.g. `_data`) whose address is the beginning of the data segment.
-  Sometimes the value can be computed using the `GC_SysVGetDataStart`
+  Sometimes the value can be computed using the `MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart`
   function. Not used if either the next macro is defined, or if dynamic
   loading is supported, and the dynamic loading support defines a function
-  `GC_register_main_static_data` which returns false.
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_register_main_static_data` which returns false.
   * `SEARCH_FOR_DATA_START` - If this is defined `DATASTART` will be defined
   to a dynamically computed value which is obtained by starting with the
   address of `_end` and walking backwards until non-addressable memory
@@ -111,19 +111,19 @@ operating system:
   thread support, this must be the cold end of the main stack, which typically
   cannot be found in the same way as the other thread stacks. If this is not
   defined and none of the following three macros is defined, client code must
-  explicitly set `GC_stackbottom` to an appropriate value before calling
-  `GC_INIT` or any other `GC_` routine.
+  explicitly set `MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom` to an appropriate value before calling
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_INIT` or any other `MANAGED_STACK_ADDRESS_BOEHM_GC_` routine.
   * `LINUX_STACKBOTTOM` - May be defined instead of `STACKBOTTOM`. If defined,
   then the cold end of the stack will be determined, we usually read it from
   `/proc`.
   * `HEURISTIC1` - May be defined instead of `STACKBOTTOM`. `STACK_GRAN`
   should generally also be redefined. The cold end of the stack is determined
-  by taking an address inside `GC_init`s frame, and rounding it up to the next
+  by taking an address inside `MANAGED_STACK_ADDRESS_BOEHM_GC_init`s frame, and rounding it up to the next
   multiple of `STACK_GRAN`. This works well if the stack bottom is always
   aligned to a large power of two. (`STACK_GRAN` is predefined to 0x1000000,
   which is rarely optimal.)
   * `HEURISTIC2` - May be defined instead of `STACKBOTTOM`. The cold end
-  of the stack is determined by taking an address inside `GC_init`s frame,
+  of the stack is determined by taking an address inside `MANAGED_STACK_ADDRESS_BOEHM_GC_init`s frame,
   incrementing it repeatedly in small steps (decrement if `STACK_GROWS_UP`),
   and reading the value at each location. We remember the value when the first
   Segmentation violation or Bus error is signaled, round that to the nearest
@@ -137,10 +137,10 @@ operating system:
   `MPROTECT_VDB` identifies modified pages by write protecting the heap and
   catching faults. `PROC_VDB` and `SOFT_VDB` use the /proc pseudo-files to
   read dirty bits.)
-  * `PREFETCH`, `GC_PREFETCH_FOR_WRITE` - The collector uses `PREFETCH(x)`
+  * `PREFETCH`, `MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE` - The collector uses `PREFETCH(x)`
   to preload the cache with the data at _x_ address. This defaults to a no-op.
   * `CLEAR_DOUBLE` - If `CLEAR_DOUBLE` is defined, then `CLEAR_DOUBLE(x)`
-  is used as a fast way to clear the two words at `GC_malloc`-aligned address
+  is used as a fast way to clear the two words at `MANAGED_STACK_ADDRESS_BOEHM_GC_malloc`-aligned address
   _x_. By default, word stores of 0 are used instead.
   * `HEAP_START` - May be defined as the initial address hint for mmap-based
   allocation.
@@ -149,7 +149,7 @@ operating system:
 
 In some cases, you may have to add additional platform-specific code to other
 files. A likely candidate is the implementation
-of `GC_with_callee_saves_pushed` in `mach_dep.c`. This ensure that register
+of `MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed` in `mach_dep.c`. This ensure that register
 contents that the collector must trace from are copied to the stack. Typically
 this can be done portably, but on some platforms it may require assembly code,
 or just tweaking of conditional compilation tests.
@@ -178,10 +178,10 @@ more files specific to the particular thread interface. For example, somewhat
 portable pthread support is implemented in `pthread_support.c` and
 `pthread_stop_world.c`. The essential functionality consists of:
 
-  * `GC_stop_world` - Stops all threads which may access the garbage collected
+  * `MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world` - Stops all threads which may access the garbage collected
   heap, other than the caller;
-  * `GC_start_world` - Restart other threads;
-  * `GC_push_all_stacks` - Push the contents of all thread stacks (or,
+  * `MANAGED_STACK_ADDRESS_BOEHM_GC_start_world` - Restart other threads;
+  * `MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks` - Push the contents of all thread stacks (or,
   at least, of pointer-containing regions in the thread stacks) onto the mark
   stack.
 
@@ -193,9 +193,9 @@ In addition, `LOCK` and `UNLOCK` must be implemented in `gc_locks.h`.
 The easiest case is probably a new pthreads platform on which threads can be
 stopped with signals. In this case, the changes involve:
 
-  1. Introducing a suitable `GC_xxx_THREADS` macro, which should
+  1. Introducing a suitable `MANAGED_STACK_ADDRESS_BOEHM_GC_xxx_THREADS` macro, which should
   be automatically defined by `gc_config_macros.h` in the right cases.
-  It should also result in a definition of `GC_PTHREADS`, as for the existing
+  It should also result in a definition of `MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS`, as for the existing
   cases.
   2. Ensuring that the `atomic_ops` package at least minimally
   supports the platform. If incremental GC is needed, or if pthread locks
@@ -224,9 +224,9 @@ If dynamic library data sections must also be traced, then:
 
   * `DYNAMIC_LOADING` must be defined in the appropriate section of
   `gcconfig.h`.
-  * An appropriate versions of the functions `GC_register_dynamic_libraries`
+  * An appropriate versions of the functions `MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries`
   should be defined in `dyn_load.c`. This function should invoke
-  `GC_cond_add_roots(region_start, region_end, TRUE)` on each dynamic
+  `MANAGED_STACK_ADDRESS_BOEHM_GC_cond_add_roots(region_start, region_end, TRUE)` on each dynamic
   library data section.
 
 Implementations that scan for writable data segments are error prone,
@@ -253,8 +253,8 @@ useless.
 
 ## Stack traces for debug support
 
-If stack traces in objects are needed for debug support, `GC_save_callers` and
-`GC_print_callers` must be implemented.
+If stack traces in objects are needed for debug support, `MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers` and
+`MANAGED_STACK_ADDRESS_BOEHM_GC_print_callers` must be implemented.
 
 ## Disclaimer
 

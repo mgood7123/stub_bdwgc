@@ -3,26 +3,26 @@
 #include <limits.h>
 #include <stdio.h>
 
-#ifndef GC_IGNORE_WARN
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_IGNORE_WARN
   /* Ignore misleading "Out of Memory!" warning (which is printed on    */
-  /* every GC_MALLOC call below) by defining this macro before "gc.h"   */
+  /* every MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC call below) by defining this macro before "gc.h"   */
   /* inclusion.                                                         */
-# define GC_IGNORE_WARN
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_IGNORE_WARN
 #endif
 
-#ifndef GC_MAXIMUM_HEAP_SIZE
-# define GC_MAXIMUM_HEAP_SIZE (100 * 1024 * 1024)
-# define GC_INITIAL_HEAP_SIZE (GC_MAXIMUM_HEAP_SIZE / 20)
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_MAXIMUM_HEAP_SIZE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_MAXIMUM_HEAP_SIZE (100 * 1024 * 1024)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INITIAL_HEAP_SIZE (MANAGED_STACK_ADDRESS_BOEHM_GC_MAXIMUM_HEAP_SIZE / 20)
     /* Otherwise heap expansion aborts when deallocating large block.   */
     /* That's OK.  We test this corner case mostly to make sure that    */
     /* it fails predictably.                                            */
 #endif
 
-#ifndef GC_ATTR_ALLOC_SIZE
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_ALLOC_SIZE
   /* Omit alloc_size attribute to avoid compiler warnings about         */
-  /* exceeding maximum object size when values close to GC_SWORD_MAX    */
-  /* are passed to GC_MALLOC.                                           */
-# define GC_ATTR_ALLOC_SIZE(argnum) /* empty */
+  /* exceeding maximum object size when values close to MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX    */
+  /* are passed to MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC.                                           */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_ALLOC_SIZE(argnum) /* empty */
 #endif
 
 #include "gc.h"
@@ -43,25 +43,25 @@
     } \
   } while (0)
 
-#define GC_WORD_MAX ((GC_word)-1)
-#define GC_SWORD_MAX ((GC_signed_word)(GC_WORD_MAX >> 1))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX ((MANAGED_STACK_ADDRESS_BOEHM_GC_word)-1)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX ((MANAGED_STACK_ADDRESS_BOEHM_GC_signed_word)(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX >> 1))
 
 int main(void)
 {
-  GC_INIT();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 
-  CHECK_ALLOC_FAILED(GC_MALLOC(GC_SWORD_MAX - 1024), "SWORD_MAX-1024");
-  CHECK_ALLOC_FAILED(GC_MALLOC(GC_SWORD_MAX), "SWORD_MAX");
+  CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX - 1024), "SWORD_MAX-1024");
+  CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX), "SWORD_MAX");
   /* Skip other checks to avoid "exceeds maximum object size" gcc warning. */
 # if !defined(_FORTIFY_SOURCE)
-    CHECK_ALLOC_FAILED(GC_MALLOC((GC_word)GC_SWORD_MAX + 1), "SWORD_MAX+1");
-    CHECK_ALLOC_FAILED(GC_MALLOC((GC_word)GC_SWORD_MAX + 1024),
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC((MANAGED_STACK_ADDRESS_BOEHM_GC_word)MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX + 1), "SWORD_MAX+1");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC((MANAGED_STACK_ADDRESS_BOEHM_GC_word)MANAGED_STACK_ADDRESS_BOEHM_GC_SWORD_MAX + 1024),
                        "SWORD_MAX+1024");
-    CHECK_ALLOC_FAILED(GC_MALLOC(GC_WORD_MAX - 1024), "WORD_MAX-1024");
-    CHECK_ALLOC_FAILED(GC_MALLOC(GC_WORD_MAX - 16), "WORD_MAX-16");
-    CHECK_ALLOC_FAILED(GC_MALLOC(GC_WORD_MAX - 8), "WORD_MAX-8");
-    CHECK_ALLOC_FAILED(GC_MALLOC(GC_WORD_MAX - 4), "WORD_MAX-4");
-    CHECK_ALLOC_FAILED(GC_MALLOC(GC_WORD_MAX), "WORD_MAX");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX - 1024), "WORD_MAX-1024");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX - 16), "WORD_MAX-16");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX - 8), "WORD_MAX-8");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX - 4), "WORD_MAX-4");
+    CHECK_ALLOC_FAILED(MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX), "WORD_MAX");
 # endif
   printf("SUCCEEDED\n");
   return 0;

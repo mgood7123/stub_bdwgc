@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef GC_DEBUG
-# define GC_DEBUG
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
 #endif
 
 #include "gc.h"
@@ -23,14 +23,14 @@ struct treenode {
 } *root[10];
 
 static struct treenode *mktree(int i) {
-  struct treenode *r = GC_NEW(struct treenode);
+  struct treenode *r = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(struct treenode);
   struct treenode *x, *y;
 
   CHECK_OUT_OF_MEMORY(r);
   if (0 == i)
     return NULL;
   if (1 == i) {
-    r = (struct treenode *)GC_MALLOC_ATOMIC(sizeof(struct treenode));
+    r = (struct treenode *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(sizeof(struct treenode));
     CHECK_OUT_OF_MEMORY(r);
   }
   x = mktree(i - 1);
@@ -38,9 +38,9 @@ static struct treenode *mktree(int i) {
   r -> x = x;
   r -> y = y;
   if (i != 1) {
-    GC_END_STUBBORN_CHANGE(r);
-    GC_reachable_here(x);
-    GC_reachable_here(y);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(r);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(x);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_here(y);
   }
   return r;
 }
@@ -49,16 +49,16 @@ int main(void)
 {
   int i;
 
-  GC_INIT();
-  if (GC_get_find_leak())
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
     printf("This test program is not designed for leak detection mode\n");
   for (i = 0; i < 10; ++i) {
     root[i] = mktree(12);
   }
-  GC_generate_random_backtrace();
-  GC_generate_random_backtrace();
-  GC_generate_random_backtrace();
-  GC_generate_random_backtrace();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_generate_random_backtrace();
   printf("SUCCEEDED\n");
   return 0;
 }

@@ -66,19 +66,19 @@ on some corner cases of the language. On Linux, it suffices to add
 ## Writing the program
 
 You will need to include "gc.h" at the beginning of every file that allocates
-memory through the garbage collector. Call `GC_MALLOC` wherever you would have
+memory through the garbage collector. Call `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` wherever you would have
 call `malloc`. This initializes memory to zero like `calloc`; there is no need
 to explicitly clear the result.
 
 If you know that an object will not contain pointers to the garbage-collected
-heap, and you don't need it to be initialized, call `GC_MALLOC_ATOMIC`
+heap, and you don't need it to be initialized, call `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC`
 instead.
 
-A function `GC_FREE` is provided but need not be called. For very small
+A function `MANAGED_STACK_ADDRESS_BOEHM_GC_FREE` is provided but need not be called. For very small
 objects, your program will probably perform better if you do not call it, and
 let the collector do its job.
 
-A `GC_REALLOC` function behaves like the C library `realloc`. It allocates
+A `MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC` function behaves like the C library `realloc`. It allocates
 uninitialized pointer-free memory if the original object was allocated that
 way.
 
@@ -92,15 +92,15 @@ The following program `loop.c` is a trivial example:
     int main(void) {
         int i;
 
-        GC_INIT();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
         for (i = 0; i < 10000000; ++i) {
-            int **p = (int **) GC_MALLOC(sizeof(int *));
-            int *q = (int *) GC_MALLOC_ATOMIC(sizeof(int));
+            int **p = (int **) MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(sizeof(int *));
+            int *q = (int *) MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(sizeof(int));
             assert(*p == 0);
-            *p = (int *) GC_REALLOC(q, 2 * sizeof(int));
+            *p = (int *) MANAGED_STACK_ADDRESS_BOEHM_GC_REALLOC(q, 2 * sizeof(int));
             if (i % 100000 == 0)
                 printf("Heap size = %lu bytes\n",
-                       (unsigned long)GC_get_heap_size());
+                       (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_get_heap_size());
         }
         return 0;
     }
@@ -114,7 +114,7 @@ to the garbage-collected heap in memory allocated with the system `malloc`.
 
 ### Other Platforms
 
-On some other platforms it is necessary to call `GC_INIT` from the main
+On some other platforms it is necessary to call `MANAGED_STACK_ADDRESS_BOEHM_GC_INIT` from the main
 program, which is presumed to be part of the main executable, not a dynamic
 library. This can never hurt, and is thus generally good practice.
 
@@ -123,7 +123,7 @@ library. This can never hurt, and is thus generally good practice.
 For a multi-threaded program, some more rules apply:
 
   * Files that either allocate through the GC _or make thread-related calls_
-  should first define the macro `GC_THREADS`, and then include `gc.h`. On some
+  should first define the macro `MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS`, and then include `gc.h`. On some
   platforms this will redefine some threads primitives, e.g. to let the
   collector keep track of thread creation.
 
@@ -135,10 +135,10 @@ The collector includes some _alternate interfaces_ to make that easier.
 
 ### Debugging
 
-Additional debug checks can be performed by defining `GC_DEBUG` before
+Additional debug checks can be performed by defining `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG` before
 including `gc.h`. Additional options are available if the collector is also
 built with `--enable-gc-debug` and all allocations are performed with
-`GC_DEBUG` defined.
+`MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG` defined.
 
 ### What if I can't rewrite/recompile my program?
 
@@ -178,5 +178,5 @@ The executable can of course be run normally, e.g. by typing:
 
 
 The operation of the collector is affected by a number of environment
-variables. For example, setting `GC_PRINT_STATS` produces some GC statistics
+variables. For example, setting `MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS` produces some GC statistics
 on stdout. See [README.environment](README.environment) file for the details.

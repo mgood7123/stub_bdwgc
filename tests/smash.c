@@ -1,7 +1,7 @@
 /* Test that overwrite error detection works reasonably.        */
 
-#ifndef GC_DEBUG
-# define GC_DEBUG
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG
 #endif
 
 #include "gc.h"
@@ -29,13 +29,13 @@ int main(void)
   int i;
   char *p;
 
-  GC_INIT();
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
   for (i = 0; i < COUNT; ++i) {
-    A[i] = p = (char *)GC_MALLOC(SIZE);
+    A[i] = p = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(SIZE);
     CHECK_OUT_OF_MEMORY(p);
     if (i % 3000 == 0) {
       q = NULL;
-      GC_gcollect();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
     } else if (i % 5678 == 0) {
       /* Write a byte past the end of the allocated object      */
       /* but not beyond the last word of the object's memory.   */

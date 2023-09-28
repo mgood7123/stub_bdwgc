@@ -33,7 +33,7 @@
 # include <alloca.h>
 #endif
 
-GC_INLINE void GC_usleep(unsigned us)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_usleep(unsigned us)
 {
 #   if defined(LINT2) || defined(THREAD_SANITIZER)
       /* Workaround "waiting while holding a lock" static analyzer warning. */
@@ -54,17 +54,17 @@ GC_INLINE void GC_usleep(unsigned us)
 
 #ifdef NACL
 
-  STATIC int GC_nacl_num_gc_threads = 0;
-  STATIC volatile int GC_nacl_park_threads_now = 0;
-  STATIC volatile pthread_t GC_nacl_thread_parker = -1;
+  STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads = 0;
+  STATIC volatile int MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_park_threads_now = 0;
+  STATIC volatile pthread_t MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parker = -1;
 
-  STATIC __thread int GC_nacl_thread_idx = -1;
+  STATIC __thread int MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx = -1;
 
-  STATIC __thread GC_thread GC_nacl_gc_thread_self = NULL;
-                                /* TODO: Use GC_get_tlfs() instead. */
+  STATIC __thread MANAGED_STACK_ADDRESS_BOEHM_GC_thread MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self = NULL;
+                                /* TODO: Use MANAGED_STACK_ADDRESS_BOEHM_GC_get_tlfs() instead. */
 
-  volatile int GC_nacl_thread_parked[MAX_NACL_GC_THREADS];
-  int GC_nacl_thread_used[MAX_NACL_GC_THREADS];
+  volatile int MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS];
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS];
 
 #else
 
@@ -92,7 +92,7 @@ GC_INLINE void GC_usleep(unsigned us)
 #   endif
 # endif /* !NSIG */
 
-  void GC_print_sig_mask(void)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_print_sig_mask(void)
   {
     sigset_t blocked;
     int i;
@@ -101,14 +101,14 @@ GC_INLINE void GC_usleep(unsigned us)
       ABORT("pthread_sigmask failed");
     for (i = 1; i < NSIG; i++) {
       if (sigismember(&blocked, i))
-        GC_printf("Signal blocked: %d\n", i);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Signal blocked: %d\n", i);
     }
   }
 #endif /* DEBUG_THREADS */
 
 /* Remove the signals that we want to allow in thread stopping  */
 /* handler from a set.                                          */
-STATIC void GC_remove_allowed_signals(sigset_t *set)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_allowed_signals(sigset_t *set)
 {
     if (sigdelset(set, SIGINT) != 0
           || sigdelset(set, SIGQUIT) != 0
@@ -134,19 +134,19 @@ static sigset_t suspend_handler_mask;
 
 #define THREAD_RESTARTED 0x1
 
-STATIC volatile AO_t GC_stop_count;
+STATIC volatile AO_t MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count;
                         /* Incremented (to the nearest even value) at   */
-                        /* the beginning of GC_stop_world() (or when    */
+                        /* the beginning of MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world() (or when    */
                         /* a thread is requested to be suspended by     */
-                        /* GC_suspend_thread) and once more (to an odd  */
-                        /* value) at the beginning of GC_start_world(). */
+                        /* MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_thread) and once more (to an odd  */
+                        /* value) at the beginning of MANAGED_STACK_ADDRESS_BOEHM_GC_start_world(). */
                         /* The lowest bit is THREAD_RESTARTED one       */
                         /* which, if set, means it is safe for threads  */
                         /* to restart, i.e. they will see another       */
                         /* suspend signal before they are expected to   */
                         /* stop (unless they have stopped voluntarily). */
 
-STATIC GC_bool GC_retry_signals = FALSE;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals = FALSE;
 
 /*
  * We use signals to stop threads during GC.
@@ -163,16 +163,16 @@ STATIC GC_bool GC_retry_signals = FALSE;
 # ifdef SUSPEND_HANDLER_NO_CONTEXT
     /* Reuse the suspend signal. */
 #   define SIG_THR_RESTART SIG_SUSPEND
-# elif defined(GC_HPUX_THREADS) || defined(GC_OSF1_THREADS) \
-     || defined(GC_NETBSD_THREADS) || defined(GC_USESIGRT_SIGNALS)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_HPUX_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_OSF1_THREADS) \
+     || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_USESIGRT_SIGNALS)
 #   if defined(_SIGRTMIN) && !defined(CPPCHECK)
 #     define SIG_THR_RESTART _SIGRTMIN + 5
 #   else
 #     define SIG_THR_RESTART SIGRTMIN + 5
 #   endif
-# elif defined(GC_FREEBSD_THREADS) && defined(__GLIBC__)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS) && defined(__GLIBC__)
 #   define SIG_THR_RESTART (32+5)
-# elif defined(GC_FREEBSD_THREADS) || defined(HURD) || defined(RTEMS)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS) || defined(HURD) || defined(RTEMS)
 #   define SIG_THR_RESTART SIGUSR2
 # else
 #   define SIG_THR_RESTART SIGXCPU
@@ -182,53 +182,53 @@ STATIC GC_bool GC_retry_signals = FALSE;
 #define SIGNAL_UNSET (-1)
     /* Since SIG_SUSPEND and/or SIG_THR_RESTART could represent */
     /* a non-constant expression (e.g., in case of SIGRTMIN),   */
-    /* actual signal numbers are determined by GC_stop_init()   */
+    /* actual signal numbers are determined by MANAGED_STACK_ADDRESS_BOEHM_GC_stop_init()   */
     /* unless manually set (before GC initialization).          */
     /* Might be set to the same signal number.                  */
-STATIC int GC_sig_suspend = SIGNAL_UNSET;
-STATIC int GC_sig_thr_restart = SIGNAL_UNSET;
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend = SIGNAL_UNSET;
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart = SIGNAL_UNSET;
 
-GC_API void GC_CALL GC_set_suspend_signal(int sig)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_suspend_signal(int sig)
 {
-  if (GC_is_initialized) return;
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized) return;
 
-  GC_sig_suspend = sig;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend = sig;
 }
 
-GC_API void GC_CALL GC_set_thr_restart_signal(int sig)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_thr_restart_signal(int sig)
 {
-  if (GC_is_initialized) return;
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized) return;
 
-  GC_sig_thr_restart = sig;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart = sig;
 }
 
-GC_API int GC_CALL GC_get_suspend_signal(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_suspend_signal(void)
 {
-  return GC_sig_suspend != SIGNAL_UNSET ? GC_sig_suspend : SIG_SUSPEND;
+  return MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend != SIGNAL_UNSET ? MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend : SIG_SUSPEND;
 }
 
-GC_API int GC_CALL GC_get_thr_restart_signal(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_thr_restart_signal(void)
 {
-  return GC_sig_thr_restart != SIGNAL_UNSET
-            ? GC_sig_thr_restart : SIG_THR_RESTART;
+  return MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart != SIGNAL_UNSET
+            ? MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart : SIG_THR_RESTART;
 }
 
-#if defined(GC_EXPLICIT_SIGNALS_UNBLOCK) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_EXPLICIT_SIGNALS_UNBLOCK) \
     || !defined(NO_SIGNALS_UNBLOCK_IN_MAIN)
   /* Some targets (e.g., Solaris) might require this to be called when  */
   /* doing thread registering from the thread destructor.               */
-  GC_INNER void GC_unblock_gc_signals(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unblock_gc_signals(void)
   {
     sigset_t set;
     sigemptyset(&set);
-    GC_ASSERT(GC_sig_suspend != SIGNAL_UNSET);
-    GC_ASSERT(GC_sig_thr_restart != SIGNAL_UNSET);
-    sigaddset(&set, GC_sig_suspend);
-    sigaddset(&set, GC_sig_thr_restart);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend != SIGNAL_UNSET);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart != SIGNAL_UNSET);
+    sigaddset(&set, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend);
+    sigaddset(&set, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart);
     if (pthread_sigmask(SIG_UNBLOCK, &set, NULL) != 0)
       ABORT("pthread_sigmask failed");
   }
-#endif /* GC_EXPLICIT_SIGNALS_UNBLOCK */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_EXPLICIT_SIGNALS_UNBLOCK */
 
 #ifdef BASE_ATOMIC_OPS_EMULATED
  /* The AO primitives emulated with locks cannot be used inside signal  */
@@ -246,20 +246,20 @@ GC_API int GC_CALL GC_get_thr_restart_signal(void)
 # define ao_store_async(p, v) AO_store(p, v)
 #endif /* !BASE_ATOMIC_OPS_EMULATED */
 
-STATIC sem_t GC_suspend_ack_sem; /* also used to acknowledge restart */
+STATIC sem_t MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem; /* also used to acknowledge restart */
 
-STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context);
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler_inner(ptr_t dummy, void *context);
 
 #ifdef SUSPEND_HANDLER_NO_CONTEXT
-  STATIC void GC_suspend_handler(int sig)
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler(int sig)
 #else
-  STATIC void GC_suspend_sigaction(int sig, siginfo_t *info, void *context)
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_sigaction(int sig, siginfo_t *info, void *context)
 #endif
 {
   int old_errno = errno;
 
-  if (sig != GC_sig_suspend) {
-#   if defined(GC_FREEBSD_THREADS)
+  if (sig != MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend) {
+#   if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS)
       /* Workaround "deferred signal handling" bug in FreeBSD 9.2.      */
       if (0 == sig) return;
 #   endif
@@ -268,14 +268,14 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context);
 
 # ifdef SUSPEND_HANDLER_NO_CONTEXT
     /* A quick check if the signal is called to restart the world.      */
-    if ((ao_load_async(&GC_stop_count) & THREAD_RESTARTED) != 0)
+    if ((ao_load_async(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count) & THREAD_RESTARTED) != 0)
       return;
-    GC_with_callee_saves_pushed(GC_suspend_handler_inner, NULL);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed(MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler_inner, NULL);
 # else
     UNUSED_ARG(info);
     /* We believe that in this case the full context is already         */
     /* in the signal handler frame.                                     */
-    GC_suspend_handler_inner(NULL, context);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler_inner(NULL, context);
 # endif
   errno = old_errno;
 }
@@ -286,13 +286,13 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context);
 /* data structure is impossible.  Unfortunately, we have to     */
 /* instruct TSan that the lookup is safe.                       */
 #ifdef THREAD_SANITIZER
-  /* Almost same as GC_self_thread_inner() except for the       */
+  /* Almost same as MANAGED_STACK_ADDRESS_BOEHM_GC_self_thread_inner() except for the       */
   /* no-sanitize attribute added and the result is never NULL.  */
-  GC_ATTR_NO_SANITIZE_THREAD
-  static GC_thread GC_lookup_self_thread_async(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD
+  static MANAGED_STACK_ADDRESS_BOEHM_GC_thread MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_self_thread_async(void)
   {
     thread_id_t self_id = thread_id_self();
-    GC_thread p = GC_threads[THREAD_TABLE_INDEX(self_id)];
+    MANAGED_STACK_ADDRESS_BOEHM_GC_thread p = MANAGED_STACK_ADDRESS_BOEHM_GC_threads[THREAD_TABLE_INDEX(self_id)];
 
     for (;; p = p -> tm.next) {
       if (THREAD_EQUAL(p -> id, self_id)) break;
@@ -300,46 +300,46 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context);
     return p;
   }
 #else
-# define GC_lookup_self_thread_async() GC_self_thread_inner()
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_self_thread_async() MANAGED_STACK_ADDRESS_BOEHM_GC_self_thread_inner()
 #endif
 
-GC_INLINE void GC_store_stack_ptr(GC_stack_context_t crtn)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_store_stack_ptr(MANAGED_STACK_ADDRESS_BOEHM_GC_stack_context_t crtn)
 {
   /* There is no data race between the suspend handler (storing         */
-  /* stack_ptr) and GC_push_all_stacks (fetching stack_ptr) because     */
-  /* GC_push_all_stacks is executed after GC_stop_world exits and the   */
+  /* stack_ptr) and MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks (fetching stack_ptr) because     */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks is executed after MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world exits and the   */
   /* latter runs sem_wait repeatedly waiting for all the suspended      */
   /* threads to call sem_post.  Nonetheless, stack_ptr is stored (here) */
-  /* and fetched (by GC_push_all_stacks) using the atomic primitives to */
+  /* and fetched (by MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks) using the atomic primitives to */
   /* avoid the related TSan warning.                                    */
 # ifdef SPARC
     ao_store_async((volatile AO_t *)&(crtn -> stack_ptr),
-                   (AO_t)GC_save_regs_in_stack());
-    /* TODO: regs saving already done by GC_with_callee_saves_pushed */
+                   (AO_t)MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack());
+    /* TODO: regs saving already done by MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed */
 # else
 #   ifdef IA64
-      crtn -> backing_store_ptr = GC_save_regs_in_stack();
+      crtn -> backing_store_ptr = MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack();
 #   endif
     ao_store_async((volatile AO_t *)&(crtn -> stack_ptr),
-                   (AO_t)GC_approx_sp());
+                   (AO_t)MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp());
 # endif
 }
 
-STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler_inner(ptr_t dummy, void *context)
 {
-  GC_thread me;
-  GC_stack_context_t crtn;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_thread me;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_stack_context_t crtn;
 # ifdef E2K
     ptr_t bs_lo;
     size_t stack_size;
 # endif
   IF_CANCEL(int cancel_state;)
-# ifdef GC_ENABLE_SUSPEND_THREAD
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
     word suspend_cnt;
 # endif
-  AO_t my_stop_count = ao_load_acquire_async(&GC_stop_count);
+  AO_t my_stop_count = ao_load_acquire_async(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count);
                         /* After the barrier, this thread should see    */
-                        /* the actual content of GC_threads.            */
+                        /* the actual content of MANAGED_STACK_ADDRESS_BOEHM_GC_threads.            */
 
   UNUSED_ARG(dummy);
   UNUSED_ARG(context);
@@ -357,37 +357,37 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context)
       /* some way to disable cancellation in the handler.               */
 
 # ifdef DEBUG_THREADS
-    GC_log_printf("Suspending %p\n", (void *)pthread_self());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Suspending %p\n", (void *)pthread_self());
 # endif
-  me = GC_lookup_self_thread_async();
+  me = MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_self_thread_async();
   if ((me -> last_stop_count & ~(word)THREAD_RESTARTED) == my_stop_count) {
       /* Duplicate signal.  OK if we are retrying.      */
-      if (!GC_retry_signals) {
+      if (!MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals) {
           WARN("Duplicate suspend signal in thread %p\n", pthread_self());
       }
       RESTORE_CANCEL(cancel_state);
       return;
   }
   crtn = me -> crtn;
-  GC_store_stack_ptr(crtn);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_store_stack_ptr(crtn);
 # ifdef E2K
-    GC_ASSERT(NULL == crtn -> backing_store_end);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NULL == crtn -> backing_store_end);
     GET_PROCEDURE_STACK_LOCAL(&bs_lo, &stack_size);
     crtn -> backing_store_end = bs_lo;
     crtn -> backing_store_ptr = bs_lo + stack_size;
 # endif
-# ifdef GC_ENABLE_SUSPEND_THREAD
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
     suspend_cnt = (word)ao_load_async(&(me -> ext_suspend_cnt));
 # endif
 
   /* Tell the thread that wants to stop the world that this     */
   /* thread has been stopped.  Note that sem_post() is          */
   /* the only async-signal-safe primitive in LinuxThreads.      */
-  sem_post(&GC_suspend_ack_sem);
+  sem_post(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem);
   ao_store_release_async(&(me -> last_stop_count), my_stop_count);
 
   /* Wait until that thread tells us to restart by sending      */
-  /* this thread a GC_sig_thr_restart signal (should be masked  */
+  /* this thread a MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart signal (should be masked  */
   /* at this point thus there is no race).                      */
   /* We do not continue until we receive that signal,           */
   /* but we do not take that as authoritative.  (We may be      */
@@ -399,8 +399,8 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context)
   do {
       sigsuspend(&suspend_handler_mask);
       /* Iterate while not restarting the world or thread is suspended. */
-  } while (ao_load_acquire_async(&GC_stop_count) == my_stop_count
-#          ifdef GC_ENABLE_SUSPEND_THREAD
+  } while (ao_load_acquire_async(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count) == my_stop_count
+#          ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
              || ((suspend_cnt & 1) != 0
                  && (word)ao_load_async(&(me -> ext_suspend_cnt))
                     == suspend_cnt)
@@ -408,25 +408,25 @@ STATIC void GC_suspend_handler_inner(ptr_t dummy, void *context)
           );
 
 # ifdef DEBUG_THREADS
-    GC_log_printf("Resuming %p\n", (void *)pthread_self());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Resuming %p\n", (void *)pthread_self());
 # endif
 # ifdef E2K
-    GC_ASSERT(crtn -> backing_store_end == bs_lo);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(crtn -> backing_store_end == bs_lo);
     crtn -> backing_store_ptr = NULL;
     crtn -> backing_store_end = NULL;
 # endif
 
-# ifndef GC_NETBSD_THREADS_WORKAROUND
-    if (GC_retry_signals || GC_sig_suspend == GC_sig_thr_restart)
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS_WORKAROUND
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals || MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend == MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart)
 # endif
   {
     /* If the RESTART signal loss is possible (though it should be      */
     /* less likely than losing the SUSPEND signal as we do not do       */
     /* much between the first sem_post and sigsuspend calls), more      */
     /* handshaking is provided to work around it.                       */
-    sem_post(&GC_suspend_ack_sem);
+    sem_post(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem);
     /* Set the flag that the thread has been restarted. */
-    if (GC_retry_signals)
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals)
       ao_store_release_async(&(me -> last_stop_count),
                              my_stop_count | THREAD_RESTARTED);
   }
@@ -438,7 +438,7 @@ static void suspend_restart_barrier(int n_live_threads)
     int i;
 
     for (i = 0; i < n_live_threads; i++) {
-      while (0 != sem_wait(&GC_suspend_ack_sem)) {
+      while (0 != sem_wait(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem)) {
         /* On Linux, sem_wait is documented to always return zero.      */
         /* But the documentation appears to be incorrect.               */
         /* EINTR seems to happen with some versions of gdb.             */
@@ -446,9 +446,9 @@ static void suspend_restart_barrier(int n_live_threads)
           ABORT("sem_wait failed");
       }
     }
-#   ifdef GC_ASSERTIONS
-      sem_getvalue(&GC_suspend_ack_sem, &i);
-      GC_ASSERT(0 == i);
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
+      sem_getvalue(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem, &i);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == i);
 #   endif
 }
 
@@ -468,7 +468,7 @@ static int resend_lost_signals(int n_live_threads,
       for (;;) {
         int ack_count;
 
-        sem_getvalue(&GC_suspend_ack_sem, &ack_count);
+        sem_getvalue(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem, &ack_count);
         if (ack_count == n_live_threads)
           break;
         if (wait_usecs > RETRY_INTERVAL) {
@@ -478,11 +478,11 @@ static int resend_lost_signals(int n_live_threads,
             retry = 0; /* restart the counter */
           } else if (++retry >= RESEND_SIGNALS_LIMIT) /* no progress */
             ABORT_ARG1("Signals delivery fails constantly",
-                       " at GC #%lu", (unsigned long)GC_gc_no);
+                       " at GC #%lu", (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no);
 
-          GC_COND_LOG_PRINTF("Resent %d signals after timeout, retry: %d\n",
+          MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Resent %d signals after timeout, retry: %d\n",
                              newly_sent, retry);
-          sem_getvalue(&GC_suspend_ack_sem, &ack_count);
+          sem_getvalue(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem, &ack_count);
           if (newly_sent < n_live_threads - ack_count) {
             WARN("Lost some threads while stopping or starting world?!\n", 0);
             n_live_threads = ack_count + newly_sent;
@@ -490,7 +490,7 @@ static int resend_lost_signals(int n_live_threads,
           prev_sent = newly_sent;
           wait_usecs = 0;
         }
-        GC_usleep(WAIT_UNIT);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_usleep(WAIT_UNIT);
         wait_usecs += WAIT_UNIT;
       }
     }
@@ -518,7 +518,7 @@ static void resend_lost_signals_retry(int n_live_threads,
       /* First, try to wait for the semaphore with some timeout.            */
       /* On failure, fallback to WAIT_UNIT pause and resend of the signal.  */
       for (i = 0; i < n_live_threads; i++) {
-        if (0 != sem_timedwait(&GC_suspend_ack_sem, &ts))
+        if (0 != sem_timedwait(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem, &ts))
           break; /* Wait timed out or any other error.  */
       }
       /* Update the count of threads to wait the ack from.      */
@@ -529,13 +529,13 @@ static void resend_lost_signals_retry(int n_live_threads,
   suspend_restart_barrier(n_live_threads);
 }
 
-STATIC void GC_restart_handler(int sig)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_restart_handler(int sig)
 {
 # if defined(DEBUG_THREADS)
     int old_errno = errno;      /* Preserve errno value.        */
 # endif
 
-  if (sig != GC_sig_thr_restart)
+  if (sig != MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart)
     ABORT("Bad signal in restart handler");
 
   /* Note: even if we do not do anything useful here, it would still    */
@@ -543,7 +543,7 @@ STATIC void GC_restart_handler(int sig)
   /* signals, otherwise the signals will not be delivered at all,       */
   /* and will thus not interrupt the sigsuspend() above.                */
 # ifdef DEBUG_THREADS
-    GC_log_printf("In GC_restart_handler for %p\n", (void *)pthread_self());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("In MANAGED_STACK_ADDRESS_BOEHM_GC_restart_handler for %p\n", (void *)pthread_self());
     errno = old_errno;
 # endif
 }
@@ -561,19 +561,19 @@ STATIC void GC_restart_handler(int sig)
 #   define RETRY_TKILL_EAGAIN_LIMIT 16
 # endif
 
-  static int raise_signal(GC_thread p, int sig)
+  static int raise_signal(MANAGED_STACK_ADDRESS_BOEHM_GC_thread p, int sig)
   {
     int res;
 #   ifdef RETRY_TKILL_ON_EAGAIN
       int retry;
 #   endif
-#   if defined(SIMULATE_LOST_SIGNALS) && !defined(GC_ENABLE_SUSPEND_THREAD)
+#   if defined(SIMULATE_LOST_SIGNALS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD)
 #     ifndef LOST_SIGNALS_RATIO
 #       define LOST_SIGNALS_RATIO 25
 #     endif
       static int signal_cnt; /* race is OK, it is for test purpose only */
 
-      if (GC_retry_signals && (++signal_cnt) % LOST_SIGNALS_RATIO == 0)
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals && (++signal_cnt) % LOST_SIGNALS_RATIO == 0)
         return 0; /* simulate the signal is sent but lost */
 #   endif
 #   ifdef RETRY_TKILL_ON_EAGAIN
@@ -594,62 +594,62 @@ STATIC void GC_restart_handler(int sig)
 #     ifdef RETRY_TKILL_ON_EAGAIN
         if (res != EAGAIN || retry >= RETRY_TKILL_EAGAIN_LIMIT) break;
         /* A temporal overflow of the real-time signal queue.   */
-        GC_usleep(WAIT_UNIT);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_usleep(WAIT_UNIT);
 #     endif
     }
     return res;
   }
 
-# ifdef GC_ENABLE_SUSPEND_THREAD
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
 #   include <sys/time.h>
 #   include "gc/javaxfc.h" /* to get the prototypes as extern "C" */
 
-    STATIC void GC_brief_async_signal_safe_sleep(void)
+    STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_brief_async_signal_safe_sleep(void)
     {
       struct timeval tv;
       tv.tv_sec = 0;
-#     if defined(GC_TIME_LIMIT) && !defined(CPPCHECK)
-        tv.tv_usec = 1000 * GC_TIME_LIMIT / 2;
+#     if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT) && !defined(CPPCHECK)
+        tv.tv_usec = 1000 * MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT / 2;
 #     else
         tv.tv_usec = 1000 * 15 / 2;
 #     endif
       (void)select(0, 0, 0, 0, &tv);
     }
 
-    GC_INNER void GC_suspend_self_inner(GC_thread me, word suspend_cnt) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_self_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_thread me, word suspend_cnt) {
       IF_CANCEL(int cancel_state;)
 
-      GC_ASSERT((suspend_cnt & 1) != 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((suspend_cnt & 1) != 0);
       DISABLE_CANCEL(cancel_state);
 #     ifdef DEBUG_THREADS
-        GC_log_printf("Suspend self: %p\n", (void *)(me -> id));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Suspend self: %p\n", (void *)(me -> id));
 #     endif
       while ((word)ao_load_acquire_async(&(me -> ext_suspend_cnt))
              == suspend_cnt) {
         /* TODO: Use sigsuspend() even for self-suspended threads. */
-        GC_brief_async_signal_safe_sleep();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_brief_async_signal_safe_sleep();
       }
 #     ifdef DEBUG_THREADS
-        GC_log_printf("Resume self: %p\n", (void *)(me -> id));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Resume self: %p\n", (void *)(me -> id));
 #     endif
       RESTORE_CANCEL(cancel_state);
     }
 
-    GC_API void GC_CALL GC_suspend_thread(GC_SUSPEND_THREAD_ID thread) {
-      GC_thread t;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_thread(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID thread) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_thread t;
       AO_t next_stop_count;
       word suspend_cnt;
       IF_CANCEL(int cancel_state;)
 
       LOCK();
-      t = GC_lookup_by_pthread((pthread_t)thread);
+      t = MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_by_pthread((pthread_t)thread);
       if (NULL == t) {
         UNLOCK();
         return;
       }
       suspend_cnt = (word)(t -> ext_suspend_cnt);
       if ((suspend_cnt & 1) != 0) /* already suspended? */ {
-        GC_ASSERT(!THREAD_EQUAL((pthread_t)thread, pthread_self()));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!THREAD_EQUAL((pthread_t)thread, pthread_self()));
         UNLOCK();
         return;
       }
@@ -662,42 +662,42 @@ STATIC void GC_restart_handler(int sig)
 
       if (THREAD_EQUAL((pthread_t)thread, pthread_self())) {
         t -> ext_suspend_cnt = (AO_t)(suspend_cnt | 1);
-        GC_with_callee_saves_pushed(GC_suspend_self_blocked, (ptr_t)t);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed(MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_self_blocked, (ptr_t)t);
         UNLOCK();
         return;
       }
 
       DISABLE_CANCEL(cancel_state);
-                /* GC_suspend_thread is not a cancellation point.   */
+                /* MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_thread is not a cancellation point.   */
 #     ifdef PARALLEL_MARK
         /* Ensure we do not suspend a thread while it is rebuilding */
         /* a free list, otherwise such a dead-lock is possible:     */
-        /* thread 1 is blocked in GC_wait_for_reclaim holding       */
+        /* thread 1 is blocked in MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim holding       */
         /* the allocation lock, thread 2 is suspended in            */
-        /* GC_reclaim_generic invoked from GC_generic_malloc_many   */
-        /* (with GC_fl_builder_count > 0), and thread 3 is blocked  */
-        /* acquiring the allocation lock in GC_resume_thread.       */
-        if (GC_parallel)
-          GC_wait_for_reclaim();
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_generic invoked from MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_many   */
+        /* (with MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count > 0), and thread 3 is blocked  */
+        /* acquiring the allocation lock in MANAGED_STACK_ADDRESS_BOEHM_GC_resume_thread.       */
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim();
 #     endif
 
-      if (GC_manual_vdb) {
-        /* See the relevant comment in GC_stop_world.   */
-        GC_acquire_dirty_lock();
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb) {
+        /* See the relevant comment in MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world.   */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_dirty_lock();
       }
       /* Else do not acquire the lock as the write fault handler might  */
       /* be trying to acquire this lock too, and the suspend handler    */
       /* execution is deferred until the write fault handler completes. */
 
-      next_stop_count = GC_stop_count + THREAD_RESTARTED;
-      GC_ASSERT((next_stop_count & THREAD_RESTARTED) == 0);
-      AO_store(&GC_stop_count, next_stop_count);
+      next_stop_count = MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count + THREAD_RESTARTED;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((next_stop_count & THREAD_RESTARTED) == 0);
+      AO_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count, next_stop_count);
 
       /* Set the flag making the change visible to the signal handler.  */
       AO_store_release(&(t -> ext_suspend_cnt), (AO_t)(suspend_cnt | 1));
 
-      /* TODO: Support GC_retry_signals (not needed for TSan) */
-      switch (raise_signal(t, GC_sig_suspend)) {
+      /* TODO: Support MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals (not needed for TSan) */
+      switch (raise_signal(t, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend)) {
       /* ESRCH cannot happen as terminated threads are handled above.   */
       case 0:
         break;
@@ -707,38 +707,38 @@ STATIC void GC_restart_handler(int sig)
 
       /* Wait for the thread to complete threads table lookup and   */
       /* stack_ptr assignment.                                      */
-      GC_ASSERT(GC_thr_initialized);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_thr_initialized);
       suspend_restart_barrier(1);
-      if (GC_manual_vdb)
-        GC_release_dirty_lock();
-      AO_store(&GC_stop_count, next_stop_count | THREAD_RESTARTED);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock();
+      AO_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count, next_stop_count | THREAD_RESTARTED);
 
       RESTORE_CANCEL(cancel_state);
       UNLOCK();
     }
 
-    GC_API void GC_CALL GC_resume_thread(GC_SUSPEND_THREAD_ID thread) {
-      GC_thread t;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_resume_thread(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID thread) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_thread t;
 
       LOCK();
-      t = GC_lookup_by_pthread((pthread_t)thread);
+      t = MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_by_pthread((pthread_t)thread);
       if (t != NULL) {
         word suspend_cnt = (word)(t -> ext_suspend_cnt);
 
         if ((suspend_cnt & 1) != 0) /* is suspended? */ {
-          GC_ASSERT((GC_stop_count & THREAD_RESTARTED) != 0);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count & THREAD_RESTARTED) != 0);
           /* Mark the thread as not suspended - it will be resumed shortly. */
           AO_store(&(t -> ext_suspend_cnt), (AO_t)(suspend_cnt + 1));
 
           if ((t -> flags & (FINISHED | DO_BLOCKING)) == 0) {
-            int result = raise_signal(t, GC_sig_thr_restart);
+            int result = raise_signal(t, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart);
 
-            /* TODO: Support signal resending on GC_retry_signals */
+            /* TODO: Support signal resending on MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals */
             if (result != 0)
-              ABORT_ARG1("pthread_kill failed in GC_resume_thread",
+              ABORT_ARG1("pthread_kill failed in MANAGED_STACK_ADDRESS_BOEHM_GC_resume_thread",
                          ": errcode= %d", result);
-#           ifndef GC_NETBSD_THREADS_WORKAROUND
-              if (GC_retry_signals || GC_sig_suspend == GC_sig_thr_restart)
+#           ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS_WORKAROUND
+              if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals || MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend == MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart)
 #           endif
             {
               IF_CANCEL(int cancel_state;)
@@ -753,18 +753,18 @@ STATIC void GC_restart_handler(int sig)
       UNLOCK();
     }
 
-    GC_API int GC_CALL GC_is_thread_suspended(GC_SUSPEND_THREAD_ID thread) {
-      GC_thread t;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_is_thread_suspended(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID thread) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_thread t;
       int is_suspended = 0;
 
       LOCK();
-      t = GC_lookup_by_pthread((pthread_t)thread);
+      t = MANAGED_STACK_ADDRESS_BOEHM_GC_lookup_by_pthread((pthread_t)thread);
       if (t != NULL && (t -> ext_suspend_cnt & 1) != 0)
         is_suspended = (int)TRUE;
       UNLOCK();
       return is_suspended;
     }
-# endif /* GC_ENABLE_SUSPEND_THREAD */
+# endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD */
 
 # undef ao_load_acquire_async
 # undef ao_load_async
@@ -774,49 +774,49 @@ STATIC void GC_restart_handler(int sig)
 
 /* Should do exactly the right thing if the world is stopped; should    */
 /* not fail if it is not.                                               */
-GC_INNER void GC_push_all_stacks(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks(void)
 {
-    GC_bool found_me = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool found_me = FALSE;
     size_t nthreads = 0;
     int i;
-    GC_thread p;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_thread p;
     ptr_t lo; /* stack top (sp) */
     ptr_t hi; /* bottom */
 #   if defined(E2K) || defined(IA64)
       /* We also need to scan the register backing store.   */
       ptr_t bs_lo, bs_hi;
 #   endif
-    struct GC_traced_stack_sect_s *traced_stack_sect;
+    struct MANAGED_STACK_ADDRESS_BOEHM_GC_traced_stack_sect_s *traced_stack_sect;
     pthread_t self = pthread_self();
     word total_size = 0;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_thr_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_thr_initialized);
 #   ifdef DEBUG_THREADS
-      GC_log_printf("Pushing stacks from thread %p\n", (void *)self);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Pushing stacks from thread %p\n", (void *)self);
 #   endif
     for (i = 0; i < THREAD_TABLE_SZ; i++) {
-      for (p = GC_threads[i]; p != NULL; p = p -> tm.next) {
+      for (p = MANAGED_STACK_ADDRESS_BOEHM_GC_threads[i]; p != NULL; p = p -> tm.next) {
 #       if defined(E2K) || defined(IA64)
-          GC_bool is_self = FALSE;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_bool is_self = FALSE;
 #       endif
-        GC_stack_context_t crtn = p -> crtn;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_stack_context_t crtn = p -> crtn;
 
-        GC_ASSERT(THREAD_TABLE_INDEX(p -> id) == i);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(THREAD_TABLE_INDEX(p -> id) == i);
         if (KNOWN_FINISHED(p)) continue;
         ++nthreads;
         traced_stack_sect = crtn -> traced_stack_sect;
         if (THREAD_EQUAL(p -> id, self)) {
-            GC_ASSERT((p -> flags & DO_BLOCKING) == 0);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((p -> flags & DO_BLOCKING) == 0);
 #           ifdef SPARC
-              lo = GC_save_regs_in_stack();
+              lo = MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack();
 #           else
-              lo = GC_approx_sp();
+              lo = MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp();
 #             ifdef IA64
-                bs_hi = GC_save_regs_in_stack();
+                bs_hi = MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack();
 #             elif defined(E2K)
-                GC_ASSERT(NULL == crtn -> backing_store_end);
-                (void)GC_save_regs_in_stack();
+                MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NULL == crtn -> backing_store_end);
+                (void)MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack();
                 {
                   size_t stack_size;
                   GET_PROCEDURE_STACK_LOCAL(&bs_lo, &stack_size);
@@ -839,7 +839,7 @@ GC_INNER void GC_push_all_stacks(void)
             if (traced_stack_sect != NULL
                     && traced_stack_sect -> saved_stack_ptr == lo) {
               /* If the thread has never been stopped since the recent  */
-              /* GC_call_with_gc_active invocation then skip the top    */
+              /* MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_gc_active invocation then skip the top    */
               /* "stack section" as stack_ptr already points to.        */
               traced_stack_sect = traced_stack_sect -> prev;
             }
@@ -850,14 +850,14 @@ GC_INNER void GC_push_all_stacks(void)
 #       endif
 #       ifdef DEBUG_THREADS
 #         ifdef STACK_GROWS_UP
-            GC_log_printf("Stack for thread %p is (%p,%p]\n",
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Stack for thread %p is (%p,%p]\n",
                           (void *)(p -> id), (void *)hi, (void *)lo);
 #         else
-            GC_log_printf("Stack for thread %p is [%p,%p)\n",
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Stack for thread %p is [%p,%p)\n",
                           (void *)(p -> id), (void *)lo, (void *)hi);
 #         endif
 #       endif
-        if (NULL == lo) ABORT("GC_push_all_stacks: sp not set!");
+        if (NULL == lo) ABORT("MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stacks: sp not set!");
         if (crtn -> altstack != NULL && (word)(crtn -> altstack) <= (word)lo
             && (word)lo <= (word)(crtn -> altstack) + crtn -> altstack_size) {
 #         ifdef STACK_GROWS_UP
@@ -868,10 +868,10 @@ GC_INNER void GC_push_all_stacks(void)
           /* FIXME: Need to scan the normal stack too, but how ? */
         }
 #       ifdef STACKPTR_CORRECTOR_AVAILABLE
-          if (GC_sp_corrector != 0)
-            GC_sp_corrector((void **)&lo, (void *)(p -> id));
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_sp_corrector != 0)
+            MANAGED_STACK_ADDRESS_BOEHM_GC_sp_corrector((void **)&lo, (void *)(p -> id));
 #       endif
-        GC_push_all_stack_sections(lo, hi, traced_stack_sect);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack_sections(lo, hi, traced_stack_sect);
 #       ifdef STACK_GROWS_UP
           total_size += lo - hi;
 #       else
@@ -879,13 +879,13 @@ GC_INNER void GC_push_all_stacks(void)
 #       endif
 #       ifdef NACL
           /* Push reg_storage as roots, this will cover the reg context. */
-          GC_push_all_stack((ptr_t)p -> reg_storage,
-                        (ptr_t)(p -> reg_storage + NACL_GC_REG_STORAGE_SIZE));
-          total_size += NACL_GC_REG_STORAGE_SIZE * sizeof(ptr_t);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack((ptr_t)p -> reg_storage,
+                        (ptr_t)(p -> reg_storage + NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE));
+          total_size += NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE * sizeof(ptr_t);
 #       endif
 #       ifdef E2K
-          if ((GC_stop_count & THREAD_RESTARTED) != 0
-#             ifdef GC_ENABLE_SUSPEND_THREAD
+          if ((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count & THREAD_RESTARTED) != 0
+#             ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
                 && (p -> ext_suspend_cnt & 1) == 0
 #             endif
               && !is_self && (p -> flags & DO_BLOCKING) == 0)
@@ -893,80 +893,80 @@ GC_INNER void GC_push_all_stacks(void)
 #       endif
 #       if defined(E2K) || defined(IA64)
 #         ifdef DEBUG_THREADS
-            GC_log_printf("Reg stack for thread %p is [%p,%p)\n",
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Reg stack for thread %p is [%p,%p)\n",
                           (void *)(p -> id), (void *)bs_lo, (void *)bs_hi);
 #         endif
-          GC_ASSERT(bs_lo != NULL && bs_hi != NULL);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(bs_lo != NULL && bs_hi != NULL);
           /* FIXME: This (if is_self) may add an unbounded number of    */
           /* entries, and hence overflow the mark stack, which is bad.  */
 #         ifdef IA64
-            GC_push_all_register_sections(bs_lo, bs_hi, is_self,
+            MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_register_sections(bs_lo, bs_hi, is_self,
                                           traced_stack_sect);
 #         else
             if (is_self) {
-              GC_push_all_eager(bs_lo, bs_hi);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_eager(bs_lo, bs_hi);
             } else {
-              GC_push_all_stack(bs_lo, bs_hi);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_push_all_stack(bs_lo, bs_hi);
             }
 #         endif
           total_size += bs_hi - bs_lo; /* bs_lo <= bs_hi */
 #       endif
       }
     }
-    GC_VERBOSE_LOG_PRINTF("Pushed %d thread stacks\n", (int)nthreads);
-    if (!found_me && !GC_in_thread_creation)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_VERBOSE_LOG_PRINTF("Pushed %d thread stacks\n", (int)nthreads);
+    if (!found_me && !MANAGED_STACK_ADDRESS_BOEHM_GC_in_thread_creation)
       ABORT("Collecting from unknown thread");
-    GC_total_stacksize = total_size;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_total_stacksize = total_size;
 }
 
 #ifdef DEBUG_THREADS
   /* There seems to be a very rare thread stopping problem.  To help us */
   /* debug that, we save the ids of the stopping thread.                */
-  pthread_t GC_stopping_thread;
-  int GC_stopping_pid = 0;
+  pthread_t MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_thread;
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_pid = 0;
 #endif
 
 /* Suspend all threads that might still be running.  Return the number  */
 /* of suspend signals that were sent.                                   */
-STATIC int GC_suspend_all(void)
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_all(void)
 {
   int n_live_threads = 0;
   int i;
 # ifndef NACL
-    GC_thread p;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_thread p;
     pthread_t self = pthread_self();
     int result;
 
-    GC_ASSERT((GC_stop_count & THREAD_RESTARTED) == 0);
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count & THREAD_RESTARTED) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     for (i = 0; i < THREAD_TABLE_SZ; i++) {
-      for (p = GC_threads[i]; p != NULL; p = p -> tm.next) {
+      for (p = MANAGED_STACK_ADDRESS_BOEHM_GC_threads[i]; p != NULL; p = p -> tm.next) {
         if (!THREAD_EQUAL(p -> id, self)) {
             if ((p -> flags & (FINISHED | DO_BLOCKING)) != 0) continue;
-#           ifdef GC_ENABLE_SUSPEND_THREAD
+#           ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
                 if ((p -> ext_suspend_cnt & 1) != 0) continue;
 #           endif
-            if (AO_load(&(p -> last_stop_count)) == GC_stop_count)
-              continue; /* matters only if GC_retry_signals */
+            if (AO_load(&(p -> last_stop_count)) == MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count)
+              continue; /* matters only if MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals */
             n_live_threads++;
 #           ifdef DEBUG_THREADS
-              GC_log_printf("Sending suspend signal to %p\n", (void *)p->id);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Sending suspend signal to %p\n", (void *)p->id);
 #           endif
 
-              /* The synchronization between GC_dirty (based on         */
+              /* The synchronization between MANAGED_STACK_ADDRESS_BOEHM_GC_dirty (based on         */
               /* test-and-set) and the signal-based thread suspension   */
-              /* is performed in GC_stop_world because                  */
-              /* GC_release_dirty_lock cannot be called before          */
+              /* is performed in MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world because                  */
+              /* MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock cannot be called before          */
               /* acknowledging the thread is really suspended.          */
-            result = raise_signal(p, GC_sig_suspend);
+            result = raise_signal(p, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend);
             switch (result) {
                 case ESRCH:
                     /* Not really there anymore.  Possible? */
                     n_live_threads--;
                     break;
                 case 0:
-                    if (GC_on_thread_event)
-                      GC_on_thread_event(GC_EVENT_THREAD_SUSPENDED,
+                    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event)
+                      MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_THREAD_SUSPENDED,
                                          (void *)(word)THREAD_SYSTEM_ID(p));
                                 /* Note: thread id might be truncated.  */
                     break;
@@ -984,64 +984,64 @@ STATIC int GC_suspend_all(void)
 #   endif
     unsigned long num_sleeps = 0;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 #   ifdef DEBUG_THREADS
-      GC_log_printf("pthread_stop_world: number of threads: %d\n",
-                    GC_nacl_num_gc_threads - 1);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("pthread_stop_world: number of threads: %d\n",
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads - 1);
 #   endif
-    GC_nacl_thread_parker = pthread_self();
-    GC_nacl_park_threads_now = 1;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parker = pthread_self();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_park_threads_now = 1;
 
-    if (GC_manual_vdb)
-      GC_acquire_dirty_lock();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_dirty_lock();
     for (;;) {
       int num_threads_parked = 0;
       int num_used = 0;
 
       /* Check the 'parked' flag for each thread the GC knows about.    */
-      for (i = 0; i < MAX_NACL_GC_THREADS
-                  && num_used < GC_nacl_num_gc_threads; i++) {
-        if (GC_nacl_thread_used[i] == 1) {
+      for (i = 0; i < MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
+                  && num_used < MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads; i++) {
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[i] == 1) {
           num_used++;
-          if (GC_nacl_thread_parked[i] == 1) {
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[i] == 1) {
             num_threads_parked++;
-            if (GC_on_thread_event)
-              GC_on_thread_event(GC_EVENT_THREAD_SUSPENDED, (void *)(word)i);
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event)
+              MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_THREAD_SUSPENDED, (void *)(word)i);
           }
         }
       }
       /* -1 for the current thread.     */
-      if (num_threads_parked >= GC_nacl_num_gc_threads - 1)
+      if (num_threads_parked >= MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads - 1)
         break;
 #     ifdef DEBUG_THREADS
-        GC_log_printf("Sleep waiting for %d threads to park...\n",
-                      GC_nacl_num_gc_threads - num_threads_parked - 1);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Sleep waiting for %d threads to park...\n",
+                      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads - num_threads_parked - 1);
 #     endif
-      GC_usleep(NACL_PARK_WAIT_USEC);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_usleep(NACL_PARK_WAIT_USEC);
       if (++num_sleeps > (1000 * 1000) / NACL_PARK_WAIT_USEC) {
         WARN("GC appears stalled waiting for %" WARN_PRIdPTR
              " threads to park...\n",
-             GC_nacl_num_gc_threads - num_threads_parked - 1);
+             MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads - num_threads_parked - 1);
         num_sleeps = 0;
       }
     }
-    if (GC_manual_vdb)
-      GC_release_dirty_lock();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock();
 # endif /* NACL */
   return n_live_threads;
 }
 
-GC_INNER void GC_stop_world(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world(void)
 {
 # if !defined(NACL)
     int n_live_threads;
 # endif
-  GC_ASSERT(I_HOLD_LOCK());
-  GC_ASSERT(GC_thr_initialized);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_thr_initialized);
 # ifdef DEBUG_THREADS
-    GC_stopping_thread = pthread_self();
-    GC_stopping_pid = getpid();
-    GC_log_printf("Stopping the world from %p\n", (void *)GC_stopping_thread);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_thread = pthread_self();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_pid = getpid();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Stopping the world from %p\n", (void *)MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_thread);
 # endif
 
   /* Make sure all free list construction has stopped before we start.  */
@@ -1049,41 +1049,41 @@ GC_INNER void GC_stop_world(void)
   /* required to acquire and release the GC lock before it starts,      */
   /* and we have the lock.                                              */
 # ifdef PARALLEL_MARK
-    if (GC_parallel) {
-      GC_acquire_mark_lock();
-      GC_ASSERT(GC_fl_builder_count == 0);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_mark_lock();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count == 0);
       /* We should have previously waited for it to become zero.        */
     }
 # endif /* PARALLEL_MARK */
 
 # if defined(NACL)
-    (void)GC_suspend_all();
+    (void)MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_all();
 # else
-    AO_store(&GC_stop_count, GC_stop_count + THREAD_RESTARTED);
+    AO_store(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count, MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count + THREAD_RESTARTED);
         /* Only concurrent reads are possible. */
-    if (GC_manual_vdb) {
-      GC_acquire_dirty_lock();
-      /* The write fault handler cannot be called if GC_manual_vdb      */
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_acquire_dirty_lock();
+      /* The write fault handler cannot be called if MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb      */
       /* (thus double-locking should not occur in                       */
       /* async_set_pht_entry_from_index based on test-and-set).         */
     }
-    n_live_threads = GC_suspend_all();
-    if (GC_retry_signals) {
-      resend_lost_signals_retry(n_live_threads, GC_suspend_all);
+    n_live_threads = MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_all();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals) {
+      resend_lost_signals_retry(n_live_threads, MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_all);
     } else {
       suspend_restart_barrier(n_live_threads);
     }
-    if (GC_manual_vdb)
-      GC_release_dirty_lock(); /* cannot be done in GC_suspend_all */
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_manual_vdb)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_release_dirty_lock(); /* cannot be done in MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_all */
 # endif
 
 # ifdef PARALLEL_MARK
-    if (GC_parallel)
-      GC_release_mark_lock();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_release_mark_lock();
 # endif
 # ifdef DEBUG_THREADS
-    GC_log_printf("World stopped from %p\n", (void *)pthread_self());
-    GC_stopping_thread = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("World stopped from %p\n", (void *)pthread_self());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_stopping_thread = 0;
 # endif
 }
 
@@ -1098,10 +1098,10 @@ GC_INNER void GC_stop_world(void)
           __asm__ __volatile__ ("push %r14"); \
           __asm__ __volatile__ ("push %r15"); \
           __asm__ __volatile__ ("mov %%esp, %0" \
-                    : "=m" (GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
-          BCOPY(GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
-                GC_nacl_gc_thread_self -> reg_storage, \
-                NACL_GC_REG_STORAGE_SIZE * sizeof(ptr_t)); \
+                    : "=m" (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
+          BCOPY(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
+                MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> reg_storage, \
+                NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE * sizeof(ptr_t)); \
           __asm__ __volatile__ ("naclasp $48, %r15"); \
         } while (0)
 # elif defined(__i386__)
@@ -1112,10 +1112,10 @@ GC_INNER void GC_stop_world(void)
           __asm__ __volatile__ ("push %esi"); \
           __asm__ __volatile__ ("push %edi"); \
           __asm__ __volatile__ ("mov %%esp, %0" \
-                    : "=m" (GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
-          BCOPY(GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
-                GC_nacl_gc_thread_self -> reg_storage, \
-                NACL_GC_REG_STORAGE_SIZE * sizeof(ptr_t));\
+                    : "=m" (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
+          BCOPY(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
+                MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> reg_storage, \
+                NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE * sizeof(ptr_t));\
           __asm__ __volatile__ ("add $16, %esp"); \
         } while (0)
 # elif defined(__arm__)
@@ -1123,12 +1123,12 @@ GC_INNER void GC_stop_world(void)
         do { \
           __asm__ __volatile__ ("push {r4-r8,r10-r12,lr}"); \
           __asm__ __volatile__ ("mov r0, %0" \
-                : : "r" (&GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
+                : : "r" (&MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr)); \
           __asm__ __volatile__ ("bic r0, r0, #0xc0000000"); \
           __asm__ __volatile__ ("str sp, [r0]"); \
-          BCOPY(GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
-                GC_nacl_gc_thread_self -> reg_storage, \
-                NACL_GC_REG_STORAGE_SIZE * sizeof(ptr_t)); \
+          BCOPY(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr, \
+                MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> reg_storage, \
+                NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE * sizeof(ptr_t)); \
           __asm__ __volatile__ ("add sp, sp, #40"); \
           __asm__ __volatile__ ("bic sp, sp, #0xc0000000"); \
         } while (0)
@@ -1136,55 +1136,55 @@ GC_INNER void GC_stop_world(void)
 #   error TODO Please port NACL_STORE_REGS
 # endif
 
-  GC_API_OSCALL void nacl_pre_syscall_hook(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL void nacl_pre_syscall_hook(void)
   {
-    if (GC_nacl_thread_idx != -1) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx != -1) {
       NACL_STORE_REGS();
-      GC_nacl_gc_thread_self -> crtn -> stack_ptr = GC_approx_sp();
-      GC_nacl_thread_parked[GC_nacl_thread_idx] = 1;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr = MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] = 1;
     }
   }
 
-  GC_API_OSCALL void __nacl_suspend_thread_if_needed(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL void __nacl_suspend_thread_if_needed(void)
   {
-      if (!GC_nacl_park_threads_now) return;
+      if (!MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_park_threads_now) return;
 
       /* Don't try to park the thread parker.   */
-      if (GC_nacl_thread_parker == pthread_self()) return;
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parker == pthread_self()) return;
 
       /* This can happen when a thread is created outside of the GC     */
       /* system (wthread mostly).                                       */
-      if (GC_nacl_thread_idx < 0) return;
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx < 0) return;
 
       /* If it was already 'parked', we're returning from a syscall,    */
       /* so don't bother storing registers again, the GC has a set.     */
-      if (!GC_nacl_thread_parked[GC_nacl_thread_idx]) {
+      if (!MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx]) {
         NACL_STORE_REGS();
-        GC_nacl_gc_thread_self -> crtn -> stack_ptr = GC_approx_sp();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> crtn -> stack_ptr = MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp();
       }
-      GC_nacl_thread_parked[GC_nacl_thread_idx] = 1;
-      while (GC_nacl_park_threads_now) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] = 1;
+      while (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_park_threads_now) {
         /* Just spin.   */
       }
-      GC_nacl_thread_parked[GC_nacl_thread_idx] = 0;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] = 0;
 
       /* Clear out the reg storage for next suspend.    */
-      BZERO(GC_nacl_gc_thread_self -> reg_storage,
-            NACL_GC_REG_STORAGE_SIZE * sizeof(ptr_t));
+      BZERO(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self -> reg_storage,
+            NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_REG_STORAGE_SIZE * sizeof(ptr_t));
   }
 
-  GC_API_OSCALL void nacl_post_syscall_hook(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API_OSCALL void nacl_post_syscall_hook(void)
   {
     /* Calling __nacl_suspend_thread_if_needed right away should        */
     /* guarantee we don't mutate the GC set.                            */
     __nacl_suspend_thread_if_needed();
-    if (GC_nacl_thread_idx != -1) {
-      GC_nacl_thread_parked[GC_nacl_thread_idx] = 0;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx != -1) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] = 0;
     }
   }
 
-  STATIC GC_bool GC_nacl_thread_parking_inited = FALSE;
-  STATIC pthread_mutex_t GC_nacl_thread_alloc_lock = PTHREAD_MUTEX_INITIALIZER;
+  STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parking_inited = FALSE;
+  STATIC pthread_mutex_t MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_alloc_lock = PTHREAD_MUTEX_INITIALIZER;
 
   struct nacl_irt_blockhook {
     int (*register_block_hooks)(void (*pre)(void), void (*post)(void));
@@ -1195,87 +1195,87 @@ GC_INNER void GC_stop_world(void)
                                      void *table, size_t tablesize);
   EXTERN_C_END
 
-  GC_INNER void GC_nacl_initialize_gc_thread(GC_thread me)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_initialize_gc_thread(MANAGED_STACK_ADDRESS_BOEHM_GC_thread me)
   {
     int i;
     static struct nacl_irt_blockhook gc_hook;
 
-    GC_ASSERT(NULL == GC_nacl_gc_thread_self);
-    GC_nacl_gc_thread_self = me;
-    pthread_mutex_lock(&GC_nacl_thread_alloc_lock);
-    if (!EXPECT(GC_nacl_thread_parking_inited, TRUE)) {
-      BZERO(GC_nacl_thread_parked, sizeof(GC_nacl_thread_parked));
-      BZERO(GC_nacl_thread_used, sizeof(GC_nacl_thread_used));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NULL == MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self = me;
+    pthread_mutex_lock(&MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_alloc_lock);
+    if (!EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parking_inited, TRUE)) {
+      BZERO(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked, sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parked));
+      BZERO(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used, sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used));
       /* TODO: replace with public 'register hook' function when        */
       /* available from glibc.                                          */
       nacl_interface_query("nacl-irt-blockhook-0.1",
                            &gc_hook, sizeof(gc_hook));
       gc_hook.register_block_hooks(nacl_pre_syscall_hook,
                                    nacl_post_syscall_hook);
-      GC_nacl_thread_parking_inited = TRUE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_parking_inited = TRUE;
     }
-    GC_ASSERT(GC_nacl_num_gc_threads <= MAX_NACL_GC_THREADS);
-    for (i = 0; i < MAX_NACL_GC_THREADS; i++) {
-      if (GC_nacl_thread_used[i] == 0) {
-        GC_nacl_thread_used[i] = 1;
-        GC_nacl_thread_idx = i;
-        GC_nacl_num_gc_threads++;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads <= MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS);
+    for (i = 0; i < MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS; i++) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[i] == 0) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[i] = 1;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx = i;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads++;
         break;
       }
     }
-    pthread_mutex_unlock(&GC_nacl_thread_alloc_lock);
+    pthread_mutex_unlock(&MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_alloc_lock);
   }
 
-  GC_INNER void GC_nacl_shutdown_gc_thread(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_shutdown_gc_thread(void)
   {
-    GC_ASSERT(GC_nacl_gc_thread_self != NULL);
-    pthread_mutex_lock(&GC_nacl_thread_alloc_lock);
-    GC_ASSERT(GC_nacl_thread_idx >= 0);
-    GC_ASSERT(GC_nacl_thread_idx < MAX_NACL_GC_THREADS);
-    GC_ASSERT(GC_nacl_thread_used[GC_nacl_thread_idx] != 0);
-    GC_nacl_thread_used[GC_nacl_thread_idx] = 0;
-    GC_nacl_thread_idx = -1;
-    GC_nacl_num_gc_threads--;
-    pthread_mutex_unlock(&GC_nacl_thread_alloc_lock);
-    GC_nacl_gc_thread_self = NULL;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self != NULL);
+    pthread_mutex_lock(&MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_alloc_lock);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx >= 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx < MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_used[MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx] = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_idx = -1;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_num_gc_threads--;
+    pthread_mutex_unlock(&MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_thread_alloc_lock);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_gc_thread_self = NULL;
   }
 
 #else /* !NACL */
 
   /* Restart all threads that were suspended by the collector.  */
   /* Return the number of restart signals that were sent.       */
-  STATIC int GC_restart_all(void)
+  STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_restart_all(void)
   {
     int n_live_threads = 0;
     int i;
     pthread_t self = pthread_self();
-    GC_thread p;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_thread p;
     int result;
 
-    GC_ASSERT((GC_stop_count & THREAD_RESTARTED) != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count & THREAD_RESTARTED) != 0);
     for (i = 0; i < THREAD_TABLE_SZ; i++) {
-      for (p = GC_threads[i]; p != NULL; p = p -> tm.next) {
+      for (p = MANAGED_STACK_ADDRESS_BOEHM_GC_threads[i]; p != NULL; p = p -> tm.next) {
         if (!THREAD_EQUAL(p -> id, self)) {
           if ((p -> flags & (FINISHED | DO_BLOCKING)) != 0) continue;
-#         ifdef GC_ENABLE_SUSPEND_THREAD
+#         ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ENABLE_SUSPEND_THREAD
               if ((p -> ext_suspend_cnt & 1) != 0) continue;
 #         endif
-          if (GC_retry_signals
-                && AO_load(&(p -> last_stop_count)) == GC_stop_count)
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals
+                && AO_load(&(p -> last_stop_count)) == MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count)
               continue; /* The thread has been restarted. */
           n_live_threads++;
 #         ifdef DEBUG_THREADS
-            GC_log_printf("Sending restart signal to %p\n", (void *)p->id);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Sending restart signal to %p\n", (void *)p->id);
 #         endif
-          result = raise_signal(p, GC_sig_thr_restart);
+          result = raise_signal(p, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart);
           switch (result) {
             case ESRCH:
               /* Not really there anymore.  Possible?   */
               n_live_threads--;
               break;
             case 0:
-              if (GC_on_thread_event)
-                GC_on_thread_event(GC_EVENT_THREAD_UNSUSPENDED,
+              if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event)
+                MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_THREAD_UNSUSPENDED,
                                    (void *)(word)THREAD_SYSTEM_ID(p));
               break;
             default:
@@ -1289,69 +1289,69 @@ GC_INNER void GC_stop_world(void)
   }
 #endif /* !NACL */
 
-GC_INNER void GC_start_world(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_world(void)
 {
 # ifndef NACL
     int n_live_threads;
 
-    GC_ASSERT(I_HOLD_LOCK()); /* held continuously since the world stopped */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK()); /* held continuously since the world stopped */
 #   ifdef DEBUG_THREADS
-      GC_log_printf("World starting\n");
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("World starting\n");
 #   endif
-    AO_store_release(&GC_stop_count, GC_stop_count + THREAD_RESTARTED);
+    AO_store_release(&MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count, MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count + THREAD_RESTARTED);
                     /* The updated value should now be visible to the   */
                     /* signal handler (note that pthread_kill is not on */
                     /* the list of functions which synchronize memory). */
-    n_live_threads = GC_restart_all();
-    if (GC_retry_signals) {
-        resend_lost_signals_retry(n_live_threads, GC_restart_all);
+    n_live_threads = MANAGED_STACK_ADDRESS_BOEHM_GC_restart_all();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals) {
+        resend_lost_signals_retry(n_live_threads, MANAGED_STACK_ADDRESS_BOEHM_GC_restart_all);
     } else {
-#       ifndef GC_NETBSD_THREADS_WORKAROUND
-          if (GC_sig_suspend == GC_sig_thr_restart)
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS_WORKAROUND
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend == MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart)
 #       endif
         {
           suspend_restart_barrier(n_live_threads);
         }
     }
 #   ifdef DEBUG_THREADS
-      GC_log_printf("World started\n");
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("World started\n");
 #   endif
 # else /* NACL */
 #   ifdef DEBUG_THREADS
-      GC_log_printf("World starting...\n");
+      MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("World starting...\n");
 #   endif
-    GC_nacl_park_threads_now = 0;
-    if (GC_on_thread_event)
-      GC_on_thread_event(GC_EVENT_THREAD_UNSUSPENDED, NULL);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_nacl_park_threads_now = 0;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_on_thread_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_THREAD_UNSUSPENDED, NULL);
       /* TODO: Send event for every unsuspended thread. */
 # endif
 }
 
-GC_INNER void GC_stop_init(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_stop_init(void)
 {
 # if !defined(NACL)
     struct sigaction act;
     char *str;
 
-    if (SIGNAL_UNSET == GC_sig_suspend)
-        GC_sig_suspend = SIG_SUSPEND;
-    if (SIGNAL_UNSET == GC_sig_thr_restart)
-        GC_sig_thr_restart = SIG_THR_RESTART;
+    if (SIGNAL_UNSET == MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend = SIG_SUSPEND;
+    if (SIGNAL_UNSET == MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart = SIG_THR_RESTART;
 
-    if (sem_init(&GC_suspend_ack_sem, GC_SEM_INIT_PSHARED, 0) != 0)
+    if (sem_init(&MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_ack_sem, MANAGED_STACK_ADDRESS_BOEHM_GC_SEM_INIT_PSHARED, 0) != 0)
         ABORT("sem_init failed");
-    GC_stop_count = THREAD_RESTARTED; /* i.e. the world is not stopped */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_stop_count = THREAD_RESTARTED; /* i.e. the world is not stopped */
 
     if (sigfillset(&act.sa_mask) != 0) {
         ABORT("sigfillset failed");
     }
-#   ifdef GC_RTEMS_PTHREADS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_RTEMS_PTHREADS
       if(sigprocmask(SIG_UNBLOCK, &act.sa_mask, NULL) != 0) {
         ABORT("sigprocmask failed");
       }
 #   endif
-    GC_remove_allowed_signals(&act.sa_mask);
-    /* GC_sig_thr_restart is set in the resulting mask. */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_remove_allowed_signals(&act.sa_mask);
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart is set in the resulting mask. */
     /* It is unmasked by the handler when necessary.    */
 
 #   ifdef SA_RESTART
@@ -1360,52 +1360,52 @@ GC_INNER void GC_stop_init(void)
       act.sa_flags = 0;
 #   endif
 #   ifdef SUSPEND_HANDLER_NO_CONTEXT
-      act.sa_handler = GC_suspend_handler;
+      act.sa_handler = MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_handler;
 #   else
       act.sa_flags |= SA_SIGINFO;
-      act.sa_sigaction = GC_suspend_sigaction;
+      act.sa_sigaction = MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_sigaction;
 #   endif
     /* act.sa_restorer is deprecated and should not be initialized. */
-    if (sigaction(GC_sig_suspend, &act, NULL) != 0) {
+    if (sigaction(MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend, &act, NULL) != 0) {
         ABORT("Cannot set SIG_SUSPEND handler");
     }
 
-    if (GC_sig_suspend != GC_sig_thr_restart) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_sig_suspend != MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart) {
 #     ifndef SUSPEND_HANDLER_NO_CONTEXT
         act.sa_flags &= ~SA_SIGINFO;
 #     endif
-      act.sa_handler = GC_restart_handler;
-      if (sigaction(GC_sig_thr_restart, &act, NULL) != 0)
+      act.sa_handler = MANAGED_STACK_ADDRESS_BOEHM_GC_restart_handler;
+      if (sigaction(MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart, &act, NULL) != 0)
         ABORT("Cannot set SIG_THR_RESTART handler");
     } else {
-      GC_COND_LOG_PRINTF("Using same signal for suspend and restart\n");
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Using same signal for suspend and restart\n");
     }
 
-    /* Initialize suspend_handler_mask (excluding GC_sig_thr_restart).  */
+    /* Initialize suspend_handler_mask (excluding MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart).  */
     if (sigfillset(&suspend_handler_mask) != 0) ABORT("sigfillset failed");
-    GC_remove_allowed_signals(&suspend_handler_mask);
-    if (sigdelset(&suspend_handler_mask, GC_sig_thr_restart) != 0)
+    MANAGED_STACK_ADDRESS_BOEHM_GC_remove_allowed_signals(&suspend_handler_mask);
+    if (sigdelset(&suspend_handler_mask, MANAGED_STACK_ADDRESS_BOEHM_GC_sig_thr_restart) != 0)
         ABORT("sigdelset failed");
 
 #   ifndef NO_RETRY_SIGNALS
       /* Any platform could lose signals, so let's be conservative and  */
       /* always enable signals retry logic.                             */
-      GC_retry_signals = TRUE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals = TRUE;
 #   endif
-    /* Override the default value of GC_retry_signals.  */
-    str = GETENV("GC_RETRY_SIGNALS");
+    /* Override the default value of MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals.  */
+    str = GETENV("MANAGED_STACK_ADDRESS_BOEHM_GC_RETRY_SIGNALS");
     if (str != NULL) {
-        GC_retry_signals = *str != '0' || *(str + 1) != '\0';
+        MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals = *str != '0' || *(str + 1) != '\0';
             /* Do not retry if the environment variable is set to "0". */
     }
-    if (GC_retry_signals) {
-      GC_COND_LOG_PRINTF(
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_retry_signals) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF(
                 "Will retry suspend and restart signals if necessary\n");
     }
 
 #   ifndef NO_SIGNALS_UNBLOCK_IN_MAIN
       /* Explicitly unblock the signals once before new threads creation. */
-      GC_unblock_gc_signals();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_unblock_gc_signals();
 #   endif
 # endif /* !NACL */
 }

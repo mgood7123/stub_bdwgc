@@ -22,7 +22,7 @@ unloading shared library.
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_BUILD
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 #include "gc.h"
 #include "private/gc_priv.h"
 
@@ -35,7 +35,7 @@ typedef struct {
         unsigned long JTOffset;
 } *CodeZeroPtr, **CodeZeroHandle;
 
-void* GC_MacGetDataStart(void)
+void* MANAGED_STACK_ADDRESS_BOEHM_GC_MacGetDataStart(void)
 {
         CodeZeroHandle code0 = (CodeZeroHandle)GetResource('CODE', 0);
         if (code0) {
@@ -63,9 +63,9 @@ struct TemporaryMemoryBlock {
 
 static TemporaryMemoryHandle theTemporaryMemory = NULL;
 
-void GC_MacFreeTemporaryMemory(void);
+void MANAGED_STACK_ADDRESS_BOEHM_GC_MacFreeTemporaryMemory(void);
 
-Ptr GC_MacTemporaryNewPtr(size_t size, Boolean clearMemory)
+Ptr MANAGED_STACK_ADDRESS_BOEHM_GC_MacTemporaryNewPtr(size_t size, Boolean clearMemory)
 {
 #     if !defined(SHARED_LIBRARY_BUILD)
         static Boolean firstTime = true;
@@ -89,7 +89,7 @@ Ptr GC_MacTemporaryNewPtr(size_t size, Boolean clearMemory)
 #     if !defined(SHARED_LIBRARY_BUILD)
         /* install an exit routine to clean up the memory used at the end. */
         if (firstTime) {
-                atexit(&GC_MacFreeTemporaryMemory);
+                atexit(&MANAGED_STACK_ADDRESS_BOEHM_GC_MacFreeTemporaryMemory);
                 firstTime = false;
         }
 #     endif
@@ -104,17 +104,17 @@ static void perform_final_collection(void)
 
   /* adjust the stack bottom, because CFM calls us from another stack
      location. */
-     GC_stackbottom = (ptr_t)&i;
+     MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom = (ptr_t)&i;
 
   /* try to collect and finalize everything in sight */
-    for (i = 0; i < 2 || GC_fo_entries < last_fo_entries; i++) {
-        last_fo_entries = GC_fo_entries;
-        GC_gcollect();
+    for (i = 0; i < 2 || MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries < last_fo_entries; i++) {
+        last_fo_entries = MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
     }
 }
 
 
-void GC_MacFreeTemporaryMemory(void)
+void MANAGED_STACK_ADDRESS_BOEHM_GC_MacFreeTemporaryMemory(void)
 {
 # if defined(SHARED_LIBRARY_BUILD)
     /* if possible, collect all memory, and invoke all finalizers. */
@@ -136,7 +136,7 @@ void GC_MacFreeTemporaryMemory(void)
 
 #if __option(far_data)
 
-  void* GC_MacGetDataEnd(void)
+  void* MANAGED_STACK_ADDRESS_BOEHM_GC_MacGetDataEnd(void)
   {
         CodeZeroHandle code0 = (CodeZeroHandle)GetResource('CODE', 0);
         if (code0) {

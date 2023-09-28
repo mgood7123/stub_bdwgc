@@ -156,12 +156,12 @@ of every source file. I used these:
   #define ALL_INTERIOR_POINTERS // follows interior pointers.
 //#define DONT_ADD_BYTE_AT_END  // disables the padding if defined.
 //#define SMALL_CONFIG          // whether to use a smaller heap.
-  #define GC_ATOMIC_UNCOLLECTABLE // GC_malloc_atomic_uncollectable()
+  #define MANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE // MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_atomic_uncollectable()
 
   // define either or none as per personal preference
   //   used in malloc.c
-  #define REDIRECT_MALLOC GC_malloc
-//#define REDIRECT_MALLOC GC_malloc_uncollectable
+  #define REDIRECT_MALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_malloc
+//#define REDIRECT_MALLOC MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_uncollectable
   // if REDIRECT_MALLOC is #defined make sure that the GC library
   // is listed before the ANSI/ISO libs in the Codewarrior
   // 'Link order' panel
@@ -216,7 +216,7 @@ prefix:
 #include <ansi_prefix.mac.h>
 #undef NDEBUG
 
-#define ALL_INTERIOR_POINTERS   /* for GC_priv.h */
+#define ALL_INTERIOR_POINTERS   /* for MANAGED_STACK_ADDRESS_BOEHM_GC_priv.h */
 ---- ( cut here ) ----
 
 == 3. Test that the C++ interface 'gc_cpp.h' works with 'tests/cpp.cc' ==
@@ -242,7 +242,7 @@ the MSL hierarchy so that I don't have to alter access-paths in projects
 that use the GC.
 
 After that, just add the proper GC library to your project and the GC is in
-action! malloc will call GC_malloc and free GC_free, new/delete too. You
+action! malloc will call MANAGED_STACK_ADDRESS_BOEHM_GC_malloc and free MANAGED_STACK_ADDRESS_BOEHM_GC_free, new/delete too. You
 don't have to call free or delete. You may have to be a bit cautious about
 delete if you're freeing other resources than RAM. See gc_cpp.h. You can
 also keep coding as always with delete/free. That works too. If you want,
@@ -308,6 +308,6 @@ and dataend.c to your project, bracketing all files that use the collector.
 See mw/gctest for an example.
 
 Include the projects/libraries you built above into your own project,
-#include "gc.h", and call GC_malloc. You don't have to call GC_free.
+#include "gc.h", and call MANAGED_STACK_ADDRESS_BOEHM_GC_malloc. You don't have to call MANAGED_STACK_ADDRESS_BOEHM_GC_free.
 
 Patrick C. Beard

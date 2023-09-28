@@ -25,14 +25,14 @@
 /* -O3 -fno-strict-aliasing -march=native -Wall -fprofile-generate/use  */
 
 /* Warning: GCC for Linux (for C++ clients only): Use -fexceptions both */
-/* for GC and the client otherwise GC_thread_exit_proc() is not         */
+/* for GC and the client otherwise MANAGED_STACK_ADDRESS_BOEHM_GC_thread_exit_proc() is not         */
 /* guaranteed to be invoked (see the comments in pthread_start.c).      */
 
 #ifndef __cplusplus
   /* static is desirable here for more efficient linkage.               */
   /* TODO: Enable this in case of the compilation as C++ code.          */
-# define GC_INNER STATIC
-# define GC_EXTERN GC_INNER
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_INNER STATIC
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN MANAGED_STACK_ADDRESS_BOEHM_GC_INNER
                 /* STATIC is defined in gcconfig.h. */
 #endif
 
@@ -76,7 +76,7 @@
 #include "../specific.c"
 #include "../win32_threads.c"
 
-#ifndef GC_PTHREAD_START_STANDALONE
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREAD_START_STANDALONE
 # include "../pthread_start.c"
 #endif
 
@@ -84,8 +84,8 @@
 /* pthread_stop_world.c, pthread_support.c or win32_threads.c). */
 /* This is only useful if directly included from application    */
 /* (instead of linking gc).                                     */
-#ifndef GC_NO_THREAD_REDIRECTS
-# define GC_PTHREAD_REDIRECTS_ONLY
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREAD_REDIRECTS_ONLY
 # include "gc/gc_pthread_redirects.h"
 #endif
 

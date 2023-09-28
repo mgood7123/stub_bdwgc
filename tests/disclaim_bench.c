@@ -23,8 +23,8 @@
 #include <string.h>
 
 #undef rand
-static GC_RAND_STATE_T seed;
-#define rand() GC_RAND_NEXT(&seed)
+static MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_STATE_T seed;
+#define rand() MANAGED_STACK_ADDRESS_BOEHM_GC_RAND_NEXT(&seed)
 
 #define my_assert(e) \
     if (!(e)) { \
@@ -49,14 +49,14 @@ struct testobj_s {
 
 typedef struct testobj_s *testobj_t;
 
-static void GC_CALLBACK testobj_finalize(void *obj, void *carg)
+static void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK testobj_finalize(void *obj, void *carg)
 {
     ++*(int *)carg;
     my_assert(((testobj_t)obj)->i == 109);
     ((testobj_t)obj)->i = 110;
 }
 
-static const struct GC_finalizer_closure fclos = {
+static const struct MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_closure fclos = {
     testobj_finalize,
     &free_count
 };
@@ -65,20 +65,20 @@ static testobj_t testobj_new(int model)
 {
     testobj_t obj;
     switch (model) {
-#     ifndef GC_NO_FINALIZATION
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
         case 0:
-            obj = (struct testobj_s *)GC_malloc(sizeof(struct testobj_s));
+            obj = (struct testobj_s *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct testobj_s));
             if (obj != NULL)
-              GC_register_finalizer_no_order(obj, testobj_finalize,
+              MANAGED_STACK_ADDRESS_BOEHM_GC_register_finalizer_no_order(obj, testobj_finalize,
                                              &free_count, NULL, NULL);
             break;
 #     endif
         case 1:
-            obj = (testobj_t)GC_finalized_malloc(sizeof(struct testobj_s),
+            obj = (testobj_t)MANAGED_STACK_ADDRESS_BOEHM_GC_finalized_malloc(sizeof(struct testobj_s),
                                                  &fclos);
             break;
         case 2:
-            obj = (struct testobj_s *)GC_malloc(sizeof(struct testobj_s));
+            obj = (struct testobj_s *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(struct testobj_s));
             break;
         default:
             exit(-1);
@@ -104,8 +104,8 @@ int main(int argc, char **argv)
     int model, model_min, model_max;
     testobj_t *keep_arr;
 
-    GC_INIT();
-    GC_init_finalized_malloc();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_init_finalized_malloc();
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         fprintf(stderr,
                 "Usage: %s [FINALIZATION_MODEL]\n"
@@ -119,17 +119,17 @@ int main(int argc, char **argv)
         if (model_min < 0 || model_max > 2)
             exit(2);
     } else {
-#     ifndef GC_NO_FINALIZATION
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
         model_min = 0;
 #     else
         model_min = 1;
 #     endif
         model_max = 2;
     }
-    if (GC_get_find_leak())
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_get_find_leak())
         printf("This test program is not designed for leak detection mode\n");
 
-    keep_arr = (testobj_t *)GC_malloc(sizeof(void *) * KEEP_CNT);
+    keep_arr = (testobj_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_malloc(sizeof(void *) * KEEP_CNT);
     CHECK_OUT_OF_MEMORY(keep_arr);
     printf("\t\t\tfin. ratio       time/s    time/fin.\n");
     for (model = model_min; model <= model_max; ++model) {
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
             int k = rand() % KEEP_CNT;
             keep_arr[k] = testobj_new(model);
         }
-        GC_gcollect();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect();
 #       ifndef NO_CLOCK
             GET_TIME(tF);
             t = (double)MS_TIME_DIFF(tF, tI) * 1e-3;

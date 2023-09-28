@@ -17,10 +17,10 @@
 
 #include "private/gc_priv.h"
 
-#ifdef GC_USE_ENTIRE_HEAP
-  int GC_use_entire_heap = TRUE;
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_USE_ENTIRE_HEAP
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_use_entire_heap = TRUE;
 #else
-  int GC_use_entire_heap = FALSE;
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_use_entire_heap = FALSE;
 #endif
 
 /*
@@ -47,54 +47,54 @@
 # define N_HBLK_FLS ((HUGE_THRESHOLD - UNIQUE_THRESHOLD) / FL_COMPRESSION \
                      + UNIQUE_THRESHOLD)
 
-#ifndef GC_GCJ_SUPPORT
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
   STATIC
 #endif
-  struct hblk * GC_hblkfreelist[N_HBLK_FLS+1] = { 0 };
+  struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[N_HBLK_FLS+1] = { 0 };
                                 /* List of completely empty heap blocks */
                                 /* Linked through hb_next field of      */
                                 /* header structure associated with     */
                                 /* block.  Remains externally visible   */
                                 /* as used by GNU GCJ currently.        */
 
-GC_API void GC_CALL GC_iterate_free_hblks(GC_walk_free_blk_fn fn,
-                                          GC_word client_data)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_iterate_free_hblks(MANAGED_STACK_ADDRESS_BOEHM_GC_walk_free_blk_fn fn,
+                                          MANAGED_STACK_ADDRESS_BOEHM_GC_word client_data)
 {
   int i;
 
   for (i = 0; i <= N_HBLK_FLS; ++i) {
     struct hblk *h;
 
-    for (h = GC_hblkfreelist[i]; h != NULL; h = HDR(h) -> hb_next) {
+    for (h = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[i]; h != NULL; h = HDR(h) -> hb_next) {
       (*fn)(h, i, client_data);
     }
   }
 }
 
-#ifndef GC_GCJ_SUPPORT
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT
   STATIC
 #endif
-  word GC_free_bytes[N_HBLK_FLS+1] = { 0 };
+  word MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[N_HBLK_FLS+1] = { 0 };
         /* Number of free bytes on each list.  Remains visible to GCJ.  */
 
 /* Return the largest n such that the number of free bytes on lists     */
-/* n .. N_HBLK_FLS is greater or equal to GC_max_large_allocd_bytes     */
-/* minus GC_large_allocd_bytes.  If there is no such n, return 0.       */
-GC_INLINE int GC_enough_large_bytes_left(void)
+/* n .. N_HBLK_FLS is greater or equal to MANAGED_STACK_ADDRESS_BOEHM_GC_max_large_allocd_bytes     */
+/* minus MANAGED_STACK_ADDRESS_BOEHM_GC_large_allocd_bytes.  If there is no such n, return 0.       */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int MANAGED_STACK_ADDRESS_BOEHM_GC_enough_large_bytes_left(void)
 {
     int n;
-    word bytes = GC_large_allocd_bytes;
+    word bytes = MANAGED_STACK_ADDRESS_BOEHM_GC_large_allocd_bytes;
 
-    GC_ASSERT(GC_max_large_allocd_bytes <= GC_heapsize);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_max_large_allocd_bytes <= MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize);
     for (n = N_HBLK_FLS; n >= 0; --n) {
-        bytes += GC_free_bytes[n];
-        if (bytes >= GC_max_large_allocd_bytes) return n;
+        bytes += MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[n];
+        if (bytes >= MANAGED_STACK_ADDRESS_BOEHM_GC_max_large_allocd_bytes) return n;
     }
     return 0;
 }
 
 /* Map a number of blocks to the appropriate large block free list index. */
-STATIC int GC_hblk_fl_from_blocks(size_t blocks_needed)
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_fl_from_blocks(size_t blocks_needed)
 {
     if (blocks_needed <= UNIQUE_THRESHOLD) return (int)blocks_needed;
     if (blocks_needed >= HUGE_THRESHOLD) return N_HBLK_FLS;
@@ -111,53 +111,53 @@ STATIC int GC_hblk_fl_from_blocks(size_t blocks_needed)
 #   define IS_MAPPED(hhdr) TRUE
 # endif /* !USE_MUNMAP */
 
-#if !defined(NO_DEBUGGING) || defined(GC_ASSERTIONS)
-  static void GC_CALLBACK add_hb_sz(struct hblk *h, int i, GC_word client_data)
+#if !defined(NO_DEBUGGING) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS)
+  static void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK add_hb_sz(struct hblk *h, int i, MANAGED_STACK_ADDRESS_BOEHM_GC_word client_data)
   {
       UNUSED_ARG(i);
       *(word *)client_data += HDR(h) -> hb_sz;
   }
 
-  /* Should return the same value as GC_large_free_bytes.       */
-  GC_INNER word GC_compute_large_free_bytes(void)
+  /* Should return the same value as MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes.       */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER word MANAGED_STACK_ADDRESS_BOEHM_GC_compute_large_free_bytes(void)
   {
       word total_free = 0;
 
-      GC_iterate_free_hblks(add_hb_sz, (word)&total_free);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_iterate_free_hblks(add_hb_sz, (word)&total_free);
       return total_free;
   }
-#endif /* !NO_DEBUGGING || GC_ASSERTIONS */
+#endif /* !NO_DEBUGGING || MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS */
 
 # if !defined(NO_DEBUGGING)
-  static void GC_CALLBACK print_hblkfreelist_item(struct hblk *h, int i,
-                                                  GC_word prev_index_ptr)
+  static void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK print_hblkfreelist_item(struct hblk *h, int i,
+                                                  MANAGED_STACK_ADDRESS_BOEHM_GC_word prev_index_ptr)
   {
     hdr *hhdr = HDR(h);
 
     if (i != *(int *)prev_index_ptr) {
-      GC_printf("Free list %d (total size %lu):\n",
-                i, (unsigned long)GC_free_bytes[i]);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Free list %d (total size %lu):\n",
+                i, (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[i]);
       *(int *)prev_index_ptr = i;
     }
 
-    GC_printf("\t%p size %lu %s black listed\n",
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t%p size %lu %s black listed\n",
               (void *)h, (unsigned long)(hhdr -> hb_sz),
-              GC_is_black_listed(h, HBLKSIZE) != NULL ? "start"
-                : GC_is_black_listed(h, hhdr -> hb_sz) != NULL ? "partially"
+              MANAGED_STACK_ADDRESS_BOEHM_GC_is_black_listed(h, HBLKSIZE) != NULL ? "start"
+                : MANAGED_STACK_ADDRESS_BOEHM_GC_is_black_listed(h, hhdr -> hb_sz) != NULL ? "partially"
                 : "not");
   }
 
-  void GC_print_hblkfreelist(void)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_print_hblkfreelist(void)
   {
     word total;
     int prev_index = -1;
 
-    GC_iterate_free_hblks(print_hblkfreelist_item, (word)&prev_index);
-    GC_printf("GC_large_free_bytes: %lu\n",
-              (unsigned long)GC_large_free_bytes);
-    total = GC_compute_large_free_bytes();
-    if (total != GC_large_free_bytes)
-      GC_err_printf("GC_large_free_bytes INCONSISTENT!! Should be: %lu\n",
+    MANAGED_STACK_ADDRESS_BOEHM_GC_iterate_free_hblks(print_hblkfreelist_item, (word)&prev_index);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes: %lu\n",
+              (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes);
+    total = MANAGED_STACK_ADDRESS_BOEHM_GC_compute_large_free_bytes();
+    if (total != MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes INCONSISTENT!! Should be: %lu\n",
                     (unsigned long)total);
   }
 
@@ -171,7 +171,7 @@ static int free_list_index_of(const hdr *wanted)
       struct hblk * h;
       hdr * hhdr;
 
-      for (h = GC_hblkfreelist[i]; h != 0; h = hhdr -> hb_next) {
+      for (h = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[i]; h != 0; h = hhdr -> hb_next) {
         hhdr = HDR(h);
         if (hhdr == wanted) return i;
       }
@@ -179,50 +179,50 @@ static int free_list_index_of(const hdr *wanted)
     return -1;
 }
 
-GC_API void GC_CALL GC_dump_regions(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_dump_regions(void)
 {
     unsigned i;
 
-    for (i = 0; i < GC_n_heap_sects; ++i) {
-        ptr_t start = GC_heap_sects[i].hs_start;
-        size_t bytes = GC_heap_sects[i].hs_bytes;
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects; ++i) {
+        ptr_t start = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start;
+        size_t bytes = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes;
         ptr_t end = start + bytes;
         ptr_t p;
 
         /* Merge in contiguous sections.        */
-          while (i+1 < GC_n_heap_sects && GC_heap_sects[i+1].hs_start == end) {
+          while (i+1 < MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects && MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i+1].hs_start == end) {
             ++i;
-            end = GC_heap_sects[i].hs_start + GC_heap_sects[i].hs_bytes;
+            end = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start + MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes;
           }
-        GC_printf("***Section from %p to %p\n", (void *)start, (void *)end);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_printf("***Section from %p to %p\n", (void *)start, (void *)end);
         for (p = start; (word)p < (word)end; ) {
             hdr *hhdr = HDR(p);
 
             if (IS_FORWARDING_ADDR_OR_NIL(hhdr)) {
-                GC_printf("\t%p Missing header!!(%p)\n",
+                MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t%p Missing header!!(%p)\n",
                           (void *)p, (void *)hhdr);
                 p += HBLKSIZE;
                 continue;
             }
             if (HBLK_IS_FREE(hhdr)) {
-                int correct_index = GC_hblk_fl_from_blocks(
+                int correct_index = MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_fl_from_blocks(
                                         (size_t)divHBLKSZ(hhdr -> hb_sz));
                 int actual_index;
 
-                GC_printf("\t%p\tfree block of size 0x%lx bytes%s\n",
+                MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t%p\tfree block of size 0x%lx bytes%s\n",
                           (void *)p, (unsigned long)(hhdr -> hb_sz),
                           IS_MAPPED(hhdr) ? "" : " (unmapped)");
                 actual_index = free_list_index_of(hhdr);
                 if (-1 == actual_index) {
-                    GC_printf("\t\tBlock not on free list %d!!\n",
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t\tBlock not on free list %d!!\n",
                               correct_index);
                 } else if (correct_index != actual_index) {
-                    GC_printf("\t\tBlock on list %d, should be on %d!!\n",
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t\tBlock on list %d, should be on %d!!\n",
                               actual_index, correct_index);
                 }
                 p += hhdr -> hb_sz;
             } else {
-                GC_printf("\t%p\tused for blocks of size 0x%lx bytes\n",
+                MANAGED_STACK_ADDRESS_BOEHM_GC_printf("\t%p\tused for blocks of size 0x%lx bytes\n",
                           (void *)p, (unsigned long)(hhdr -> hb_sz));
                 p += HBLKSIZE * OBJ_SZ_TO_BLOCKS(hhdr -> hb_sz);
             }
@@ -234,19 +234,19 @@ GC_API void GC_CALL GC_dump_regions(void)
 
 /* Initialize hdr for a block containing the indicated size and         */
 /* kind of objects.  Return FALSE on failure.                           */
-static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
+static MANAGED_STACK_ADDRESS_BOEHM_GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
                             int kind, unsigned flags)
 {
     struct obj_kind *ok;
     word descr;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(byte_sz >= ALIGNMENT);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(byte_sz >= ALIGNMENT);
 #   ifndef MARK_BIT_PER_OBJ
       if (byte_sz > MAXOBJBYTES)
         flags |= LARGE_BLOCK;
 #   endif
-    ok = &GC_obj_kinds[kind];
+    ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind];
 #   ifdef ENABLE_DISCLAIM
       if (ok -> ok_disclaim_proc)
         flags |= HAS_DISCLAIM;
@@ -260,7 +260,7 @@ static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
     hhdr -> hb_flags = (unsigned char)flags;
     hhdr -> hb_block = block;
     descr = ok -> ok_descriptor;
-#   if ALIGNMENT > GC_DS_TAGS
+#   if ALIGNMENT > MANAGED_STACK_ADDRESS_BOEHM_GC_DS_TAGS
       /* An extra byte is not added in case of ignore-off-page  */
       /* allocated objects not smaller than HBLKSIZE.           */
       if (EXTRA_BYTES != 0 && (flags & IGNORE_OFF_PAGE) != 0
@@ -279,7 +279,7 @@ static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
       } else {
         unsigned32 inv_sz;
 
-        GC_ASSERT(byte_sz > 1);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(byte_sz > 1);
 #       if CPP_WORDSZ > 32
           inv_sz = (unsigned32)(((word)1 << 32) / byte_sz);
           if (((inv_sz * (word)byte_sz) >> 32) == 0) ++inv_sz;
@@ -289,7 +289,7 @@ static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
             inv_sz++;
 #       endif
 #       if (CPP_WORDSZ == 32) && defined(__GNUC__)
-          GC_ASSERT(((1ULL << 32) + byte_sz - 1) / byte_sz == inv_sz);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(((1ULL << 32) + byte_sz - 1) / byte_sz == inv_sz);
 #       endif
         hhdr -> hb_inv_sz = inv_sz;
       }
@@ -297,7 +297,7 @@ static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
       {
         size_t granules = BYTES_TO_GRANULES(byte_sz);
 
-        if (EXPECT(!GC_add_map_entry(granules), FALSE)) {
+        if (EXPECT(!MANAGED_STACK_ADDRESS_BOEHM_GC_add_map_entry(granules), FALSE)) {
           /* Make it look like a valid block.   */
           hhdr -> hb_sz = HBLKSIZE;
           hhdr -> hb_descr = 0;
@@ -305,36 +305,36 @@ static GC_bool setup_header(hdr *hhdr, struct hblk *block, size_t byte_sz,
           hhdr -> hb_map = 0;
           return FALSE;
         }
-        hhdr -> hb_map = GC_obj_map[(hhdr -> hb_flags & LARGE_BLOCK) != 0 ?
+        hhdr -> hb_map = MANAGED_STACK_ADDRESS_BOEHM_GC_obj_map[(hhdr -> hb_flags & LARGE_BLOCK) != 0 ?
                                     0 : granules];
       }
 #   endif
 
     /* Clear mark bits */
-    GC_clear_hdr_marks(hhdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_clear_hdr_marks(hhdr);
 
-    hhdr -> hb_last_reclaimed = (unsigned short)GC_gc_no;
+    hhdr -> hb_last_reclaimed = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
     return TRUE;
 }
 
 /* Remove hhdr from the free list (it is assumed to specified by index). */
-STATIC void GC_remove_from_fl_at(hdr *hhdr, int index)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl_at(hdr *hhdr, int index)
 {
-    GC_ASSERT(modHBLKSZ(hhdr -> hb_sz) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(hhdr -> hb_sz) == 0);
     if (hhdr -> hb_prev == 0) {
-        GC_ASSERT(HDR(GC_hblkfreelist[index]) == hhdr);
-        GC_hblkfreelist[index] = hhdr -> hb_next;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(HDR(MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[index]) == hhdr);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[index] = hhdr -> hb_next;
     } else {
         hdr *phdr;
         GET_HDR(hhdr -> hb_prev, phdr);
         phdr -> hb_next = hhdr -> hb_next;
     }
     /* We always need index to maintain free counts.    */
-    GC_ASSERT(GC_free_bytes[index] >= hhdr -> hb_sz);
-    GC_free_bytes[index] -= hhdr -> hb_sz;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] >= hhdr -> hb_sz);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] -= hhdr -> hb_sz;
     if (0 != hhdr -> hb_next) {
         hdr * nhdr;
-        GC_ASSERT(!IS_FORWARDING_ADDR_OR_NIL(NHDR(hhdr)));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!IS_FORWARDING_ADDR_OR_NIL(NHDR(hhdr)));
         GET_HDR(hhdr -> hb_next, nhdr);
         nhdr -> hb_prev = hhdr -> hb_prev;
     }
@@ -342,9 +342,9 @@ STATIC void GC_remove_from_fl_at(hdr *hhdr, int index)
 
 /* Remove hhdr from the appropriate free list (we assume it is on the   */
 /* size-appropriate free list).                                         */
-GC_INLINE void GC_remove_from_fl(hdr *hhdr)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl(hdr *hhdr)
 {
-  GC_remove_from_fl_at(hhdr, GC_hblk_fl_from_blocks(
+  MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl_at(hhdr, MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_fl_from_blocks(
                                         (size_t)divHBLKSZ(hhdr -> hb_sz)));
 }
 
@@ -362,7 +362,7 @@ static struct hblk * get_block_ending_at(struct hblk *h)
     if (0 != phdr) {
         return p;
     }
-    p = GC_prev_block(h - 1);
+    p = MANAGED_STACK_ADDRESS_BOEHM_GC_prev_block(h - 1);
     if (p) {
         phdr = HDR(p);
         if ((ptr_t)p + phdr -> hb_sz == (ptr_t)h) {
@@ -373,7 +373,7 @@ static struct hblk * get_block_ending_at(struct hblk *h)
 }
 
 /* Return a pointer to the free block ending just before h, if any.     */
-STATIC struct hblk * GC_free_block_ending_at(struct hblk *h)
+STATIC struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_free_block_ending_at(struct hblk *h)
 {
     struct hblk * p = get_block_ending_at(h);
 
@@ -389,29 +389,29 @@ STATIC struct hblk * GC_free_block_ending_at(struct hblk *h)
 
 /* Add hhdr to the appropriate free list.               */
 /* We maintain individual free lists sorted by address. */
-STATIC void GC_add_to_fl(struct hblk *h, hdr *hhdr)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_fl(struct hblk *h, hdr *hhdr)
 {
-    int index = GC_hblk_fl_from_blocks((size_t)divHBLKSZ(hhdr -> hb_sz));
-    struct hblk *second = GC_hblkfreelist[index];
+    int index = MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_fl_from_blocks((size_t)divHBLKSZ(hhdr -> hb_sz));
+    struct hblk *second = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[index];
 
-#   if defined(GC_ASSERTIONS) && !defined(USE_MUNMAP)
+#   if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) && !defined(USE_MUNMAP)
     {
       struct hblk *next = (struct hblk *)((word)h + hhdr -> hb_sz);
       hdr * nexthdr = HDR(next);
-      struct hblk *prev = GC_free_block_ending_at(h);
+      struct hblk *prev = MANAGED_STACK_ADDRESS_BOEHM_GC_free_block_ending_at(h);
       hdr * prevhdr = HDR(prev);
 
-      GC_ASSERT(nexthdr == 0 || !HBLK_IS_FREE(nexthdr)
-                || (GC_heapsize & SIGNB) != 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(nexthdr == 0 || !HBLK_IS_FREE(nexthdr)
+                || (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize & SIGNB) != 0);
                 /* In the last case, blocks may be too large to merge. */
-      GC_ASSERT(NULL == prev || !HBLK_IS_FREE(prevhdr)
-                || (GC_heapsize & SIGNB) != 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NULL == prev || !HBLK_IS_FREE(prevhdr)
+                || (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize & SIGNB) != 0);
     }
 #   endif
-    GC_ASSERT(modHBLKSZ(hhdr -> hb_sz) == 0);
-    GC_hblkfreelist[index] = h;
-    GC_free_bytes[index] += hhdr -> hb_sz;
-    GC_ASSERT(GC_free_bytes[index] <= GC_large_free_bytes);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(hhdr -> hb_sz) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[index] = h;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] += hhdr -> hb_sz;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] <= MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes);
     hhdr -> hb_next = second;
     hhdr -> hb_prev = 0;
     if (second /* != NULL */) { /* CPPCHECK */
@@ -426,7 +426,7 @@ STATIC void GC_add_to_fl(struct hblk *h, hdr *hhdr)
 #ifdef USE_MUNMAP
 
 #ifdef COUNT_UNMAPPED_REGIONS
-  /* GC_unmap_old will avoid creating more than this many unmapped regions, */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_old will avoid creating more than this many unmapped regions, */
   /* but an unmapped region may be split again so exceeding the limit.      */
 
   /* Return the change in number of unmapped regions if the block h swaps   */
@@ -435,12 +435,12 @@ STATIC void GC_add_to_fl(struct hblk *h, hdr *hhdr)
   {
     struct hblk * prev = get_block_ending_at(h);
     struct hblk * next;
-    GC_bool prev_unmapped = FALSE;
-    GC_bool next_unmapped = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool prev_unmapped = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool next_unmapped = FALSE;
 
-    next = GC_next_block((struct hblk *)((ptr_t)h + hhdr->hb_sz), TRUE);
+    next = MANAGED_STACK_ADDRESS_BOEHM_GC_next_block((struct hblk *)((ptr_t)h + hhdr->hb_sz), TRUE);
     /* Ensure next is contiguous with h.        */
-    if ((ptr_t)next != GC_unmap_end((ptr_t)h, (size_t)hhdr->hb_sz)) {
+    if ((ptr_t)next != MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_end((ptr_t)h, (size_t)hhdr->hb_sz)) {
       next = NULL;
     }
     if (prev != NULL) {
@@ -469,12 +469,12 @@ STATIC void GC_add_to_fl(struct hblk *h, hdr *hhdr)
   }
 #endif /* COUNT_UNMAPPED_REGIONS */
 
-/* Update GC_num_unmapped_regions assuming the block h changes      */
+/* Update MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions assuming the block h changes      */
 /* from its current state of mapped/unmapped to the opposite state. */
-GC_INLINE void GC_adjust_num_unmapped(struct hblk *h, hdr *hhdr)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(struct hblk *h, hdr *hhdr)
 {
 # ifdef COUNT_UNMAPPED_REGIONS
-    GC_num_unmapped_regions += calc_num_unmapped_regions_delta(h, hhdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions += calc_num_unmapped_regions_delta(h, hhdr);
 # else
     UNUSED_ARG(h);
     UNUSED_ARG(hhdr);
@@ -483,14 +483,14 @@ GC_INLINE void GC_adjust_num_unmapped(struct hblk *h, hdr *hhdr)
 
 /* Unmap blocks that haven't been recently touched.  This is the only   */
 /* way blocks are ever unmapped.                                        */
-GC_INNER void GC_unmap_old(unsigned threshold)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_old(unsigned threshold)
 {
     int i;
 
 # ifdef COUNT_UNMAPPED_REGIONS
     /* Skip unmapping if we have already exceeded the soft limit.       */
     /* This forgoes any opportunities to merge unmapped regions though. */
-    if (GC_num_unmapped_regions >= GC_UNMAPPED_REGIONS_SOFT_LIMIT)
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions >= MANAGED_STACK_ADDRESS_BOEHM_GC_UNMAPPED_REGIONS_SOFT_LIMIT)
       return;
 # endif
 
@@ -498,28 +498,28 @@ GC_INNER void GC_unmap_old(unsigned threshold)
       struct hblk * h;
       hdr * hhdr;
 
-      for (h = GC_hblkfreelist[i]; 0 != h; h = hhdr -> hb_next) {
+      for (h = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[i]; 0 != h; h = hhdr -> hb_next) {
         hhdr = HDR(h);
         if (!IS_MAPPED(hhdr)) continue;
 
         /* Check that the interval is not smaller than the threshold.   */
         /* The truncated counter value wrapping is handled correctly.   */
-        if ((unsigned short)(GC_gc_no - hhdr->hb_last_reclaimed)
+        if ((unsigned short)(MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no - hhdr->hb_last_reclaimed)
             >= (unsigned short)threshold) {
 #         ifdef COUNT_UNMAPPED_REGIONS
             /* Continue with unmapping the block only if it will not    */
             /* create too many unmapped regions, or if unmapping        */
             /* reduces the number of regions.                           */
             int delta = calc_num_unmapped_regions_delta(h, hhdr);
-            signed_word regions = GC_num_unmapped_regions + delta;
+            signed_word regions = MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions + delta;
 
-            if (delta >= 0 && regions >= GC_UNMAPPED_REGIONS_SOFT_LIMIT) {
-              GC_COND_LOG_PRINTF("Unmapped regions limit reached!\n");
+            if (delta >= 0 && regions >= MANAGED_STACK_ADDRESS_BOEHM_GC_UNMAPPED_REGIONS_SOFT_LIMIT) {
+              MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Unmapped regions limit reached!\n");
               return;
             }
-            GC_num_unmapped_regions = regions;
+            MANAGED_STACK_ADDRESS_BOEHM_GC_num_unmapped_regions = regions;
 #         endif
-          GC_unmap((ptr_t)h, (size_t)(hhdr -> hb_sz));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_unmap((ptr_t)h, (size_t)(hhdr -> hb_sz));
           hhdr -> hb_flags |= WAS_UNMAPPED;
         }
       }
@@ -529,12 +529,12 @@ GC_INNER void GC_unmap_old(unsigned threshold)
 /* Merge all unmapped blocks that are adjacent to other free            */
 /* blocks.  This may involve remapping, since all blocks are either     */
 /* fully mapped or fully unmapped.                                      */
-GC_INNER void GC_merge_unmapped(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_merge_unmapped(void)
 {
     int i;
 
     for (i = 0; i <= N_HBLK_FLS; ++i) {
-      struct hblk *h = GC_hblkfreelist[i];
+      struct hblk *h = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[i];
 
       while (h != 0) {
         struct hblk *next;
@@ -557,37 +557,37 @@ GC_INNER void GC_merge_unmapped(void)
             if (IS_MAPPED(hhdr) && !IS_MAPPED(nexthdr)) {
               /* make both consistent, so that we can merge */
                 if (size > nextsize) {
-                  GC_adjust_num_unmapped(next, nexthdr);
-                  GC_remap((ptr_t)next, nextsize);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(next, nexthdr);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_remap((ptr_t)next, nextsize);
                 } else {
-                  GC_adjust_num_unmapped(h, hhdr);
-                  GC_unmap((ptr_t)h, size);
-                  GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(h, hhdr);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_unmap((ptr_t)h, size);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
                   hhdr -> hb_flags |= WAS_UNMAPPED;
                 }
             } else if (IS_MAPPED(nexthdr) && !IS_MAPPED(hhdr)) {
               if (size > nextsize) {
-                GC_adjust_num_unmapped(next, nexthdr);
-                GC_unmap((ptr_t)next, nextsize);
-                GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(next, nexthdr);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_unmap((ptr_t)next, nextsize);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
               } else {
-                GC_adjust_num_unmapped(h, hhdr);
-                GC_remap((ptr_t)h, size);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(h, hhdr);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_remap((ptr_t)h, size);
                 hhdr -> hb_flags &= (unsigned char)~WAS_UNMAPPED;
                 hhdr -> hb_last_reclaimed = nexthdr -> hb_last_reclaimed;
               }
             } else if (!IS_MAPPED(hhdr) && !IS_MAPPED(nexthdr)) {
               /* Unmap any gap in the middle */
-                GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_gap((ptr_t)h, size, (ptr_t)next, nextsize);
             }
             /* If they are both unmapped, we merge, but leave unmapped. */
-            GC_remove_from_fl_at(hhdr, i);
-            GC_remove_from_fl(nexthdr);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl_at(hhdr, i);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl(nexthdr);
             hhdr -> hb_sz += nexthdr -> hb_sz;
-            GC_remove_header(next);
-            GC_add_to_fl(h, hhdr);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_remove_header(next);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_fl(h, hhdr);
             /* Start over at beginning of list */
-            h = GC_hblkfreelist[i];
+            h = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[i];
           } else /* not mergeable with successor */ {
             h = hhdr -> hb_next;
           }
@@ -606,22 +606,22 @@ GC_INNER void GC_merge_unmapped(void)
  * The header for the returned block must be set up by the caller.
  * If the return value is not 0, then hhdr is the header for it.
  */
-STATIC struct hblk * GC_get_first_part(struct hblk *h, hdr *hhdr,
+STATIC struct hblk * MANAGED_STACK_ADDRESS_BOEHM_GC_get_first_part(struct hblk *h, hdr *hhdr,
                                        size_t bytes, int index)
 {
     size_t total_size;
     struct hblk * rest;
     hdr * rest_hdr;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(modHBLKSZ(bytes) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(bytes) == 0);
     total_size = (size_t)(hhdr -> hb_sz);
-    GC_ASSERT(modHBLKSZ(total_size) == 0);
-    GC_remove_from_fl_at(hhdr, index);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(total_size) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl_at(hhdr, index);
     if (total_size == bytes) return h;
 
     rest = (struct hblk *)((word)h + bytes);
-    rest_hdr = GC_install_header(rest);
+    rest_hdr = MANAGED_STACK_ADDRESS_BOEHM_GC_install_header(rest);
     if (EXPECT(NULL == rest_hdr, FALSE)) {
         /* FIXME: This is likely to be very bad news ... */
         WARN("Header allocation failed: dropping block\n", 0);
@@ -629,11 +629,11 @@ STATIC struct hblk * GC_get_first_part(struct hblk *h, hdr *hhdr,
     }
     rest_hdr -> hb_sz = total_size - bytes;
     rest_hdr -> hb_flags = 0;
-#   ifdef GC_ASSERTIONS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
       /* Mark h not free, to avoid assertion about adjacent free blocks. */
         hhdr -> hb_flags &= (unsigned char)~FREE_BLK;
 #   endif
-    GC_add_to_fl(rest, rest_hdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_fl(rest, rest_hdr);
     return h;
 }
 
@@ -651,7 +651,7 @@ STATIC struct hblk * GC_get_first_part(struct hblk *h, hdr *hhdr,
  * (Hence adding it to a free list is silly.  But this path is hopefully
  * rare enough that it doesn't matter.  The code is cleaner this way.)
  */
-STATIC void GC_split_block(struct hblk *h, hdr *hhdr, struct hblk *n,
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_split_block(struct hblk *h, hdr *hhdr, struct hblk *n,
                            hdr *nhdr, int index /* of free list */)
 {
     word total_size = hhdr -> hb_sz;
@@ -667,22 +667,22 @@ STATIC void GC_split_block(struct hblk *h, hdr *hhdr, struct hblk *n,
       if (prev /* != NULL */) { /* CPPCHECK */
         HDR(prev) -> hb_next = n;
       } else {
-        GC_hblkfreelist[index] = n;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[index] = n;
       }
       if (next /* != NULL */) {
         HDR(next) -> hb_prev = n;
       }
-      GC_ASSERT(GC_free_bytes[index] > h_size);
-      GC_free_bytes[index] -= h_size;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] > h_size);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_free_bytes[index] -= h_size;
 #   ifdef USE_MUNMAP
-      hhdr -> hb_last_reclaimed = (unsigned short)GC_gc_no;
+      hhdr -> hb_last_reclaimed = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
 #   endif
     hhdr -> hb_sz = h_size;
-    GC_add_to_fl(h, hhdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_fl(h, hhdr);
     nhdr -> hb_flags |= FREE_BLK;
 }
 
-STATIC struct hblk *GC_allochblk_nth(size_t sz /* bytes */, int kind,
+STATIC struct hblk *MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk_nth(size_t sz /* bytes */, int kind,
                                      unsigned flags, int n, int may_split,
                                      size_t align_m1);
 
@@ -690,7 +690,7 @@ STATIC struct hblk *GC_allochblk_nth(size_t sz /* bytes */, int kind,
 # define AVOID_SPLIT_REMAPPED 2
 #endif
 
-GC_INNER struct hblk *GC_allochblk(size_t sz, int kind,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER struct hblk *MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk(size_t sz, int kind,
                                    unsigned flags /* IGNORE_OFF_PAGE or 0 */,
                                    size_t align_m1)
 {
@@ -700,25 +700,25 @@ GC_INNER struct hblk *GC_allochblk(size_t sz, int kind,
     int may_split;
     int split_limit; /* highest index of free list whose blocks we split */
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT((sz & (GC_GRANULE_BYTES-1)) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((sz & (MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1)) == 0);
     blocks = OBJ_SZ_TO_BLOCKS_CHECKED(sz);
     if (EXPECT(SIZET_SAT_ADD(blocks * HBLKSIZE, align_m1)
-                >= (GC_SIZE_MAX >> 1), FALSE))
+                >= (MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX >> 1), FALSE))
       return NULL; /* overflow */
 
-    start_list = GC_hblk_fl_from_blocks(blocks);
+    start_list = MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_fl_from_blocks(blocks);
     /* Try for an exact match first. */
-    result = GC_allochblk_nth(sz, kind, flags, start_list, FALSE, align_m1);
+    result = MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk_nth(sz, kind, flags, start_list, FALSE, align_m1);
     if (result != NULL) return result;
 
     may_split = TRUE;
-    if (GC_use_entire_heap || GC_dont_gc
-        || GC_heapsize - GC_large_free_bytes < GC_requested_heapsize
-        || GC_incremental || !GC_should_collect()) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_use_entire_heap || MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc
+        || MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes < MANAGED_STACK_ADDRESS_BOEHM_GC_requested_heapsize
+        || MANAGED_STACK_ADDRESS_BOEHM_GC_incremental || !MANAGED_STACK_ADDRESS_BOEHM_GC_should_collect()) {
         /* Should use more of the heap, even if it requires splitting. */
         split_limit = N_HBLK_FLS;
-    } else if (GC_finalizer_bytes_freed > (GC_heapsize >> 4)) {
+    } else if (MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_bytes_freed > (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize >> 4)) {
           /* If we are deallocating lots of memory from         */
           /* finalizers, fail and collect sooner rather         */
           /* than later.                                        */
@@ -729,7 +729,7 @@ GC_INNER struct hblk *GC_allochblk(size_t sz, int kind,
           /* and split.  Assuming a steady state, that should   */
           /* be safe.  It means that we can use the full        */
           /* heap if we allocate only small objects.            */
-          split_limit = GC_enough_large_bytes_left();
+          split_limit = MANAGED_STACK_ADDRESS_BOEHM_GC_enough_large_bytes_left();
 #         ifdef USE_MUNMAP
             if (split_limit > 0)
               may_split = AVOID_SPLIT_REMAPPED;
@@ -741,24 +741,24 @@ GC_INNER struct hblk *GC_allochblk(size_t sz, int kind,
       ++start_list;
     }
     for (; start_list <= split_limit; ++start_list) {
-      result = GC_allochblk_nth(sz, kind, flags, start_list, may_split,
+      result = MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk_nth(sz, kind, flags, start_list, may_split,
                                 align_m1);
       if (result != NULL) break;
     }
     return result;
 }
 
-STATIC long GC_large_alloc_warn_suppressed = 0;
+STATIC long MANAGED_STACK_ADDRESS_BOEHM_GC_large_alloc_warn_suppressed = 0;
                         /* Number of warnings suppressed so far.        */
 
-STATIC unsigned GC_drop_blacklisted_count = 0;
+STATIC unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_drop_blacklisted_count = 0;
                         /* Counter of the cases when found block by     */
-                        /* GC_allochblk_nth is blacklisted completely.  */
+                        /* MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk_nth is blacklisted completely.  */
 
 #define ALIGN_PAD_SZ(p, align_m1) \
                (((align_m1) + 1 - (size_t)(word)(p)) & (align_m1))
 
-static GC_bool next_hblk_fits_better(hdr *hhdr, word size_avail,
+static MANAGED_STACK_ADDRESS_BOEHM_GC_bool next_hblk_fits_better(hdr *hhdr, word size_avail,
                                      word size_needed, size_t align_m1)
 {
   hdr *next_hdr;
@@ -773,7 +773,7 @@ static GC_bool next_hblk_fits_better(hdr *hhdr, word size_avail,
 
   next_ofs = ALIGN_PAD_SZ(next_hbp, align_m1);
   return next_size >= size_needed + next_ofs
-         && !GC_is_black_listed(next_hbp + divHBLKSZ(next_ofs), size_needed);
+         && !MANAGED_STACK_ADDRESS_BOEHM_GC_is_black_listed(next_hbp + divHBLKSZ(next_ofs), size_needed);
 }
 
 static struct hblk *find_nonbl_hblk(struct hblk *last_hbp, word size_remain,
@@ -785,7 +785,7 @@ static struct hblk *find_nonbl_hblk(struct hblk *last_hbp, word size_remain,
     struct hblk *next_hbp;
 
     last_hbp += divHBLKSZ(ALIGN_PAD_SZ(last_hbp, align_m1));
-    next_hbp = GC_is_black_listed(last_hbp, eff_size_needed);
+    next_hbp = MANAGED_STACK_ADDRESS_BOEHM_GC_is_black_listed(last_hbp, eff_size_needed);
     if (NULL == next_hbp) return last_hbp; /* not black-listed */
     last_hbp = next_hbp;
   } while ((word)last_hbp <= search_end);
@@ -799,27 +799,27 @@ static void drop_hblk_in_chunks(int n, struct hblk *hbp, hdr *hhdr)
   size_t total_size = (size_t)(hhdr -> hb_sz);
   struct hblk *limit = hbp + divHBLKSZ(total_size);
 
-  GC_ASSERT(HDR(hbp) == hhdr);
-  GC_ASSERT(modHBLKSZ(total_size) == 0 && total_size > 0);
-  GC_large_free_bytes -= total_size;
-  GC_bytes_dropped += total_size;
-  GC_remove_from_fl_at(hhdr, n);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(HDR(hbp) == hhdr);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(total_size) == 0 && total_size > 0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes -= total_size;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_dropped += total_size;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl_at(hhdr, n);
   do {
     (void)setup_header(hhdr, hbp, HBLKSIZE, PTRFREE, 0); /* cannot fail */
-    if (GC_debugging_started) BZERO(hbp, HBLKSIZE);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) BZERO(hbp, HBLKSIZE);
     if ((word)(++hbp) >= (word)limit) break;
 
-    hhdr = GC_install_header(hbp);
+    hhdr = MANAGED_STACK_ADDRESS_BOEHM_GC_install_header(hbp);
   } while (EXPECT(hhdr != NULL, TRUE)); /* no header allocation failure? */
 }
 
-/* The same as GC_allochblk, but with search restricted to the n-th     */
+/* The same as MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk, but with search restricted to the n-th     */
 /* free list.  flags should be IGNORE_OFF_PAGE or zero; may_split       */
 /* indicates whether it is OK to split larger blocks; sz is in bytes.   */
 /* If may_split is set to AVOID_SPLIT_REMAPPED, then memory remapping   */
 /* followed by splitting should be generally avoided.  Rounded-up sz    */
-/* plus align_m1 value should be less than GC_SIZE_MAX/2.               */
-STATIC struct hblk *GC_allochblk_nth(size_t sz, int kind, unsigned flags,
+/* plus align_m1 value should be less than MANAGED_STACK_ADDRESS_BOEHM_GC_SIZE_MAX/2.               */
+STATIC struct hblk *MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk_nth(size_t sz, int kind, unsigned flags,
                                      int n, int may_split, size_t align_m1)
 {
     struct hblk *hbp, *last_hbp;
@@ -827,12 +827,12 @@ STATIC struct hblk *GC_allochblk_nth(size_t sz, int kind, unsigned flags,
     word size_needed = HBLKSIZE * OBJ_SZ_TO_BLOCKS_CHECKED(sz);
                                 /* number of bytes in requested objects */
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(((align_m1 + 1) & align_m1) == 0 && sz > 0);
-    GC_ASSERT(0 == align_m1 || modHBLKSZ(align_m1 + 1) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(((align_m1 + 1) & align_m1) == 0 && sz > 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == align_m1 || modHBLKSZ(align_m1 + 1) == 0);
   retry:
     /* Search for a big enough block in free list.      */
-    for (hbp = GC_hblkfreelist[n];; hbp = hhdr -> hb_next) {
+    for (hbp = MANAGED_STACK_ADDRESS_BOEHM_GC_hblkfreelist[n];; hbp = hhdr -> hb_next) {
       word size_avail; /* bytes available in this block */
       size_t align_ofs;
 
@@ -882,8 +882,8 @@ STATIC struct hblk *GC_allochblk_nth(size_t sz, int kind, unsigned flags,
       /* time traversing them if pointer-free blocks are unpopular.     */
       /* A dropped block will be reconsidered at next GC.               */
       if (size_needed == HBLKSIZE && 0 == align_m1
-          && !GC_find_leak && IS_MAPPED(hhdr)
-          && (++GC_drop_blacklisted_count & 3) == 0) {
+          && !MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak && IS_MAPPED(hhdr)
+          && (++MANAGED_STACK_ADDRESS_BOEHM_GC_drop_blacklisted_count & 3) == 0) {
         struct hblk *prev = hhdr -> hb_prev;
 
         drop_hblk_in_chunks(n, hbp, hhdr);
@@ -895,80 +895,80 @@ STATIC struct hblk *GC_allochblk_nth(size_t sz, int kind, unsigned flags,
 
       if (size_needed > BL_LIMIT && size_avail - size_needed > BL_LIMIT) {
         /* Punt, since anything else risks unreasonable heap growth.    */
-        if (++GC_large_alloc_warn_suppressed
-            >= GC_large_alloc_warn_interval) {
+        if (++MANAGED_STACK_ADDRESS_BOEHM_GC_large_alloc_warn_suppressed
+            >= MANAGED_STACK_ADDRESS_BOEHM_GC_large_alloc_warn_interval) {
           WARN("Repeated allocation of very large block"
                " (appr. size %" WARN_PRIuPTR " KiB):\n"
                "\tMay lead to memory leak and poor performance\n",
                size_needed >> 10);
-          GC_large_alloc_warn_suppressed = 0;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_large_alloc_warn_suppressed = 0;
         }
         last_hbp = hbp + divHBLKSZ(align_ofs);
         break;
       }
     }
 
-    GC_ASSERT(((word)last_hbp & align_m1) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(((word)last_hbp & align_m1) == 0);
     if (last_hbp != hbp) {
-      hdr *last_hdr = GC_install_header(last_hbp);
+      hdr *last_hdr = MANAGED_STACK_ADDRESS_BOEHM_GC_install_header(last_hbp);
 
       if (EXPECT(NULL == last_hdr, FALSE)) return NULL;
       /* Make sure it's mapped before we mangle it.     */
 #     ifdef USE_MUNMAP
         if (!IS_MAPPED(hhdr)) {
-          GC_adjust_num_unmapped(hbp, hhdr);
-          GC_remap((ptr_t)hbp, (size_t)(hhdr -> hb_sz));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(hbp, hhdr);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_remap((ptr_t)hbp, (size_t)(hhdr -> hb_sz));
           hhdr -> hb_flags &= (unsigned char)~WAS_UNMAPPED;
         }
 #     endif
       /* Split the block at last_hbp. */
-      GC_split_block(hbp, hhdr, last_hbp, last_hdr, n);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_split_block(hbp, hhdr, last_hbp, last_hdr, n);
       /* We must now allocate last_hbp, since it may be on the  */
       /* wrong free list.                                       */
       hbp = last_hbp;
       hhdr = last_hdr;
     }
-    GC_ASSERT(hhdr -> hb_sz >= size_needed);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr -> hb_sz >= size_needed);
 
 #   ifdef USE_MUNMAP
       if (!IS_MAPPED(hhdr)) {
-        GC_adjust_num_unmapped(hbp, hhdr);
-        GC_remap((ptr_t)hbp, (size_t)(hhdr -> hb_sz));
+        MANAGED_STACK_ADDRESS_BOEHM_GC_adjust_num_unmapped(hbp, hhdr);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_remap((ptr_t)hbp, (size_t)(hhdr -> hb_sz));
         hhdr -> hb_flags &= (unsigned char)~WAS_UNMAPPED;
         /* Note: This may leave adjacent, mapped free blocks. */
       }
 #   endif
     /* hbp may be on the wrong freelist; the parameter n is important.  */
-    hbp = GC_get_first_part(hbp, hhdr, (size_t)size_needed, n);
+    hbp = MANAGED_STACK_ADDRESS_BOEHM_GC_get_first_part(hbp, hhdr, (size_t)size_needed, n);
     if (EXPECT(NULL == hbp, FALSE)) return NULL;
 
     /* Add it to map of valid blocks.   */
-    if (EXPECT(!GC_install_counts(hbp, (size_t)size_needed), FALSE))
+    if (EXPECT(!MANAGED_STACK_ADDRESS_BOEHM_GC_install_counts(hbp, (size_t)size_needed), FALSE))
       return NULL; /* This leaks memory under very rare conditions. */
 
     /* Set up the header.       */
-    GC_ASSERT(HDR(hbp) == hhdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(HDR(hbp) == hhdr);
     if (EXPECT(!setup_header(hhdr, hbp, sz, kind, flags), FALSE)) {
-      GC_remove_counts(hbp, (size_t)size_needed);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_remove_counts(hbp, (size_t)size_needed);
       return NULL; /* ditto */
     }
 
-#   ifndef GC_DISABLE_INCREMENTAL
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
       /* Notify virtual dirty bit implementation that we are about to */
       /* write.  Ensure that pointer-free objects are not protected   */
       /* if it is avoidable.  This also ensures that newly allocated  */
       /* blocks are treated as dirty.  Necessary since we don't       */
       /* protect free blocks.                                         */
-      GC_ASSERT(modHBLKSZ(size_needed) == 0);
-      GC_remove_protection(hbp, divHBLKSZ(size_needed),
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(modHBLKSZ(size_needed) == 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_remove_protection(hbp, divHBLKSZ(size_needed),
                            0 == hhdr -> hb_descr /* pointer-free */);
 #   endif
     /* We just successfully allocated a block.  Restart count of        */
     /* consecutive failures.                                            */
-    GC_fail_count = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count = 0;
 
-    GC_large_free_bytes -= size_needed;
-    GC_ASSERT(IS_MAPPED(hhdr));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes -= size_needed;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(IS_MAPPED(hhdr));
     return hbp;
 }
 
@@ -979,7 +979,7 @@ STATIC struct hblk *GC_allochblk_nth(size_t sz, int kind, unsigned flags,
  *
  * All mark words are assumed to be cleared.
  */
-GC_INNER void GC_freehblk(struct hblk *hbp)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(struct hblk *hbp)
 {
     struct hblk *next, *prev;
     hdr *hhdr, *prevhdr, *nexthdr;
@@ -992,10 +992,10 @@ GC_INNER void GC_freehblk(struct hblk *hbp)
       /* Probably possible if we try to allocate more than half the address */
       /* space at once.  If we don't catch it here, strange things happen   */
       /* later.                                                             */
-    GC_remove_counts(hbp, (size_t)size);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_remove_counts(hbp, (size_t)size);
     hhdr -> hb_sz = size;
 #   ifdef USE_MUNMAP
-      hhdr -> hb_last_reclaimed = (unsigned short)GC_gc_no;
+      hhdr -> hb_last_reclaimed = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
 #   endif
 
     /* Check for duplicate deallocation in the easy case */
@@ -1004,29 +1004,29 @@ GC_INNER void GC_freehblk(struct hblk *hbp)
                    " of %p", (void *)hbp);
       }
 
-    GC_ASSERT(IS_MAPPED(hhdr));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(IS_MAPPED(hhdr));
     hhdr -> hb_flags |= FREE_BLK;
     next = (struct hblk *)((ptr_t)hbp + size);
     GET_HDR(next, nexthdr);
-    prev = GC_free_block_ending_at(hbp);
+    prev = MANAGED_STACK_ADDRESS_BOEHM_GC_free_block_ending_at(hbp);
     /* Coalesce with successor, if possible */
       if (nexthdr != NULL && HBLK_IS_FREE(nexthdr) && IS_MAPPED(nexthdr)
           && !((hhdr -> hb_sz + nexthdr -> hb_sz) & SIGNB) /* no overflow */) {
-        GC_remove_from_fl(nexthdr);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl(nexthdr);
         hhdr -> hb_sz += nexthdr -> hb_sz;
-        GC_remove_header(next);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_remove_header(next);
       }
     /* Coalesce with predecessor, if possible. */
       if (prev /* != NULL */) { /* CPPCHECK */
         prevhdr = HDR(prev);
         if (IS_MAPPED(prevhdr)
             && !((hhdr -> hb_sz + prevhdr -> hb_sz) & SIGNB)) {
-          GC_remove_from_fl(prevhdr);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_remove_from_fl(prevhdr);
           prevhdr -> hb_sz += hhdr -> hb_sz;
 #         ifdef USE_MUNMAP
-            prevhdr -> hb_last_reclaimed = (unsigned short)GC_gc_no;
+            prevhdr -> hb_last_reclaimed = (unsigned short)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
 #         endif
-          GC_remove_header(hbp);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_remove_header(hbp);
           hbp = prev;
           hhdr = prevhdr;
         }
@@ -1035,6 +1035,6 @@ GC_INNER void GC_freehblk(struct hblk *hbp)
     /* with USE_MUNMAP, since it updates ages and hence prevents        */
     /* unmapping.                                                       */
 
-    GC_large_free_bytes += size;
-    GC_add_to_fl(hbp, hhdr);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes += size;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_fl(hbp, hhdr);
 }

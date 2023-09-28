@@ -37,7 +37,7 @@
 /* If available, use GCC built-in atomic load-acquire and store-release */
 /* primitives to access the cache lines safely.  Otherwise, fall back   */
 /* to using the GC allocation lock even during the cache lines reading. */
-/* Note: for simplicity of libcord building, do not rely on GC_THREADS  */
+/* Note: for simplicity of libcord building, do not rely on MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS  */
 /* macro, libatomic_ops package presence and private/gc_atomic_ops.h.   */
 #if !defined(AO_DISABLE_GCC_ATOMICS) \
     && ((defined(__clang__) && __clang_major__ >= 8) /* clang 8.0+ */ \
@@ -66,7 +66,7 @@ CORD CORD_cat_char(CORD x, char c)
     char * string;
 
     if ('\0' == c) return CORD_cat(x, CORD_nul(1));
-    string = (char *)GC_MALLOC_ATOMIC(2);
+    string = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(2);
     if (NULL == string) OUT_OF_MEMORY;
     string[0] = c;
     string[1] = '\0';
@@ -221,7 +221,7 @@ int CORD_ncmp(CORD x, size_t x_start, CORD y, size_t y_start, size_t len)
 char * CORD_to_char_star(CORD x)
 {
     size_t len = CORD_len(x);
-    char * result = (char *)GC_MALLOC_ATOMIC(len + 1);
+    char * result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
 
     if (NULL == result) OUT_OF_MEMORY;
     if (len > 0 && CORD_fill_buf(x, 0, len, result) != 1)
@@ -236,7 +236,7 @@ CORD CORD_from_char_star(const char *s)
     size_t len = strlen(s);
 
     if (0 == len) return CORD_EMPTY;
-    result = (char *)GC_MALLOC_ATOMIC(len + 1);
+    result = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
     if (NULL == result) OUT_OF_MEMORY;
     memcpy(result, s, len+1);
     return result;
@@ -404,7 +404,7 @@ void CORD_ec_flush_buf(CORD_ec x)
     char * s;
 
     if (len == 0) return;
-    s = (char *)GC_MALLOC_ATOMIC(len + 1);
+    s = (char *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(len + 1);
     if (NULL == s) OUT_OF_MEMORY;
     memcpy(s, x[0].ec_buf, len);
     s[len] = '\0';
@@ -421,12 +421,12 @@ void CORD_ec_append_cord(CORD_ec x, CORD s)
 static char CORD_nul_func(size_t i, void * client_data)
 {
     (void)i;
-    return (char)(GC_word)client_data;
+    return (char)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)client_data;
 }
 
 CORD CORD_chars(char c, size_t i)
 {
-    return CORD_from_fn(CORD_nul_func, (void *)(GC_word)(unsigned char)c, i);
+    return CORD_from_fn(CORD_nul_func, (void *)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)(unsigned char)c, i);
 }
 
 CORD CORD_from_file_eager(FILE * f)
@@ -499,7 +499,7 @@ typedef struct {
 } refill_data;
 
 /* Executed with allocation lock. */
-static void * GC_CALLBACK refill_cache(void * client_data)
+static void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK refill_cache(void * client_data)
 {
     lf_state * state = ((refill_data *)client_data) -> state;
     size_t file_pos = ((refill_data *)client_data) -> file_pos;
@@ -521,14 +521,14 @@ static void * GC_CALLBACK refill_cache(void * client_data)
         __atomic_store_n(&(state -> lf_cache[line_no]), new_cache,
                          __ATOMIC_RELEASE);
 #   endif
-    GC_END_STUBBORN_CHANGE((/* no volatile */ void *)
-                                (GC_word)(state -> lf_cache + line_no));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE((/* no volatile */ void *)
+                                (MANAGED_STACK_ADDRESS_BOEHM_GC_word)(state -> lf_cache + line_no));
     state -> lf_current = line_start + LINE_SZ;
-    return (void *)((GC_word)new_cache->data[MOD_LINE_SZ(file_pos)]);
+    return (void *)((MANAGED_STACK_ADDRESS_BOEHM_GC_word)new_cache->data[MOD_LINE_SZ(file_pos)]);
 }
 
 #ifndef CORD_USE_GCC_ATOMIC
-  static void * GC_CALLBACK get_cache_line(void * client_data)
+  static void * MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK get_cache_line(void * client_data)
   {
     return (void *)(*(cache_line **)client_data);
   }
@@ -543,7 +543,7 @@ static char CORD_lf_func(size_t i, void * client_data)
         cache_line * cl = (cache_line *)__atomic_load_n(cl_addr,
                                                         __ATOMIC_ACQUIRE);
 #   else
-        cache_line * cl = (cache_line *)GC_call_with_alloc_lock(
+        cache_line * cl = (cache_line *)MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_alloc_lock(
                                             get_cache_line, (void *)cl_addr);
 #   endif
 
@@ -553,14 +553,14 @@ static char CORD_lf_func(size_t i, void * client_data)
 
         rd.state = state;
         rd.file_pos =  i;
-        rd.new_cache = GC_NEW_ATOMIC(cache_line);
+        rd.new_cache = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW_ATOMIC(cache_line);
         if (NULL == rd.new_cache) OUT_OF_MEMORY;
-        return (char)((GC_word)GC_call_with_alloc_lock(refill_cache, &rd));
+        return (char)((MANAGED_STACK_ADDRESS_BOEHM_GC_word)MANAGED_STACK_ADDRESS_BOEHM_GC_call_with_alloc_lock(refill_cache, &rd));
     }
     return cl -> data[MOD_LINE_SZ(i)];
 }
 
-#ifndef GC_NO_FINALIZATION
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
   static void CORD_lf_close_proc(void * obj, void * client_data)
   {
     (void)client_data;
@@ -571,7 +571,7 @@ static char CORD_lf_func(size_t i, void * client_data)
 
 static CORD CORD_from_file_lazy_inner(FILE * f, size_t len)
 {
-    lf_state * state = GC_NEW(lf_state);
+    lf_state * state = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(lf_state);
     int i;
 
     if (NULL == state) OUT_OF_MEMORY;
@@ -579,7 +579,7 @@ static CORD CORD_from_file_lazy_inner(FILE * f, size_t len)
         /* Dummy read to force buffer allocation.       */
         /* This greatly increases the probability       */
         /* of avoiding deadlock if buffer allocation    */
-        /* is redirected to GC_malloc and the           */
+        /* is redirected to MANAGED_STACK_ADDRESS_BOEHM_GC_malloc and the           */
         /* world is multi-threaded.                     */
         char buf[1];
 
@@ -593,8 +593,8 @@ static CORD CORD_from_file_lazy_inner(FILE * f, size_t len)
         state -> lf_cache[i] = 0;
     }
     state -> lf_current = 0;
-#   ifndef GC_NO_FINALIZATION
-      GC_REGISTER_FINALIZER(state, CORD_lf_close_proc, 0, 0, 0);
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+      MANAGED_STACK_ADDRESS_BOEHM_GC_REGISTER_FINALIZER(state, CORD_lf_close_proc, 0, 0, 0);
 #   endif
     return CORD_from_fn(CORD_lf_func, state, len);
 }

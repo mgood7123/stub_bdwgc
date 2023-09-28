@@ -149,7 +149,7 @@ static void prune_map(void)
         if (map -> line < start_line - LINES && map -> previous != 0) {
             line_map pred = map -> previous -> previous;
 
-            GC_PTR_STORE_AND_DIRTY(&map->previous, pred);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(&map->previous, pred);
         }
         map = map -> previous;
     } while (map != 0);
@@ -158,7 +158,7 @@ static void prune_map(void)
 /* Add mapping entry */
 static void add_map(int line_arg, size_t pos)
 {
-    line_map new_map = GC_NEW(struct LineMapRep);
+    line_map new_map = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(struct LineMapRep);
     line_map cur_map;
 
     if (NULL == new_map) OUT_OF_MEMORY;
@@ -166,7 +166,7 @@ static void add_map(int line_arg, size_t pos)
     new_map -> line = line_arg;
     new_map -> pos = pos;
     cur_map = current_map;
-    GC_PTR_STORE_AND_DIRTY(&new_map->previous, cur_map);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(&new_map->previous, cur_map);
     current_map = new_map;
     current_map_size++;
 }
@@ -204,16 +204,16 @@ static size_t line_pos(int i, int *c)
 
 static void add_hist(CORD s)
 {
-    history new_file = GC_NEW(struct HistoryRep);
+    history new_file = MANAGED_STACK_ADDRESS_BOEHM_GC_NEW(struct HistoryRep);
 
     if (NULL == new_file) OUT_OF_MEMORY;
     new_file -> file_contents = current = s;
     current_len = CORD_len(s);
     new_file -> previous = now;
-    GC_END_STUBBORN_CHANGE(new_file);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(new_file);
     if (now != NULL) {
         now -> map = current_map;
-        GC_END_STUBBORN_CHANGE(now);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(now);
     }
     now = new_file;
 }
@@ -242,7 +242,7 @@ int screen_size = 0;
 
     if (screen == 0 || LINES > screen_size) {
         screen_size = LINES;
-        screen = (CORD *)GC_MALLOC(screen_size * sizeof(CORD));
+        screen = (CORD *)MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC(screen_size * sizeof(CORD));
         if (NULL == screen) OUT_OF_MEMORY;
     }
 #   if !defined(MACINTOSH)
@@ -265,7 +265,7 @@ int screen_size = 0;
                 addch(c);
             }
         }
-        GC_PTR_STORE_AND_DIRTY(screen + i, s);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_PTR_STORE_AND_DIRTY(screen + i, s);
     }
   }
 #else
@@ -592,7 +592,7 @@ void generic_init(void)
     add_hist(initial);
     now -> map = current_map;
     now -> previous = now;  /* Can't back up further: beginning of the world */
-    GC_END_STUBBORN_CHANGE(now);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_END_STUBBORN_CHANGE(now);
     need_redisplay = ALL;
     fix_cursor();
 }
@@ -609,10 +609,10 @@ int main(int argc, char **argv)
         cshow(stdout);
         argc = ccommand(&argv);
 #   endif
-    GC_set_find_leak(0); /* app is not for testing leak detection mode */
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(0); /* app is not for testing leak detection mode */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 #   ifndef NO_INCREMENTAL
-      GC_enable_incremental();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental();
 #   endif
 
     if (argc != 2) {
@@ -624,7 +624,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     arg_file_name = argv[1];
-    buf = GC_MALLOC_ATOMIC(8192);
+    buf = MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC_ATOMIC(8192);
     if (NULL == buf) OUT_OF_MEMORY;
     setvbuf(stdout, (char *)buf, _IOFBF, 8192);
     initscr();

@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#if defined(GC_BUILTIN_ATOMIC) || defined(GC_THREADS)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_BUILTIN_ATOMIC) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS)
 
 # include <stdlib.h>
 
@@ -62,13 +62,10 @@
 #   ifdef AO_HAVE_load_acquire
       TA_assert(AO_load_acquire(&x) == 13);
 #   endif
-#   if defined(AO_HAVE_fetch_and_add) && defined(AO_HAVE_fetch_and_add1) \
-       && defined(AO_HAVE_fetch_and_sub1)
+#   if defined(AO_HAVE_fetch_and_add) && defined(AO_HAVE_fetch_and_add1)
       TA_assert(AO_fetch_and_add(&x, 42) == 13);
       TA_assert(AO_fetch_and_add(&x, (AO_t)(-43)) == 55);
       TA_assert(AO_fetch_and_add1(&x) == 12);
-      TA_assert(AO_fetch_and_sub1(&x) == 13);
-      TA_assert(AO_fetch_and_add1(&x) == 12); /* 2nd call */
 #   endif
 #   ifdef AO_HAVE_compare_and_swap_release
       TA_assert(!AO_compare_and_swap(&x, 14, 42));

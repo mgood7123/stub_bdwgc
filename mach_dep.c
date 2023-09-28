@@ -30,10 +30,10 @@
 # include <asm/e2k_syswork.h>
 # include <sys/syscall.h>
 
-  GC_INNER size_t GC_get_procedure_stack(ptr_t buf, size_t buf_sz) {
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER size_t MANAGED_STACK_ADDRESS_BOEHM_GC_get_procedure_stack(ptr_t buf, size_t buf_sz) {
     unsigned long long new_sz;
 
-    GC_ASSERT(0 == buf_sz || buf != NULL);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == buf_sz || buf != NULL);
     for (;;) {
       unsigned long long stack_ofs;
 
@@ -45,7 +45,7 @@
                      ": errno= %d", errno);
         continue;
       }
-      GC_ASSERT(new_sz > 0 && new_sz % sizeof(word) == 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(new_sz > 0 && new_sz % sizeof(word) == 0);
       if (new_sz > buf_sz)
         break;
       /* Immediately read the stack right after checking its size. */
@@ -60,7 +60,7 @@
     return (size_t)new_sz;
   }
 
-  ptr_t GC_save_regs_in_stack(void) {
+  ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack(void) {
     __asm__ __volatile__ ("flushr");
     return NULL;
   }
@@ -92,7 +92,7 @@
         int i;
         getRegisters(&regs);
         for (i = 0; i < NONVOLATILE_GPR_COUNT; i++)
-                GC_push_one(regs.gprs[i]);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(regs.gprs[i]);
   }
 
 #else /* M68K */
@@ -101,29 +101,29 @@
   {
     sub.w   #4,sp                   /* reserve space for one parameter */
     move.l  a2,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  a3,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  a4,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
 #   if !__option(a6frames)
       /* <pcb> perhaps a6 should be pushed if stack frames are not being used */
         move.l  a6,(sp)
-        jsr             GC_push_one
+        jsr             MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
 #   endif
         /* skip a5 (globals), a6 (frame pointer), and a7 (stack pointer) */
     move.l  d2,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  d3,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  d4,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  d5,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  d6,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     move.l  d7,(sp)
-    jsr         GC_push_one
+    jsr         MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
     add.w   #4,sp                   /* fix stack */
     rts
   }
@@ -134,7 +134,7 @@
 
 # if defined(IA64) && !defined(THREADS)
     /* Value returned from register flushing routine (ar.bsp).  */
-    GC_INNER ptr_t GC_save_regs_ret_val = NULL;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_ret_val = NULL;
 # endif
 
 /* Routine to mark from registers that are preserved by the C compiler. */
@@ -149,7 +149,7 @@
 #else  /* No asm implementation */
 
 # ifdef STACK_NOT_SCANNED
-    void GC_push_regs(void)
+    void MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs(void)
     {
       /* empty */
     }
@@ -159,7 +159,7 @@
     /* This function is not static because it could also be             */
     /* erroneously defined in .S file, so this error would be caught    */
     /* by the linker.                                                   */
-    void GC_push_regs(void)
+    void MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs(void)
     {
          /*  AMIGA - could be replaced by generic code                  */
          /* a0, a1, d0 and d1 are caller save */
@@ -167,36 +167,36 @@
 #       ifdef __GNUC__
           asm("subq.w &0x4,%sp");       /* allocate word on top of stack */
 
-          asm("mov.l %a2,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %a3,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %a4,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %a5,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %a6,(%sp)"); asm("jsr _GC_push_one");
+          asm("mov.l %a2,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %a3,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %a4,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %a5,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %a6,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
           /* Skip frame pointer and stack pointer */
-          asm("mov.l %d2,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %d3,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %d4,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %d5,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %d6,(%sp)"); asm("jsr _GC_push_one");
-          asm("mov.l %d7,(%sp)"); asm("jsr _GC_push_one");
+          asm("mov.l %d2,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %d3,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %d4,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %d5,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %d6,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
+          asm("mov.l %d7,(%sp)"); asm("jsr _MANAGED_STACK_ADDRESS_BOEHM_GC_push_one");
 
           asm("addq.w &0x4,%sp");       /* put stack back where it was  */
 #       else /* !__GNUC__ */
-          GC_push_one(getreg(REG_A2));
-          GC_push_one(getreg(REG_A3));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_A2));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_A3));
 #         ifndef __SASC
             /* Can probably be changed to #if 0 -Kjetil M. (a4=globals) */
-            GC_push_one(getreg(REG_A4));
+            MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_A4));
 #         endif
-          GC_push_one(getreg(REG_A5));
-          GC_push_one(getreg(REG_A6));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_A5));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_A6));
           /* Skip stack pointer */
-          GC_push_one(getreg(REG_D2));
-          GC_push_one(getreg(REG_D3));
-          GC_push_one(getreg(REG_D4));
-          GC_push_one(getreg(REG_D5));
-          GC_push_one(getreg(REG_D6));
-          GC_push_one(getreg(REG_D7));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D2));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D3));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D4));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D5));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D6));
+          MANAGED_STACK_ADDRESS_BOEHM_GC_push_one(getreg(REG_D7));
 #       endif /* !__GNUC__ */
     }
 #   define HAVE_PUSH_REGS
@@ -206,8 +206,8 @@
 #   if defined(M68K) && defined(THINK_C) && !defined(CPPCHECK)
 #     define PushMacReg(reg) \
               move.l  reg,(sp) \
-              jsr             GC_push_one
-      void GC_push_regs(void)
+              jsr             MANAGED_STACK_ADDRESS_BOEHM_GC_push_one
+      void MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs(void)
       {
           asm {
               sub.w   #4,sp          ; reserve space for one parameter.
@@ -227,7 +227,7 @@
 #     define HAVE_PUSH_REGS
 #     undef PushMacReg
 #   elif defined(__MWERKS__)
-      void GC_push_regs(void)
+      void MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs(void)
       {
           PushMacRegisters();
       }
@@ -238,8 +238,8 @@
 #endif /* !USE_ASM_PUSH_REGS */
 
 #if defined(HAVE_PUSH_REGS) && defined(THREADS)
-# error GC_push_regs cannot be used with threads
- /* Would fail for GC_do_blocking.  There are probably other safety     */
+# error MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs cannot be used with threads
+ /* Would fail for MANAGED_STACK_ADDRESS_BOEHM_GC_do_blocking.  There are probably other safety     */
  /* issues.                                                             */
 # undef HAVE_PUSH_REGS
 #endif
@@ -264,17 +264,17 @@
 /* ctxt is either a pointer to a ucontext_t we generated, or NULL.      */
 /* Could be called with or w/o the GC lock held; could be called from   */
 /* a signal handler as well.                                            */
-GC_ATTR_NO_SANITIZE_ADDR
-GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
+MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_ADDR
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
                                           volatile ptr_t arg)
 {
-  volatile int dummy;
+  volatile int dummy = 0;
   volatile ptr_t context = 0;
 
 # if defined(HAVE_PUSH_REGS)
-    GC_push_regs();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_push_regs();
 # elif defined(EMSCRIPTEN)
-    /* No-op, "registers" are pushed in GC_push_other_roots().  */
+    /* No-op, "registers" are pushed in MANAGED_STACK_ADDRESS_BOEHM_GC_push_other_roots().  */
 # else
 #   if defined(UNIX_LIKE) && !defined(NO_GETCONTEXT)
       /* Older versions of Darwin seem to lack getcontext().    */
@@ -291,7 +291,7 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
           unsigned short old_fcw;
 
 #         if defined(CPPCHECK)
-            GC_noop1((word)&old_fcw);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)&old_fcw);
 #         endif
           __asm__ __volatile__ ("fstcw %0" : "=m" (*&old_fcw));
 #       else
@@ -332,9 +332,9 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
         /* contents on the stack for this to work.  This may already be */
         /* subsumed by the getcontext() call.                           */
 #       if defined(IA64) && !defined(THREADS)
-          GC_save_regs_ret_val =
+          MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_ret_val =
 #       endif
-            GC_save_regs_in_stack();
+            MANAGED_STACK_ADDRESS_BOEHM_GC_save_regs_in_stack();
 #     endif
       if (NULL == context) /* getcontext failed */
 #   endif /* !NO_GETCONTEXT */
@@ -378,7 +378,7 @@ GC_INNER void GC_with_callee_saves_pushed(void (*fn)(ptr_t, void *),
   /* Strongly discourage the compiler from treating the above   */
   /* as a tail-call, since that would pop the register          */
   /* contents before we get a chance to look at them.           */
-  GC_noop1(COVERT_DATAFLOW(&dummy));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_noop1(COVERT_DATAFLOW(&dummy));
 }
 
 #endif /* !PLATFORM_MACH_DEP && !SN_TARGET_PSP2 */

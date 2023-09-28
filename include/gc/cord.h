@@ -63,8 +63,8 @@
   extern "C" {
 #endif
 
-#if defined(GC_DLL) && !defined(CORD_NOT_DLL) && !defined(CORD_API)
-  /* Same as for GC_API in gc_config_macros.h.  */
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DLL) && !defined(CORD_NOT_DLL) && !defined(CORD_API)
+  /* Same as for MANAGED_STACK_ADDRESS_BOEHM_GC_API in gc_config_macros.h.  */
 # ifdef CORD_BUILD
 #   if defined(__MINGW32__) && !defined(__cplusplus) || defined(__CEGCC__)
 #     define CORD_API __declspec(dllexport)
@@ -72,8 +72,8 @@
          || defined(__CYGWIN__) || defined(__MINGW32__) \
          || defined(__WATCOMC__)
 #     define CORD_API extern __declspec(dllexport)
-#   elif defined(__GNUC__) && !defined(GC_NO_VISIBILITY) \
-         && (__GNUC__ >= 4 || defined(GC_VISIBILITY_HIDDEN_SET))
+#   elif defined(__GNUC__) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VISIBILITY) \
+         && (__GNUC__ >= 4 || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_VISIBILITY_HIDDEN_SET))
     /* Only matters if used in conjunction with -fvisibility=hidden option. */
 #     define CORD_API extern __attribute__((__visibility__("default")))
 #   endif
@@ -85,7 +85,7 @@
 #     define CORD_API extern __declspec(dllimport)
 #   endif
 # endif /* !CORD_BUILD */
-#endif /* GC_DLL */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_DLL */
 
 #ifndef CORD_API
 # define CORD_API extern

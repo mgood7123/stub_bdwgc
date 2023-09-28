@@ -49,14 +49,14 @@ CVTRES_CPU=X64
 !ENDIF
 
 !IFNDEF NODEBUG
-CFLAGS_DEBUG=-DGC_ASSERTIONS
+CFLAGS_DEBUG=-DMANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
 !ENDIF
 
 !IFDEF ENABLE_STATIC
-CFLAGS_GCDLL=-DGC_NOT_DLL
+CFLAGS_GCDLL=-DMANAGED_STACK_ADDRESS_BOEHM_GC_NOT_DLL
 CORDFLAG=
 !ELSE
-CFLAGS_GCDLL=-DGC_DLL
+CFLAGS_GCDLL=-DMANAGED_STACK_ADDRESS_BOEHM_GC_DLL
 # cord.dll and its clients should not link C library statically otherwise
 # FILE-related functions might not work (because own set of opened FILEs
 # is maintained by each copy of the C library thus making impossible to pass
@@ -70,7 +70,7 @@ CORDFLAG=-MDd
 !ENDIF
 
 !IFNDEF DISABLE_THREADS
-CFLAGS_MT=$(cvarsmt) -DGC_THREADS -DTHREAD_LOCAL_ALLOC -DPARALLEL_MARK
+CFLAGS_MT=$(cvarsmt) -DMANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -DTHREAD_LOCAL_ALLOC -DPARALLEL_MARK
 !ENDIF
 
 # Extra user-defined flags to pass both to C and C++ compilers.
@@ -78,7 +78,7 @@ CFLAGS_EXTRA=
 
 CFLAGS_SPECIFIC=$(CFLAGS_DEBUG) $(CFLAGS_GCDLL) $(CFLAGS_MT)
 
-CFLAGS_DEFAULT=-DALL_INTERIOR_POINTERS -DENABLE_DISCLAIM -DGC_ATOMIC_UNCOLLECTABLE -DGC_GCJ_SUPPORT -DJAVA_FINALIZATION -DNO_EXECUTE_PERMISSION -DGC_REQUIRE_WCSDUP -DUSE_MUNMAP
+CFLAGS_DEFAULT=-DALL_INTERIOR_POINTERS -DENABLE_DISCLAIM -DMANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE -DMANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -DJAVA_FINALIZATION -DNO_EXECUTE_PERMISSION -DMANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP -DUSE_MUNMAP
 
 CXXFLAGS_SPECIFIC=/EHsc
 
@@ -94,7 +94,7 @@ AO_SRC_DIR=libatomic_ops/src
 AO_INCLUDE_DIR=$(AO_SRC_DIR)
 
 !IFDEF ENABLE_STATIC
-# pthread_start.obj is needed just in case client defines GC_WIN32_PTHREADS.
+# pthread_start.obj is needed just in case client defines MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS.
 OBJS= misc.obj win32_threads.obj alloc.obj reclaim.obj allchblk.obj mach_dep.obj os_dep.obj mark_rts.obj headers.obj mark.obj obj_map.obj blacklst.obj finalize.obj new_hblk.obj dbg_mlc.obj fnlz_mlc.obj malloc.obj dyn_load.obj typd_mlc.obj ptr_chck.obj gcj_mlc.obj mallocx.obj extra\msvc_dbg.obj pthread_start.obj pthread_support.obj thread_local_alloc.obj
 !ELSE
 OBJS= extra\gc.obj extra\msvc_dbg.obj

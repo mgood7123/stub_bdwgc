@@ -8,7 +8,7 @@
 
 extern "C" {
 
-int GC_get_main_symbian_stack_base()
+int MANAGED_STACK_ADDRESS_BOEHM_GC_get_main_symbian_stack_base()
 {
     TThreadStackInfo aInfo;
     TInt err = RThread().StackInfo(aInfo);
@@ -22,7 +22,7 @@ int GC_get_main_symbian_stack_base()
         }
 }
 
-char* GC_get_private_path_and_zero_file()
+char* MANAGED_STACK_ADDRESS_BOEHM_GC_get_private_path_and_zero_file()
 {
     // always on c: drive
     RFs fs;

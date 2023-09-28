@@ -15,10 +15,10 @@
  * modified is included with the above copyright notice.
  */
 
-#ifndef GC_JAVAXFC_H
-#define GC_JAVAXFC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_JAVAXFC_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_JAVAXFC_H
 
-#ifndef GC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_H
 # include "gc.h"
 #endif
 
@@ -42,25 +42,25 @@
  * Thus this is not recommended for general use.
  * Acquire the allocation lock (to enqueue all finalizers).
  */
-GC_API void GC_CALL GC_finalize_all(void);
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_finalize_all(void);
 
-#ifdef GC_THREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
   /* External thread suspension support.  No thread suspension count    */
   /* (so a thread which has been suspended numerous times will be       */
-  /* resumed with the very first call to GC_resume_thread).             */
+  /* resumed with the very first call to MANAGED_STACK_ADDRESS_BOEHM_GC_resume_thread).             */
   /* Acquire the allocation lock.  Thread should be registered in GC    */
-  /* (otherwise no-op, GC_is_thread_suspended returns false).           */
+  /* (otherwise no-op, MANAGED_STACK_ADDRESS_BOEHM_GC_is_thread_suspended returns false).           */
   /* Unimplemented on some platforms.  Not recommended for general use. */
-# ifndef GC_SUSPEND_THREAD_ID
-#   define GC_SUSPEND_THREAD_ID void*
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID void*
 # endif
-  GC_API void GC_CALL GC_suspend_thread(GC_SUSPEND_THREAD_ID);
-  GC_API void GC_CALL GC_resume_thread(GC_SUSPEND_THREAD_ID);
-  GC_API int GC_CALL GC_is_thread_suspended(GC_SUSPEND_THREAD_ID);
-#endif /* GC_THREADS */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_suspend_thread(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_resume_thread(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_is_thread_suspended(MANAGED_STACK_ADDRESS_BOEHM_GC_SUSPEND_THREAD_ID);
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS */
 
 #ifdef __cplusplus
   } /* extern "C" */
 #endif
 
-#endif /* GC_JAVAXFC_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_JAVAXFC_H */

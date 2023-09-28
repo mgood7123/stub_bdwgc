@@ -21,13 +21,13 @@
 # include "gc/gc_disclaim.h"
 #endif
 
-GC_INNER signed_word GC_bytes_found = 0;
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER signed_word MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found = 0;
                         /* Number of bytes of memory reclaimed     */
                         /* minus the number of bytes originally    */
                         /* on free lists which we had to drop.     */
 
 #if defined(PARALLEL_MARK)
-  GC_INNER signed_word GC_fl_builder_count = 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER signed_word MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count = 0;
         /* Number of threads currently building free lists without      */
         /* holding GC lock.  It is not safe to collect if this is       */
         /* nonzero.  Also, together with the mark lock, it is used as   */
@@ -40,41 +40,41 @@ GC_INNER signed_word GC_bytes_found = 0;
 #ifndef MAX_LEAKED
 # define MAX_LEAKED 40
 #endif
-STATIC ptr_t GC_leaked[MAX_LEAKED] = { NULL };
-STATIC unsigned GC_n_leaked = 0;
+STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_leaked[MAX_LEAKED] = { NULL };
+STATIC unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_leaked = 0;
 
 #ifdef AO_HAVE_store
-  GC_INNER volatile AO_t GC_have_errors = 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER volatile AO_t MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors = 0;
 #else
-  GC_INNER GC_bool GC_have_errors = FALSE;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_have_errors = FALSE;
 #endif
 
 #if !defined(EAGER_SWEEP) && defined(ENABLE_DISCLAIM)
-  STATIC void GC_reclaim_unconditionally_marked(void);
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_unconditionally_marked(void);
 #endif
 
-GC_INLINE void GC_add_leaked(ptr_t leaked)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_add_leaked(ptr_t leaked)
 {
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 #   ifndef SHORT_DBG_HDRS
-      if (GC_findleak_delay_free && !GC_check_leaked(leaked))
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_findleak_delay_free && !MANAGED_STACK_ADDRESS_BOEHM_GC_check_leaked(leaked))
         return;
 #   endif
 
-    GC_SET_HAVE_ERRORS();
-    if (GC_n_leaked < MAX_LEAKED) {
-      GC_leaked[GC_n_leaked++] = leaked;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_SET_HAVE_ERRORS();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_leaked < MAX_LEAKED) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_leaked[MANAGED_STACK_ADDRESS_BOEHM_GC_n_leaked++] = leaked;
       /* Make sure it's not reclaimed this cycle */
-      GC_set_mark_bit(leaked);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_set_mark_bit(leaked);
     }
 }
 
 /* Print all objects on the list after printing any smashed objects.    */
 /* Clear both lists.  Called without the allocation lock held.          */
-GC_INNER void GC_print_all_errors(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_errors(void)
 {
-    static GC_bool printing_errors = FALSE;
-    GC_bool have_errors;
+    static MANAGED_STACK_ADDRESS_BOEHM_GC_bool printing_errors = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool have_errors;
     unsigned i, n_leaked;
     ptr_t leaked[MAX_LEAKED];
 
@@ -85,36 +85,36 @@ GC_INNER void GC_print_all_errors(void)
     }
     have_errors = get_have_errors();
     printing_errors = TRUE;
-    n_leaked = GC_n_leaked;
+    n_leaked = MANAGED_STACK_ADDRESS_BOEHM_GC_n_leaked;
     if (n_leaked > 0) {
-      GC_ASSERT(n_leaked <= MAX_LEAKED);
-      BCOPY(GC_leaked, leaked, n_leaked * sizeof(ptr_t));
-      GC_n_leaked = 0;
-      BZERO(GC_leaked, n_leaked * sizeof(ptr_t));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(n_leaked <= MAX_LEAKED);
+      BCOPY(MANAGED_STACK_ADDRESS_BOEHM_GC_leaked, leaked, n_leaked * sizeof(ptr_t));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_n_leaked = 0;
+      BZERO(MANAGED_STACK_ADDRESS_BOEHM_GC_leaked, n_leaked * sizeof(ptr_t));
     }
     UNLOCK();
 
-    if (GC_debugging_started) {
-      GC_print_all_smashed();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed();
     } else {
       have_errors = FALSE;
     }
 
     if (n_leaked > 0) {
-        GC_err_printf("Found %u leaked objects:\n", n_leaked);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Found %u leaked objects:\n", n_leaked);
         have_errors = TRUE;
     }
     for (i = 0; i < n_leaked; i++) {
         ptr_t p = leaked[i];
 #       ifndef SKIP_LEAKED_OBJECTS_PRINTING
-          GC_print_heap_obj(p);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_obj(p);
 #       endif
-        GC_free(p);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_free(p);
     }
 
     if (have_errors
-#       ifndef GC_ABORT_ON_LEAK
-          && GETENV("GC_ABORT_ON_LEAK") != NULL
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_ABORT_ON_LEAK
+          && GETENV("MANAGED_STACK_ADDRESS_BOEHM_GC_ABORT_ON_LEAK") != NULL
 #       endif
         ) {
       ABORT("Leaked or smashed objects encountered");
@@ -133,12 +133,12 @@ GC_INNER void GC_print_all_errors(void)
 
 /* Test whether a block is completely empty, i.e. contains no marked    */
 /* objects.  This does not require the block to be in physical memory.  */
-GC_INNER GC_bool GC_block_empty(hdr *hhdr)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_block_empty(hdr *hhdr)
 {
     return 0 == hhdr -> hb_n_marks;
 }
 
-STATIC GC_bool GC_block_nearly_full(hdr *hhdr, word sz)
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_block_nearly_full(hdr *hhdr, word sz)
 {
     return hhdr -> hb_n_marks > HBLK_OBJS(sz) * 7 / 8;
 }
@@ -146,14 +146,14 @@ STATIC GC_bool GC_block_nearly_full(hdr *hhdr, word sz)
 /* TODO: This should perhaps again be specialized for USE_MARK_BYTES    */
 /* and USE_MARK_BITS cases.                                             */
 
-GC_INLINE word *GC_clear_block(word *p, word sz, word *pcount)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE word *MANAGED_STACK_ADDRESS_BOEHM_GC_clear_block(word *p, word sz, word *pcount)
 {
   word *q = (word *)((ptr_t)p + sz);
 
   /* Clear object, advance p to next object in the process.     */
 # ifdef USE_MARK_BYTES
-    GC_ASSERT((sz & 1) == 0);
-    GC_ASSERT(((word)p & (2 * sizeof(word) - 1)) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((sz & 1) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(((word)p & (2 * sizeof(word) - 1)) == 0);
     p[1] = 0;
     p += 2;
     while ((word)p < (word)q) {
@@ -175,19 +175,19 @@ GC_INLINE word *GC_clear_block(word *p, word sz, word *pcount)
  * free list.  Returns the new list.
  * Clears unmarked objects.  Sz is in bytes.
  */
-STATIC ptr_t GC_reclaim_clear(struct hblk *hbp, hdr *hhdr, word sz,
+STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_clear(struct hblk *hbp, hdr *hhdr, word sz,
                               ptr_t list, word *pcount)
 {
     word bit_no = 0;
     ptr_t p, plim;
 
-    GC_ASSERT(hhdr == GC_find_header((ptr_t)hbp));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr == MANAGED_STACK_ADDRESS_BOEHM_GC_find_header((ptr_t)hbp));
 #   ifndef THREADS
-      GC_ASSERT(sz == hhdr -> hb_sz);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz == hhdr -> hb_sz);
 #   else
-      /* Skip the assertion because of a potential race with GC_realloc. */
+      /* Skip the assertion because of a potential race with MANAGED_STACK_ADDRESS_BOEHM_GC_realloc. */
 #   endif
-    GC_ASSERT((sz & (BYTES_PER_WORD-1)) == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((sz & (BYTES_PER_WORD-1)) == 0);
     p = hbp->hb_body;
     plim = p + HBLKSIZE - sz;
 
@@ -200,7 +200,7 @@ STATIC ptr_t GC_reclaim_clear(struct hblk *hbp, hdr *hhdr, word sz,
                 obj_link(p) = list;
                 list = p;
 
-                p = (ptr_t)GC_clear_block((word *)p, sz, pcount);
+                p = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_clear_block((word *)p, sz, pcount);
             }
             bit_no += MARK_BIT_OFFSET(sz);
         }
@@ -208,7 +208,7 @@ STATIC ptr_t GC_reclaim_clear(struct hblk *hbp, hdr *hhdr, word sz,
 }
 
 /* The same thing, but don't clear objects: */
-STATIC ptr_t GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
+STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
                                ptr_t list, word *pcount)
 {
     word bit_no = 0;
@@ -216,7 +216,7 @@ STATIC ptr_t GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
     word n_bytes_found = 0;
 
 #   ifndef THREADS
-      GC_ASSERT(sz == hhdr -> hb_sz);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz == hhdr -> hb_sz);
 #   endif
     p = (word *)(hbp->hb_body);
     plim = (word *)((ptr_t)hbp + HBLKSIZE - sz);
@@ -239,17 +239,17 @@ STATIC ptr_t GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
 #ifdef ENABLE_DISCLAIM
   /* Call reclaim notifier for block's kind on each unmarked object in  */
   /* block, all within a pair of corresponding enter/leave callbacks.   */
-  STATIC ptr_t GC_disclaim_and_reclaim(struct hblk *hbp, hdr *hhdr, word sz,
+  STATIC ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_and_reclaim(struct hblk *hbp, hdr *hhdr, word sz,
                                        ptr_t list, word *pcount)
   {
     word bit_no = 0;
     ptr_t p, plim;
-    int (GC_CALLBACK *disclaim)(void *) =
-                GC_obj_kinds[hhdr -> hb_obj_kind].ok_disclaim_proc;
+    int (MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK *disclaim)(void *) =
+                MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[hhdr -> hb_obj_kind].ok_disclaim_proc;
 
-    GC_ASSERT(disclaim != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(disclaim != 0);
 #   ifndef THREADS
-      GC_ASSERT(sz == hhdr -> hb_sz);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz == hhdr -> hb_sz);
 #   endif
     p = hbp -> hb_body;
     plim = p + HBLKSIZE - sz;
@@ -264,7 +264,7 @@ STATIC ptr_t GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
         } else {
             obj_link(p) = list;
             list = p;
-            p = (ptr_t)GC_clear_block((word *)p, sz, pcount);
+            p = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_clear_block((word *)p, sz, pcount);
         }
     }
     return list;
@@ -272,13 +272,13 @@ STATIC ptr_t GC_reclaim_uninit(struct hblk *hbp, hdr *hhdr, word sz,
 #endif /* ENABLE_DISCLAIM */
 
 /* Don't really reclaim objects, just check for unmarked ones: */
-STATIC void GC_reclaim_check(struct hblk *hbp, hdr *hhdr, word sz)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_check(struct hblk *hbp, hdr *hhdr, word sz)
 {
     word bit_no;
     ptr_t p, plim;
 
 #   ifndef THREADS
-      GC_ASSERT(sz == hhdr -> hb_sz);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz == hhdr -> hb_sz);
 #   endif
     /* go through all words in block */
     p = hbp->hb_body;
@@ -286,44 +286,44 @@ STATIC void GC_reclaim_check(struct hblk *hbp, hdr *hhdr, word sz)
     for (bit_no = 0; (word)p <= (word)plim;
          p += sz, bit_no += MARK_BIT_OFFSET(sz)) {
       if (!mark_bit_from_hdr(hhdr, bit_no)) {
-        GC_add_leaked(p);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_leaked(p);
       }
     }
 }
 
 /* Is a pointer-free block?  Same as IS_PTRFREE macro (in os_dep.c) but */
-/* uses unordered atomic access to avoid racing with GC_realloc.        */
+/* uses unordered atomic access to avoid racing with MANAGED_STACK_ADDRESS_BOEHM_GC_realloc.        */
 #ifdef AO_HAVE_load
 # define IS_PTRFREE_SAFE(hhdr) \
                 (AO_load((volatile AO_t *)&(hhdr)->hb_descr) == 0)
 #else
-  /* No race as GC_realloc holds the lock while updating hb_descr.      */
+  /* No race as MANAGED_STACK_ADDRESS_BOEHM_GC_realloc holds the lock while updating hb_descr.      */
 # define IS_PTRFREE_SAFE(hhdr) ((hhdr)->hb_descr == 0)
 #endif
 
 /* Generic procedure to rebuild a free list in hbp.  Also called    */
-/* directly from GC_malloc_many.  sz is in bytes.                   */
-GC_INNER ptr_t GC_reclaim_generic(struct hblk *hbp, hdr *hhdr, size_t sz,
-                                  GC_bool init, ptr_t list, word *pcount)
+/* directly from MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_many.  sz is in bytes.                   */
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_generic(struct hblk *hbp, hdr *hhdr, size_t sz,
+                                  MANAGED_STACK_ADDRESS_BOEHM_GC_bool init, ptr_t list, word *pcount)
 {
     ptr_t result;
 
-    GC_ASSERT(GC_find_header((ptr_t)hbp) == hhdr);
-#   ifndef GC_DISABLE_INCREMENTAL
-      GC_remove_protection(hbp, 1, IS_PTRFREE_SAFE(hhdr));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_find_header((ptr_t)hbp) == hhdr);
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+      MANAGED_STACK_ADDRESS_BOEHM_GC_remove_protection(hbp, 1, IS_PTRFREE_SAFE(hhdr));
 #   endif
 #   ifdef ENABLE_DISCLAIM
       if ((hhdr -> hb_flags & HAS_DISCLAIM) != 0) {
-        result = GC_disclaim_and_reclaim(hbp, hhdr, sz, list, pcount);
+        result = MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_and_reclaim(hbp, hhdr, sz, list, pcount);
       } else
 #   endif
-    /* else */ if (init || GC_debugging_started) {
-      result = GC_reclaim_clear(hbp, hhdr, sz, list, pcount);
+    /* else */ if (init || MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) {
+      result = MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_clear(hbp, hhdr, sz, list, pcount);
     } else {
-      GC_ASSERT(IS_PTRFREE_SAFE(hhdr));
-      result = GC_reclaim_uninit(hbp, hhdr, sz, list, pcount);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(IS_PTRFREE_SAFE(hhdr));
+      result = MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_uninit(hbp, hhdr, sz, list, pcount);
     }
-    if (IS_UNCOLLECTABLE(hhdr -> hb_obj_kind)) GC_set_hdr_marks(hhdr);
+    if (IS_UNCOLLECTABLE(hhdr -> hb_obj_kind)) MANAGED_STACK_ADDRESS_BOEHM_GC_set_hdr_marks(hhdr);
     return result;
 }
 
@@ -333,40 +333,40 @@ GC_INNER ptr_t GC_reclaim_generic(struct hblk *hbp, hdr *hhdr, size_t sz,
  * If entirely empty blocks are to be completely deallocated, then
  * caller should perform that check.
  */
-STATIC void GC_reclaim_small_nonempty_block(struct hblk *hbp, word sz,
-                                            GC_bool report_if_found)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block(struct hblk *hbp, word sz,
+                                            MANAGED_STACK_ADDRESS_BOEHM_GC_bool report_if_found)
 {
     hdr *hhdr = HDR(hbp);
-    struct obj_kind * ok = &GC_obj_kinds[hhdr -> hb_obj_kind];
+    struct obj_kind * ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[hhdr -> hb_obj_kind];
     void **flh = &(ok -> ok_freelist[BYTES_TO_GRANULES(sz)]);
 
-    hhdr -> hb_last_reclaimed = (unsigned short) GC_gc_no;
+    hhdr -> hb_last_reclaimed = (unsigned short) MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
 
     if (report_if_found) {
-        GC_reclaim_check(hbp, hhdr, sz);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_check(hbp, hhdr, sz);
     } else {
-        *flh = GC_reclaim_generic(hbp, hhdr, sz, ok -> ok_init,
-                                  (ptr_t)(*flh), (word *)&GC_bytes_found);
+        *flh = MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_generic(hbp, hhdr, sz, ok -> ok_init,
+                                  (ptr_t)(*flh), (word *)&MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found);
     }
 }
 
 #ifdef ENABLE_DISCLAIM
-  STATIC void GC_disclaim_and_reclaim_or_free_small_block(struct hblk *hbp)
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_and_reclaim_or_free_small_block(struct hblk *hbp)
   {
     hdr *hhdr = HDR(hbp);
     word sz = hhdr -> hb_sz;
-    struct obj_kind * ok = &GC_obj_kinds[hhdr -> hb_obj_kind];
+    struct obj_kind * ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[hhdr -> hb_obj_kind];
     void **flh = &(ok -> ok_freelist[BYTES_TO_GRANULES(sz)]);
     void *flh_next;
 
-    hhdr -> hb_last_reclaimed = (unsigned short) GC_gc_no;
-    flh_next = GC_reclaim_generic(hbp, hhdr, sz, ok -> ok_init,
-                                  (ptr_t)(*flh), (word *)&GC_bytes_found);
+    hhdr -> hb_last_reclaimed = (unsigned short) MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
+    flh_next = MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_generic(hbp, hhdr, sz, ok -> ok_init,
+                                  (ptr_t)(*flh), (word *)&MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found);
     if (hhdr -> hb_n_marks)
         *flh = flh_next;
     else {
-        GC_bytes_found += (signed_word)HBLKSIZE;
-        GC_freehblk(hbp);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found += (signed_word)HBLKSIZE;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(hbp);
     }
   }
 #endif /* ENABLE_DISCLAIM */
@@ -375,28 +375,28 @@ STATIC void GC_reclaim_small_nonempty_block(struct hblk *hbp, word sz,
  * Restore an unmarked large object or an entirely empty blocks of small objects
  * to the heap block free list.
  * Otherwise enqueue the block for later processing
- * by GC_reclaim_small_nonempty_block.
+ * by MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block.
  * If report_if_found is TRUE, then process any block immediately, and
  * simply report free objects; do not actually reclaim them.
  */
-STATIC void GC_CALLBACK GC_reclaim_block(struct hblk *hbp,
-                                         GC_word report_if_found)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_block(struct hblk *hbp,
+                                         MANAGED_STACK_ADDRESS_BOEHM_GC_word report_if_found)
 {
     hdr * hhdr = HDR(hbp);
     word sz;    /* size of objects in current block */
-    struct obj_kind * ok = &GC_obj_kinds[hhdr -> hb_obj_kind];
+    struct obj_kind * ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[hhdr -> hb_obj_kind];
 
 #   ifdef AO_HAVE_load
-        /* Atomic access is used to avoid racing with GC_realloc.       */
+        /* Atomic access is used to avoid racing with MANAGED_STACK_ADDRESS_BOEHM_GC_realloc.       */
         sz = (word)AO_load((volatile AO_t *)&(hhdr -> hb_sz));
 #   else
-        /* No race as GC_realloc holds the lock while updating hb_sz.   */
+        /* No race as MANAGED_STACK_ADDRESS_BOEHM_GC_realloc holds the lock while updating hb_sz.   */
         sz = hhdr -> hb_sz;
 #   endif
     if (sz > MAXOBJBYTES) { /* 1 big object */
         if (!mark_bit_from_hdr(hhdr, 0)) {
             if (report_if_found) {
-              GC_add_leaked((ptr_t)hbp);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_add_leaked((ptr_t)hbp);
             } else {
 #             ifdef ENABLE_DISCLAIM
                 if (EXPECT(hhdr -> hb_flags & HAS_DISCLAIM, 0)) {
@@ -408,23 +408,23 @@ STATIC void GC_CALLBACK GC_reclaim_block(struct hblk *hbp,
                 }
 #             endif
               if (sz > HBLKSIZE) {
-                GC_large_allocd_bytes -= HBLKSIZE * OBJ_SZ_TO_BLOCKS(sz);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_large_allocd_bytes -= HBLKSIZE * OBJ_SZ_TO_BLOCKS(sz);
               }
-              GC_bytes_found += (signed_word)sz;
-              GC_freehblk(hbp);
+              MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found += (signed_word)sz;
+              MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(hbp);
             }
         } else {
 #        ifdef ENABLE_DISCLAIM
            in_use:
 #        endif
             if (IS_PTRFREE_SAFE(hhdr)) {
-              GC_atomic_in_use += sz;
+              MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use += sz;
             } else {
-              GC_composite_in_use += sz;
+              MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use += sz;
             }
         }
     } else {
-        GC_bool empty = GC_block_empty(hhdr);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bool empty = MANAGED_STACK_ADDRESS_BOEHM_GC_block_empty(hhdr);
 #       ifdef PARALLEL_MARK
           /* Count can be low or one too high because we sometimes      */
           /* have to ignore decrements.  Objects can also potentially   */
@@ -432,25 +432,25 @@ STATIC void GC_CALLBACK GC_reclaim_block(struct hblk *hbp,
           /* Here we assume 3 markers at most, but this is extremely    */
           /* unlikely to fail spuriously with more.  And if it does, it */
           /* should be looked at.                                       */
-          GC_ASSERT(sz != 0 && (GC_markers_m1 > 1 ? 3 : GC_markers_m1 + 1)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz != 0 && (MANAGED_STACK_ADDRESS_BOEHM_GC_markers_m1 > 1 ? 3 : MANAGED_STACK_ADDRESS_BOEHM_GC_markers_m1 + 1)
                                 * (HBLKSIZE/sz + 1) + 16 >= hhdr->hb_n_marks);
 #       else
-          GC_ASSERT(sz * hhdr -> hb_n_marks <= HBLKSIZE);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz * hhdr -> hb_n_marks <= HBLKSIZE);
 #       endif
         if (report_if_found) {
-          GC_reclaim_small_nonempty_block(hbp, sz,
+          MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block(hbp, sz,
                                           TRUE /* report_if_found */);
         } else if (empty) {
 #       ifdef ENABLE_DISCLAIM
           if ((hhdr -> hb_flags & HAS_DISCLAIM) != 0) {
-            GC_disclaim_and_reclaim_or_free_small_block(hbp);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_disclaim_and_reclaim_or_free_small_block(hbp);
           } else
 #       endif
           /* else */ {
-            GC_bytes_found += (signed_word)HBLKSIZE;
-            GC_freehblk(hbp);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found += (signed_word)HBLKSIZE;
+            MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(hbp);
           }
-        } else if (GC_find_leak || !GC_block_nearly_full(hhdr, sz)) {
+        } else if (MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak || !MANAGED_STACK_ADDRESS_BOEHM_GC_block_nearly_full(hhdr, sz)) {
           /* group of smaller objects, enqueue the real work */
           struct hblk **rlh = ok -> ok_reclaim_list;
 
@@ -463,11 +463,11 @@ STATIC void GC_CALLBACK GC_reclaim_block(struct hblk *hbp,
         /* We used to do the nearly_full check later, but we    */
         /* already have the right cache context here.  Also     */
         /* doing it here avoids some silly lock contention in   */
-        /* GC_malloc_many.                                      */
+        /* MANAGED_STACK_ADDRESS_BOEHM_GC_malloc_many.                                      */
         if (IS_PTRFREE_SAFE(hhdr)) {
-          GC_atomic_in_use += sz * hhdr -> hb_n_marks;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use += sz * hhdr -> hb_n_marks;
         } else {
-          GC_composite_in_use += sz * hhdr -> hb_n_marks;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use += sz * hhdr -> hb_n_marks;
         }
     }
 }
@@ -484,17 +484,17 @@ struct Print_stats
 };
 
 EXTERN_C_BEGIN /* to avoid "no previous prototype" clang warning */
-unsigned GC_n_set_marks(hdr *);
+unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_set_marks(hdr *);
 EXTERN_C_END
 
 #ifdef USE_MARK_BYTES
 
 /* Return the number of set mark bits in the given header.      */
 /* Remains externally visible as used by GNU GCJ currently.     */
-/* There could be a race between GC_clear_hdr_marks and this    */
+/* There could be a race between MANAGED_STACK_ADDRESS_BOEHM_GC_clear_hdr_marks and this    */
 /* function but the latter is for a debug purpose.              */
-GC_ATTR_NO_SANITIZE_THREAD
-unsigned GC_n_set_marks(hdr *hhdr)
+MANAGED_STACK_ADDRESS_BOEHM_GC_ATTR_NO_SANITIZE_THREAD
+unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_set_marks(hdr *hhdr)
 {
     unsigned result = 0;
     word i;
@@ -504,7 +504,7 @@ unsigned GC_n_set_marks(hdr *hhdr)
     for (i = 0; i < limit; i += offset) {
         result += hhdr -> hb_marks[i];
     }
-    GC_ASSERT(hhdr -> hb_marks[limit]); /* the one set past the end */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr -> hb_marks[limit]); /* the one set past the end */
     return result;
 }
 
@@ -521,7 +521,7 @@ static unsigned count_ones(word n)
     return result;
 }
 
-unsigned GC_n_set_marks(hdr *hhdr)
+unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_set_marks(hdr *hhdr)
 {
     unsigned result = 0;
     word sz = hhdr -> hb_sz;
@@ -539,15 +539,15 @@ unsigned GC_n_set_marks(hdr *hhdr)
           result += count_ones(hhdr -> hb_marks[i]);
       }
 #   endif
-    GC_ASSERT(result > 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(result > 0);
     result--; /* exclude the one bit set past the end */
 #   ifndef MARK_BIT_PER_OBJ
       if (IS_UNCOLLECTABLE(hhdr -> hb_obj_kind)) {
         unsigned ngranules = (unsigned)BYTES_TO_GRANULES(sz);
 
-        /* As mentioned in GC_set_hdr_marks(), all the bits are set     */
+        /* As mentioned in MANAGED_STACK_ADDRESS_BOEHM_GC_set_hdr_marks(), all the bits are set     */
         /* instead of every n-th, thus the result should be adjusted.   */
-        GC_ASSERT(ngranules > 0 && result % ngranules == 0);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(ngranules > 0 && result % ngranules == 0);
         result /= ngranules;
       }
 #   endif
@@ -556,55 +556,55 @@ unsigned GC_n_set_marks(hdr *hhdr)
 
 #endif /* !USE_MARK_BYTES  */
 
-GC_API unsigned GC_CALL GC_count_set_marks_in_hblk(const void *p) {
-    return GC_n_set_marks(HDR((/* no const */ void *)(word)p));
+MANAGED_STACK_ADDRESS_BOEHM_GC_API unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_count_set_marks_in_hblk(const void *p) {
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_n_set_marks(HDR((/* no const */ void *)(word)p));
 }
 
-STATIC void GC_CALLBACK GC_print_block_descr(struct hblk *h,
-                                GC_word /* struct PrintStats */ raw_ps)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_print_block_descr(struct hblk *h,
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_word /* struct PrintStats */ raw_ps)
 {
     hdr *hhdr = HDR(h);
     word sz = hhdr -> hb_sz;
     struct Print_stats *ps = (struct Print_stats *)raw_ps;
-    unsigned n_marks = GC_n_set_marks(hhdr);
+    unsigned n_marks = MANAGED_STACK_ADDRESS_BOEHM_GC_n_set_marks(hhdr);
     unsigned n_objs = (unsigned)HBLK_OBJS(sz);
 
 #   ifndef PARALLEL_MARK
-        GC_ASSERT(hhdr -> hb_n_marks == n_marks);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr -> hb_n_marks == n_marks);
 #   endif
-    GC_ASSERT((n_objs > 0 ? n_objs : 1) >= n_marks);
-    GC_printf("%u,%u,%u,%u\n",
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((n_objs > 0 ? n_objs : 1) >= n_marks);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("%u,%u,%u,%u\n",
               hhdr -> hb_obj_kind, (unsigned)sz, n_marks, n_objs);
     ps -> number_of_blocks++;
     ps -> total_bytes +=
                 (sz + HBLKSIZE-1) & ~(word)(HBLKSIZE-1); /* round up */
 }
 
-void GC_print_block_list(void)
+void MANAGED_STACK_ADDRESS_BOEHM_GC_print_block_list(void)
 {
     struct Print_stats pstats;
 
-    GC_printf("kind(0=ptrfree/1=normal/2=unc.),"
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("kind(0=ptrfree/1=normal/2=unc.),"
               "obj_sz,#marks_set,#objs_in_block\n");
     BZERO(&pstats, sizeof(pstats));
-    GC_apply_to_all_blocks(GC_print_block_descr, (word)&pstats);
-    GC_printf("blocks= %lu, total_bytes= %lu\n",
+    MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(MANAGED_STACK_ADDRESS_BOEHM_GC_print_block_descr, (word)&pstats);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("blocks= %lu, total_bytes= %lu\n",
               (unsigned long)pstats.number_of_blocks,
               (unsigned long)pstats.total_bytes);
 }
 
 /* Currently for debugger use only.  Assumes the allocation lock is */
 /* held but no assertion about it by design.                        */
-GC_API void GC_CALL GC_print_free_list(int kind, size_t sz_in_granules)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_print_free_list(int kind, size_t sz_in_granules)
 {
     void *flh_next;
     int n;
 
-    GC_ASSERT(kind < MAXOBJKINDS);
-    GC_ASSERT(sz_in_granules <= MAXOBJGRANULES);
-    flh_next = GC_obj_kinds[kind].ok_freelist[sz_in_granules];
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(kind < MAXOBJKINDS);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(sz_in_granules <= MAXOBJGRANULES);
+    flh_next = MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist[sz_in_granules];
     for (n = 0; flh_next; n++) {
-        GC_printf("Free object in heap block %p [%d]: %p\n",
+        MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Free object in heap block %p [%d]: %p\n",
                   (void *)HBLKPTR(flh_next), n, flh_next);
         flh_next = obj_link(flh_next);
     }
@@ -619,7 +619,7 @@ GC_API void GC_CALL GC_print_free_list(int kind, size_t sz_in_granules)
  * since may otherwise end up with dangling "descriptor" pointers.
  * It may help for other pointer-containing objects.
  */
-STATIC void GC_clear_fl_links(void **flp)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_clear_fl_links(void **flp)
 {
     void *next = *flp;
 
@@ -631,35 +631,35 @@ STATIC void GC_clear_fl_links(void **flp)
 }
 
 /*
- * Perform GC_reclaim_block on the entire heap, after first clearing
+ * Perform MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_block on the entire heap, after first clearing
  * small object free lists (if we are not just looking for leaks).
  */
-GC_INNER void GC_start_reclaim(GC_bool report_if_found)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_start_reclaim(MANAGED_STACK_ADDRESS_BOEHM_GC_bool report_if_found)
 {
     unsigned kind;
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 #   if defined(PARALLEL_MARK)
-      GC_ASSERT(0 == GC_fl_builder_count);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count);
 #   endif
-    /* Reset in use counters.  GC_reclaim_block recomputes them. */
-      GC_composite_in_use = 0;
-      GC_atomic_in_use = 0;
+    /* Reset in use counters.  MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_block recomputes them. */
+      MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use = 0;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use = 0;
     /* Clear reclaim- and free-lists */
-      for (kind = 0; kind < GC_n_kinds; kind++) {
-        struct hblk ** rlist = GC_obj_kinds[kind].ok_reclaim_list;
-        GC_bool should_clobber = (GC_obj_kinds[kind].ok_descriptor != 0);
+      for (kind = 0; kind < MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds; kind++) {
+        struct hblk ** rlist = MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_reclaim_list;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bool should_clobber = (MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_descriptor != 0);
 
         if (rlist == 0) continue;       /* This kind not used.  */
         if (!report_if_found) {
             void **fop;
-            void **lim = &GC_obj_kinds[kind].ok_freelist[MAXOBJGRANULES+1];
+            void **lim = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist[MAXOBJGRANULES+1];
 
-            for (fop = GC_obj_kinds[kind].ok_freelist;
+            for (fop = MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist;
                  (word)fop < (word)lim; (*(word **)&fop)++) {
               if (*fop != 0) {
                 if (should_clobber) {
-                  GC_clear_fl_links(fop);
+                  MANAGED_STACK_ADDRESS_BOEHM_GC_clear_fl_links(fop);
                 } else {
                   *fop = 0;
                 }
@@ -673,34 +673,34 @@ GC_INNER void GC_start_reclaim(GC_bool report_if_found)
 
   /* Go through all heap blocks (in hblklist) and reclaim unmarked objects */
   /* or enqueue the block for later processing.                            */
-    GC_apply_to_all_blocks(GC_reclaim_block, (word)report_if_found);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_block, (word)report_if_found);
 
 # ifdef EAGER_SWEEP
     /* This is a very stupid thing to do.  We make it possible anyway,  */
     /* so that you can convince yourself that it really is very stupid. */
-    GC_reclaim_all((GC_stop_func)0, FALSE);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func)0, FALSE);
 # elif defined(ENABLE_DISCLAIM)
     /* However, make sure to clear reclaimable objects of kinds with    */
     /* unconditional marking enabled before we do any significant       */
     /* marking work.                                                    */
-    GC_reclaim_unconditionally_marked();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_unconditionally_marked();
 # endif
 # if defined(PARALLEL_MARK)
-    GC_ASSERT(0 == GC_fl_builder_count);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(0 == MANAGED_STACK_ADDRESS_BOEHM_GC_fl_builder_count);
 # endif
 }
 
 /* Sweep blocks of the indicated object size and kind until either  */
 /* the appropriate free list is nonempty, or there are no more      */
 /* blocks to sweep.                                                 */
-GC_INNER void GC_continue_reclaim(word sz /* granules */, int kind)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_continue_reclaim(word sz /* granules */, int kind)
 {
     struct hblk * hbp;
-    struct obj_kind * ok = &GC_obj_kinds[kind];
+    struct obj_kind * ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind];
     struct hblk ** rlh = ok -> ok_reclaim_list;
     void **flh = &(ok -> ok_freelist[sz]);
 
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
     if (NULL == rlh)
         return; /* No blocks of this kind.      */
 
@@ -708,7 +708,7 @@ GC_INNER void GC_continue_reclaim(word sz /* granules */, int kind)
         hdr *hhdr = HDR(hbp);
 
         *rlh = hhdr -> hb_next;
-        GC_reclaim_small_nonempty_block(hbp, hhdr -> hb_sz, FALSE);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block(hbp, hhdr -> hb_sz, FALSE);
         if (*flh != NULL)
             break; /* the appropriate free list is nonempty */
     }
@@ -723,7 +723,7 @@ GC_INNER void GC_continue_reclaim(word sz /* granules */, int kind)
  * recently reclaimed, and discard the rest.
  * Stop_func may be 0.
  */
-GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func, MANAGED_STACK_ADDRESS_BOEHM_GC_bool ignore_old)
 {
     word sz;
     unsigned kind;
@@ -734,37 +734,37 @@ GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old)
 #   ifndef NO_CLOCK
       CLOCK_TYPE start_time = CLOCK_TYPE_INITIALIZER;
 
-      if (GC_print_stats == VERBOSE)
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats == VERBOSE)
         GET_TIME(start_time);
 #   endif
-    GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
 
-    for (kind = 0; kind < GC_n_kinds; kind++) {
-        rlp = GC_obj_kinds[kind].ok_reclaim_list;
+    for (kind = 0; kind < MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds; kind++) {
+        rlp = MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_reclaim_list;
         if (rlp == 0) continue;
         for (sz = 1; sz <= MAXOBJGRANULES; sz++) {
             for (rlh = rlp + sz; (hbp = *rlh) != NULL; ) {
-                if (stop_func != (GC_stop_func)0 && (*stop_func)()) {
+                if (stop_func != (MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func)0 && (*stop_func)()) {
                     return FALSE;
                 }
                 hhdr = HDR(hbp);
                 *rlh = hhdr -> hb_next;
                 if (!ignore_old
-                    || (word)hhdr->hb_last_reclaimed == GC_gc_no - 1) {
+                    || (word)hhdr->hb_last_reclaimed == MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no - 1) {
                     /* It's likely we'll need it this time, too */
                     /* It's been touched recently, so this      */
                     /* shouldn't trigger paging.                */
-                    GC_reclaim_small_nonempty_block(hbp, hhdr->hb_sz, FALSE);
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block(hbp, hhdr->hb_sz, FALSE);
                 }
             }
         }
     }
 #   ifndef NO_CLOCK
-      if (GC_print_stats == VERBOSE) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats == VERBOSE) {
         CLOCK_TYPE done_time;
 
         GET_TIME(done_time);
-        GC_verbose_log_printf(
+        MANAGED_STACK_ADDRESS_BOEHM_GC_verbose_log_printf(
                         "Disposing of reclaim lists took %lu ms %lu ns\n",
                         MS_TIME_DIFF(done_time, start_time),
                         NS_FRAC_TIME_DIFF(done_time, start_time));
@@ -776,15 +776,15 @@ GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old)
 #if !defined(EAGER_SWEEP) && defined(ENABLE_DISCLAIM)
 /* We do an eager sweep on heap blocks where unconditional marking has  */
 /* been enabled, so that any reclaimable objects have been reclaimed    */
-/* before we start marking.  This is a simplified GC_reclaim_all        */
+/* before we start marking.  This is a simplified MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all        */
 /* restricted to kinds where ok_mark_unconditionally is true.           */
-  STATIC void GC_reclaim_unconditionally_marked(void)
+  STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_unconditionally_marked(void)
   {
     unsigned kind;
 
-    for (kind = 0; kind < GC_n_kinds; kind++) {
+    for (kind = 0; kind < MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds; kind++) {
         word sz;
-        struct obj_kind *ok = &GC_obj_kinds[kind];
+        struct obj_kind *ok = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind];
         struct hblk **rlp = ok -> ok_reclaim_list;
 
         if (NULL == rlp || !(ok -> ok_mark_unconditionally)) continue;
@@ -797,7 +797,7 @@ GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old)
                 hdr *hhdr = HDR(hbp);
 
                 *rlh = hhdr -> hb_next;
-                GC_reclaim_small_nonempty_block(hbp, hhdr -> hb_sz, FALSE);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_small_nonempty_block(hbp, hhdr -> hb_sz, FALSE);
             }
         }
     }
@@ -805,19 +805,19 @@ GC_INNER GC_bool GC_reclaim_all(GC_stop_func stop_func, GC_bool ignore_old)
 #endif /* !EAGER_SWEEP && ENABLE_DISCLAIM */
 
 struct enumerate_reachable_s {
-  GC_reachable_object_proc proc;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_object_proc proc;
   void *client_data;
 };
 
-STATIC void GC_CALLBACK GC_do_enumerate_reachable_objects(struct hblk *hbp,
-                                                          GC_word ped)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_do_enumerate_reachable_objects(struct hblk *hbp,
+                                                          MANAGED_STACK_ADDRESS_BOEHM_GC_word ped)
 {
   struct hblkhdr *hhdr = HDR(hbp);
   size_t sz = (size_t)hhdr->hb_sz;
   size_t bit_no;
   char *p, *plim;
 
-  if (GC_block_empty(hhdr)) {
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_block_empty(hhdr)) {
     return;
   }
 
@@ -836,14 +836,14 @@ STATIC void GC_CALLBACK GC_do_enumerate_reachable_objects(struct hblk *hbp,
   }
 }
 
-GC_API void GC_CALL GC_enumerate_reachable_objects_inner(
-                                                GC_reachable_object_proc proc,
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_enumerate_reachable_objects_inner(
+                                                MANAGED_STACK_ADDRESS_BOEHM_GC_reachable_object_proc proc,
                                                 void *client_data)
 {
   struct enumerate_reachable_s ed;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   ed.proc = proc;
   ed.client_data = client_data;
-  GC_apply_to_all_blocks(GC_do_enumerate_reachable_objects, (word)&ed);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(MANAGED_STACK_ADDRESS_BOEHM_GC_do_enumerate_reachable_objects, (word)&ed);
 }

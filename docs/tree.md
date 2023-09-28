@@ -34,8 +34,8 @@ as appropriate.)
 The rest of this discussion focuses on the two level data structure used
 to map the high and middle bits to the block descriptor.
 
-The high bits are used as an index into the `GC_top_index` (really
-`GC_arrays._top_index`) array. Each entry points to a `bottom_index` data
+The high bits are used as an index into the `MANAGED_STACK_ADDRESS_BOEHM_GC_top_index` (really
+`MANAGED_STACK_ADDRESS_BOEHM_GC_arrays._top_index`) array. Each entry points to a `bottom_index` data
 structure. This structure in turn consists mostly of an array `index` indexed
 by the middle bits of the candidate pointer. The `index` array contains the
 actual `hdr` pointers.
@@ -43,7 +43,7 @@ actual `hdr` pointers.
 Thus a pointer lookup consists primarily of a handful of memory references,
 and can be quite fast:
 
-  1. The appropriate `bottom_index` pointer is looked up in `GC_top_index`,
+  1. The appropriate `bottom_index` pointer is looked up in `MANAGED_STACK_ADDRESS_BOEHM_GC_top_index`,
   based on the high bits of the candidate pointer.
   2. The appropriate `hdr` pointer is looked up in the `bottom_index`
   structure, based on the middle bits.
@@ -52,15 +52,15 @@ and can be quite fast:
   4. The displacement to the beginning of the object is retrieved from the
   above map.
 
-In order to conserve space, not all `GC_top_index` entries in fact point
+In order to conserve space, not all `MANAGED_STACK_ADDRESS_BOEHM_GC_top_index` entries in fact point
 to distinct `bottom_index` structures. If no address with the corresponding
-high bits is part of the heap, then the entry points to `GC_all_nils`,
+high bits is part of the heap, then the entry points to `MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils`,
 a single `bottom_index` structure consisting only of `NULL` `hdr` pointers.
 
 `Bottom_index` structures contain slightly more information than just `hdr`
 pointers. The `asc_link` field is used to link all `bottom_index` structures
 in ascending order for fast traversal. This list is pointed to be
-`GC_all_bottom_indices`. It is maintained with the aid of `key` field that
+`MANAGED_STACK_ADDRESS_BOEHM_GC_all_bottom_indices`. It is maintained with the aid of `key` field that
 contains the high bits corresponding to the `bottom_index`.
 
 ## 64-bit addresses
@@ -68,7 +68,7 @@ contains the high bits corresponding to the `bottom_index`.
 In the case of 64-bit addresses, this picture is complicated slightly by the
 fact that one of the index structures would have to be huge to cover the
 entire address space with a two level tree. We deal with this by turning
-`GC_top_index` into a chained hash table, instead of a simple array. This adds
+`MANAGED_STACK_ADDRESS_BOEHM_GC_top_index` into a chained hash table, instead of a simple array. This adds
 a `hash_link` field to the `bottom_index` structure.
 
 The _hash function_ consists of dropping the high bits. This is cheap
@@ -77,7 +77,7 @@ is contiguous and not excessively large.
 
 ## A picture
 
-The following is an _ASCII_ diagram of the data structure used by GC_base. This was
+The following is an _ASCII_ diagram of the data structure used by MANAGED_STACK_ADDRESS_BOEHM_GC_base. This was
 contributed originally by Dave Barrett.
 
 
@@ -90,7 +90,7 @@ contributed originally by Dave Barrett.
                            \______ ________/ \________ _______/ \________ _______/
                                   V                   V                  V
                                   |                   |                  |
-                GC_top_index[]    |                   |                  |
+                MANAGED_STACK_ADDRESS_BOEHM_GC_top_index[]    |                   |                  |
       ---      +--------------+   |                   |                  |
        ^       |              |   |                   |                  |
        |       |              |   |                   |                  |
@@ -112,9 +112,9 @@ contributed originally by Dave Barrett.
     BOTTOM_SZ  |              |   ha=GET_HDR_ADDR(p)  |                  |
      (items)   +--------------+<----------------------+          +-------+
        |   +--<|   index[]    |                                  |
-       |   |   +--------------+                      GC_obj_map: v
+       |   |   +--------------+                      MANAGED_STACK_ADDRESS_BOEHM_GC_obj_map: v
        |   |   |              |              from      / +-+-+-----+-+-+-+-+  ---
-       v   |   |              |       GC_add_map_entry <0| | |     | | | | |   ^
+       v   |   |              |       MANAGED_STACK_ADDRESS_BOEHM_GC_add_map_entry <0| | |     | | | | |   ^
       ---  |   +--------------+                        \ +-+-+-----+-+-+-+-+   |
            |   |   asc_link   |                          +-+-+-----+-+-+-+-+ MAXOBJGRANULES
            |   +--------------+                      +-->| | |  j  | | | | |  +1
@@ -123,8 +123,8 @@ contributed originally by Dave Barrett.
            |   |  hash_link   |                      |   | | |     | | | | |   v
            |   +--------------+                      |   +-+-+-----+-+-+-+-+  ---
            |                                         |   |<--OBJ_MAP_LEN-->|
-           |                                         |   =HBLKSIZE/GC_GRANULE_BYTES
-     HDR(p)| GC_find_header(p)                       |    (1024 on Alpha)
+           |                                         |   =HBLKSIZE/MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES
+     HDR(p)| MANAGED_STACK_ADDRESS_BOEHM_GC_find_header(p)                       |    (1024 on Alpha)
            |                           \ from        |    (8/16 bits each)
            |    (hdr) (struct hblkhdr) / alloc_hdr() |
            +--->+----------------------+             |

@@ -52,8 +52,8 @@ CFLAGS_FOR_PIC?=
 
 # The default libgc configuration, OK to customize it by client.
 CFLAGS_DEFAULT_MACROS?= \
-  -DALL_INTERIOR_POINTERS -DENABLE_DISCLAIM -DGC_ATOMIC_UNCOLLECTABLE \
-  -DGC_GCJ_SUPPORT -DJAVA_FINALIZATION -DNO_EXECUTE_PERMISSION \
+  -DALL_INTERIOR_POINTERS -DENABLE_DISCLAIM -DMANAGED_STACK_ADDRESS_BOEHM_GC_ATOMIC_UNCOLLECTABLE \
+  -DMANAGED_STACK_ADDRESS_BOEHM_GC_GCJ_SUPPORT -DJAVA_FINALIZATION -DNO_EXECUTE_PERMISSION \
   -DUSE_MMAP -DUSE_MUNMAP
 
 # The client or host might provide the default optimizations flags (e.g. -O2).
@@ -64,17 +64,17 @@ CFLAGS+= -I$(srcdir)/include -I$(AO_SRC_DIR)/src \
   $(CFLAGS_DEFAULT_MACROS) $(CFLAGS_FOR_PIC) $(CFLAGS_EXTRA)
 
 # To build the collector with threads support, add to CFLAGS_EXTRA:
-# -DGC_THREADS -DPARALLEL_MARK -DTHREAD_LOCAL_ALLOC
+# -DMANAGED_STACK_ADDRESS_BOEHM_GC_THREADS -DPARALLEL_MARK -DTHREAD_LOCAL_ALLOC
 #
 # To build the preload library that intercepts malloc, add:
-# -DGC_USE_DLOPEN_WRAP -DREDIRECT_MALLOC=GC_malloc -fpic
+# -DMANAGED_STACK_ADDRESS_BOEHM_GC_USE_DLOPEN_WRAP -DREDIRECT_MALLOC=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc -fpic
 
 # To build the collector with fork() support by default, add to the above:
 # -DHANDLE_FORK
 
-# To build the collector with GC_wcsdup support, provided libc has wcslen(),
+# To build the collector with MANAGED_STACK_ADDRESS_BOEHM_GC_wcsdup support, provided libc has wcslen(),
 # add to the above:
-# -DGC_REQUIRE_WCSDUP
+# -DMANAGED_STACK_ADDRESS_BOEHM_GC_REQUIRE_WCSDUP
 
 # HOSTCC and HOSTCFLAGS are used to build executables that will be run as
 # part of the build process, i.e. on the build machine.  These will usually
@@ -255,7 +255,7 @@ cpptest$(EXEEXT): $(srcdir)/tests/cpp.cc $(srcdir)/include/gc_cpp.h \
   $(srcdir)/include/gc.h c++ base_lib $(NODIST_OBJS) $(UTILS)
 	rm -f $@
 	./if_mach HP_PA HPUX $(CXX) $(CXXFLAGS) -o $@ $(srcdir)/tests/cpp.cc $(NODIST_OBJS) libgc.a libgccpp.a -ldld `./threadlibs`
-	./if_not_there $@ || $(CXX) $(CXXFLAGS) -DGC_NOT_DLL -o $@ $(srcdir)/tests/cpp.cc $(NODIST_OBJS) libgc.a libgccpp.a `./threadlibs`
+	./if_not_there $@ || $(CXX) $(CXXFLAGS) -DMANAGED_STACK_ADDRESS_BOEHM_GC_NOT_DLL -o $@ $(srcdir)/tests/cpp.cc $(NODIST_OBJS) libgc.a libgccpp.a `./threadlibs`
 
 check-cpp-deps: cpptest$(EXEEXT)
 
@@ -358,7 +358,7 @@ cordtest$(EXEEXT): $(srcdir)/cord/tests/cordtest.c cords base_lib $(NODIST_OBJS)
 	rm -f $@
 	./if_mach SPARC DRSNX $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/cordtest.c $(NODIST_OBJS) libgc.a libcord.a -lucb
 	./if_mach HP_PA HPUX $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/cordtest.c $(NODIST_OBJS) libgc.a libcord.a -ldld `./threadlibs`
-	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UGC_AMIGA_MAKINGLIB -o $@ $(srcdir)/cord/tests/cordtest.c $(NODIST_OBJS) libgc.a libcord.a `./threadlibs`
+	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UMANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MAKINGLIB -o $@ $(srcdir)/cord/tests/cordtest.c $(NODIST_OBJS) libgc.a libcord.a `./threadlibs`
 	./if_not_there $@ || $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/cordtest.c $(NODIST_OBJS) libgc.a libcord.a `./threadlibs`
 
 cord/de: de$(EXEEXT)
@@ -370,7 +370,7 @@ de$(EXEEXT): $(srcdir)/cord/tests/de.c $(srcdir)/cord/tests/de_win.c \
 	./if_mach HP_PA HPUX $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/de.c $(NODIST_OBJS) libgc.a libcord.a -lcurses -ltermlib -ldld `./threadlibs`
 	./if_mach POWERPC AIX $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/de.c $(NODIST_OBJS) libgc.a libcord.a -lcurses
 	./if_mach POWERPC DARWIN $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/de.c $(NODIST_OBJS) libgc.a libcord.a
-	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UGC_AMIGA_MAKINGLIB -o $@ $(srcdir)/cord/tests/de.c $(NODIST_OBJS) libgc.a libcord.a -lcurses
+	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UMANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MAKINGLIB -o $@ $(srcdir)/cord/tests/de.c $(NODIST_OBJS) libgc.a libcord.a -lcurses
 	./if_not_there $@ || $(CC) $(CFLAGS) -o $@ $(srcdir)/cord/tests/de.c $(srcdir)/cord/tests/de_win.c $(NODIST_OBJS) libgc.a libcord.a $(CURSES) `./threadlibs`
 
 if_mach$(EXEEXT): $(srcdir)/tools/if_mach.c \
@@ -395,7 +395,7 @@ gctest$(EXEEXT): tests/gctest.o base_lib $(NODIST_OBJS) $(UTILS)
 	rm -f $@
 	./if_mach SPARC DRSNX $(CC) $(CFLAGS) -o $@ tests/gctest.o $(NODIST_OBJS) libgc.a -lucb
 	./if_mach HP_PA HPUX $(CC) $(CFLAGS) -o $@ tests/gctest.o $(NODIST_OBJS) libgc.a -ldld `./threadlibs`
-	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UGC_AMIGA_MAKINGLIB -o $@ tests/gctest.o $(NODIST_OBJS) libgc.a `./threadlibs`
+	./if_mach M68K AMIGA $(CC) $(CFLAGS) -UMANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_MAKINGLIB -o $@ tests/gctest.o $(NODIST_OBJS) libgc.a `./threadlibs`
 	./if_not_there $@ || $(CC) $(CFLAGS) -o $@ tests/gctest.o $(NODIST_OBJS) libgc.a `./threadlibs`
 
 # If an optimized setjmp_test generates a segmentation fault,
@@ -418,7 +418,7 @@ check: check-deps
 test: check
 
 # BTL: added to test shared library version of collector.
-# Currently works only under SunOS5.  Requires GC_INIT call from statically
+# Currently works only under SunOS5.  Requires MANAGED_STACK_ADDRESS_BOEHM_GC_INIT call from statically
 # loaded client code.
 ABSDIR= `pwd`
 gctest_dyn_link: tests/gctest.o libgc.so
@@ -431,12 +431,12 @@ SYM_PREFIX-libgc= GC
 
 reserved_namespace: $(SRCS)
 	for file in $(SRCS) tests/gctest.c tests/cpp.cc; do \
-		sed s/GC_/_GC_/g < $$file > tmp; \
+		sed s/MANAGED_STACK_ADDRESS_BOEHM_GC_/_MANAGED_STACK_ADDRESS_BOEHM_GC_/g < $$file > tmp; \
 		cp tmp $$file; \
 		done
 
 user_namespace: $(SRCS)
 	for file in $(SRCS) tests/gctest.c tests/cpp.cc; do \
-		sed s/_GC_/GC_/g < $$file > tmp; \
+		sed s/_MANAGED_STACK_ADDRESS_BOEHM_GC_/MANAGED_STACK_ADDRESS_BOEHM_GC_/g < $$file > tmp; \
 		cp tmp $$file; \
 		done

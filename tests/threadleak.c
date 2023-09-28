@@ -3,14 +3,14 @@
 # include "config.h"
 #endif
 
-#ifndef GC_THREADS
-# define GC_THREADS
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #endif
 
-#undef GC_NO_THREAD_REDIRECTS
+#undef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREAD_REDIRECTS
 #include "gc/leak_detector.h"
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
 # include <errno.h> /* for EAGAIN */
 # include <pthread.h>
 # include <string.h>
@@ -20,7 +20,7 @@
 # endif
 # define NOSERVICE
 # include <windows.h>
-#endif /* !GC_PTHREADS */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@
         } \
     } while (0)
 
-#ifdef GC_PTHREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
   static void *test(void *arg)
 #else
   static DWORD WINAPI test(LPVOID arg)
@@ -51,10 +51,10 @@
     for (i = 1; i < N_TESTS; ++i) {
         free(p[i]);
     }
-#   ifdef GC_PTHREADS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
       return arg;
 #   else
-      return (DWORD)(GC_word)arg;
+      return (DWORD)(MANAGED_STACK_ADDRESS_BOEHM_GC_word)arg;
 #   endif
 }
 
@@ -65,22 +65,22 @@
 int main(void) {
 # if NTHREADS > 0
     int i, n;
-#   ifdef GC_PTHREADS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
       pthread_t t[NTHREADS];
 #   else
       HANDLE t[NTHREADS];
 #   endif
 # endif
 
-    GC_set_find_leak(1); /* for new collect versions not compiled       */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(1); /* for new collect versions not compiled       */
                          /* with -DFIND_LEAK.                           */
-    GC_INIT();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INIT();
 
-    GC_allow_register_threads(); /* optional if pthread_create redirected */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_allow_register_threads(); /* optional if pthread_create redirected */
 
 # if NTHREADS > 0
     for (i = 0; i < NTHREADS; ++i) {
-#       ifdef GC_PTHREADS
+#       ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
           int code = pthread_create(t + i, 0, test, 0);
 
           if (code != 0) {
@@ -104,7 +104,7 @@ int main(void) {
     for (i = 0; i < n; ++i) {
         int code;
 
-#       ifdef GC_PTHREADS
+#       ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS
           code = pthread_join(t[i], 0);
 #       else
           code = WaitForSingleObject(t[i], INFINITE) == WAIT_OBJECT_0 ? 0 :

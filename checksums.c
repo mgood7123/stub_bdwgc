@@ -21,43 +21,43 @@
 # define OFFSET 0x10000
 
 typedef struct {
-        GC_bool new_valid;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bool new_valid;
         word old_sum;
         word new_sum;
         struct hblk * block;    /* Block to which this refers + OFFSET  */
                                 /* to hide it from collector.           */
 } page_entry;
 
-page_entry GC_sums[NSUMS];
+page_entry MANAGED_STACK_ADDRESS_BOEHM_GC_sums[NSUMS];
 
-STATIC word GC_faulted[NSUMS] = { 0 };
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_faulted[NSUMS] = { 0 };
                 /* Record of pages on which we saw a write fault.       */
 
-STATIC size_t GC_n_faulted = 0;
+STATIC size_t MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted = 0;
 
 #if defined(MPROTECT_VDB) && !defined(DARWIN)
-  void GC_record_fault(struct hblk * h)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_record_fault(struct hblk * h)
   {
-    word page = (word)h & ~(word)(GC_page_size-1);
+    word page = (word)h & ~(word)(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1);
 
-    GC_ASSERT(GC_page_size != 0);
-    if (GC_n_faulted >= NSUMS) ABORT("write fault log overflowed");
-    GC_faulted[GC_n_faulted++] = page;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size != 0);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted >= NSUMS) ABORT("write fault log overflowed");
+    MANAGED_STACK_ADDRESS_BOEHM_GC_faulted[MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted++] = page;
   }
 #endif
 
-STATIC GC_bool GC_was_faulted(struct hblk *h)
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_was_faulted(struct hblk *h)
 {
     size_t i;
-    word page = (word)h & ~(word)(GC_page_size-1);
+    word page = (word)h & ~(word)(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1);
 
-    for (i = 0; i < GC_n_faulted; ++i) {
-        if (GC_faulted[i] == page) return TRUE;
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted; ++i) {
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_faulted[i] == page) return TRUE;
     }
     return FALSE;
 }
 
-STATIC word GC_checksum(struct hblk *h)
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_checksum(struct hblk *h)
 {
     word *p = (word *)h;
     word *lim = (word *)(h+1);
@@ -69,29 +69,29 @@ STATIC word GC_checksum(struct hblk *h)
     return result | SIGNB; /* does not look like pointer */
 }
 
-int GC_n_dirty_errors = 0;
-int GC_n_faulted_dirty_errors = 0;
-unsigned long GC_n_clean = 0;
-unsigned long GC_n_dirty = 0;
+int MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty_errors = 0;
+int MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted_dirty_errors = 0;
+unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_n_clean = 0;
+unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty = 0;
 
-STATIC void GC_update_check_page(struct hblk *h, int index)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_update_check_page(struct hblk *h, int index)
 {
-    page_entry *pe = GC_sums + index;
+    page_entry *pe = MANAGED_STACK_ADDRESS_BOEHM_GC_sums + index;
     hdr * hhdr = HDR(h);
     struct hblk *b;
 
     if (pe -> block != 0 && pe -> block != h + OFFSET) ABORT("goofed");
     pe -> old_sum = pe -> new_sum;
-    pe -> new_sum = GC_checksum(h);
+    pe -> new_sum = MANAGED_STACK_ADDRESS_BOEHM_GC_checksum(h);
 #   if !defined(MSWIN32) && !defined(MSWINCE)
-        if (pe -> new_sum != SIGNB && !GC_page_was_ever_dirty(h)) {
-            GC_err_printf("GC_page_was_ever_dirty(%p) is wrong\n", (void *)h);
+        if (pe -> new_sum != SIGNB && !MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_ever_dirty(h)) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_ever_dirty(%p) is wrong\n", (void *)h);
         }
 #   endif
-    if (GC_page_was_dirty(h)) {
-        GC_n_dirty++;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_dirty(h)) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty++;
     } else {
-        GC_n_clean++;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_n_clean++;
     }
     b = h;
     while (IS_FORWARDING_ADDR_OR_NIL(hhdr) && hhdr != 0) {
@@ -101,78 +101,78 @@ STATIC void GC_update_check_page(struct hblk *h, int index)
     if (pe -> new_valid
         && hhdr != 0 && hhdr -> hb_descr != 0 /* may contain pointers */
         && pe -> old_sum != pe -> new_sum) {
-        if (!GC_page_was_dirty(h) || !GC_page_was_ever_dirty(h)) {
-            GC_bool was_faulted = GC_was_faulted(h);
-            /* Set breakpoint here */GC_n_dirty_errors++;
-            if (was_faulted) GC_n_faulted_dirty_errors++;
+        if (!MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_dirty(h) || !MANAGED_STACK_ADDRESS_BOEHM_GC_page_was_ever_dirty(h)) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_bool was_faulted = MANAGED_STACK_ADDRESS_BOEHM_GC_was_faulted(h);
+            /* Set breakpoint here */MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty_errors++;
+            if (was_faulted) MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted_dirty_errors++;
         }
     }
     pe -> new_valid = TRUE;
     pe -> block = h + OFFSET;
 }
 
-word GC_bytes_in_used_blocks = 0;
+word MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks = 0;
 
-STATIC void GC_CALLBACK GC_add_block(struct hblk *h, GC_word dummy)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_add_block(struct hblk *h, MANAGED_STACK_ADDRESS_BOEHM_GC_word dummy)
 {
    hdr * hhdr = HDR(h);
 
    UNUSED_ARG(dummy);
-   GC_bytes_in_used_blocks += (hhdr->hb_sz + HBLKSIZE-1) & ~(word)(HBLKSIZE-1);
+   MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks += (hhdr->hb_sz + HBLKSIZE-1) & ~(word)(HBLKSIZE-1);
 }
 
-STATIC void GC_check_blocks(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_check_blocks(void)
 {
-    word bytes_in_free_blocks = GC_large_free_bytes;
+    word bytes_in_free_blocks = MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes;
 
-    GC_bytes_in_used_blocks = 0;
-    GC_apply_to_all_blocks(GC_add_block, 0);
-    GC_COND_LOG_PRINTF("GC_bytes_in_used_blocks= %lu,"
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_apply_to_all_blocks(MANAGED_STACK_ADDRESS_BOEHM_GC_add_block, 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks= %lu,"
                        " bytes_in_free_blocks= %lu, heapsize= %lu\n",
-                       (unsigned long)GC_bytes_in_used_blocks,
+                       (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks,
                        (unsigned long)bytes_in_free_blocks,
-                       (unsigned long)GC_heapsize);
-    if (GC_bytes_in_used_blocks + bytes_in_free_blocks != GC_heapsize) {
-        GC_err_printf("LOST SOME BLOCKS!!\n");
+                       (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_in_used_blocks + bytes_in_free_blocks != MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("LOST SOME BLOCKS!!\n");
     }
 }
 
-/* Should be called immediately after GC_read_dirty.    */
-void GC_check_dirty(void)
+/* Should be called immediately after MANAGED_STACK_ADDRESS_BOEHM_GC_read_dirty.    */
+void MANAGED_STACK_ADDRESS_BOEHM_GC_check_dirty(void)
 {
     int index;
     unsigned i;
     struct hblk *h;
     ptr_t start;
 
-    GC_check_blocks();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_check_blocks();
 
-    GC_n_dirty_errors = 0;
-    GC_n_faulted_dirty_errors = 0;
-    GC_n_clean = 0;
-    GC_n_dirty = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty_errors = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted_dirty_errors = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_clean = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty = 0;
 
     index = 0;
-    for (i = 0; i < GC_n_heap_sects; i++) {
-        start = GC_heap_sects[i].hs_start;
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects; i++) {
+        start = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start;
         for (h = (struct hblk *)start;
-             (word)h < (word)(start + GC_heap_sects[i].hs_bytes); h++) {
-             GC_update_check_page(h, index);
+             (word)h < (word)(start + MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes); h++) {
+             MANAGED_STACK_ADDRESS_BOEHM_GC_update_check_page(h, index);
              index++;
              if (index >= NSUMS) goto out;
         }
     }
 out:
-    GC_COND_LOG_PRINTF("Checked %lu clean and %lu dirty pages\n",
-                       GC_n_clean, GC_n_dirty);
-    if (GC_n_dirty_errors > 0) {
-        GC_err_printf("Found %d dirty bit errors (%d were faulted)\n",
-                      GC_n_dirty_errors, GC_n_faulted_dirty_errors);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Checked %lu clean and %lu dirty pages\n",
+                       MANAGED_STACK_ADDRESS_BOEHM_GC_n_clean, MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty_errors > 0) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Found %d dirty bit errors (%d were faulted)\n",
+                      MANAGED_STACK_ADDRESS_BOEHM_GC_n_dirty_errors, MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted_dirty_errors);
     }
-    for (i = 0; i < GC_n_faulted; ++i) {
-        GC_faulted[i] = 0; /* Don't expose block pointers to GC */
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted; ++i) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_faulted[i] = 0; /* Don't expose block pointers to GC */
     }
-    GC_n_faulted = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_faulted = 0;
 }
 
 #endif /* CHECKSUMS */

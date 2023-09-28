@@ -56,7 +56,7 @@ it can presumably only be a starting point, and is not in the standard
 distribution.  It is unclear (to me, Hans Boehm) whether it is feasible to
 change that.
 
-Clients may need to define GC_NOT_DLL before including gc.h, if the
+Clients may need to define MANAGED_STACK_ADDRESS_BOEHM_GC_NOT_DLL before including gc.h, if the
 collector was built as a static library.
 
 GNU Tools
@@ -70,7 +70,7 @@ host) and via cross-compilation, e.g.
 "./configure --host=i686-pc-mingw32; make check"
 
 By default, configure instructs make to build the collector as a DLL (shared
-library), adding -D GC_DLL to CFLAGS.
+library), adding -D MANAGED_STACK_ADDRESS_BOEHM_GC_DLL to CFLAGS.
 
 Parallel marker is enabled by default; it could be disabled by
 "--disable-parallel-mark" option.
@@ -125,8 +125,8 @@ To compile the collector use the command:
 All programs using gc should be compiled with 4-byte alignment.
 For further explanations on this see comments about Borland.
 
-If the gc is compiled as dll, the macro "GC_DLL" should be defined before
-including "gc.h" (for example, with -DGC_DLL compiler option). It's
+If the gc is compiled as dll, the macro "MANAGED_STACK_ADDRESS_BOEHM_GC_DLL" should be defined before
+including "gc.h" (for example, with -DMANAGED_STACK_ADDRESS_BOEHM_GC_DLL compiler option). It's
 important, otherwise resulting programs will not run.
 
 The alternate way to compile the collector is to use cmake build system:
@@ -152,12 +152,12 @@ The former is slow and interacts poorly with a debugger.
 Pages are protected.  Protection faults are caught by a handler
 installed at the bottom of the handler
 stack.  Whenever possible, I recommend adding a call to
-GC_enable_incremental at the last possible moment, after most
+MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental at the last possible moment, after most
 debugging is complete.  No system
 calls are wrapped by the collector itself.  It may be necessary
 to wrap ReadFile calls that use a buffer in the heap, so that the
 call does not encounter a protection fault while it's running.
-(As usual, none of this is an issue unless GC_enable_incremental
+(As usual, none of this is an issue unless MANAGED_STACK_ADDRESS_BOEHM_GC_enable_incremental
 is called.)
 
 Note that incremental collection is disabled with -DSMALL_CONFIG.
@@ -168,8 +168,8 @@ Threads
 The collector by default handles threads similarly to other platforms.
 James Clark's code which tracks threads attached to the collector DLL still
 exists, but requires that both
-- the collector is built in a DLL with GC_DLL defined, and
-- GC_use_threads_discovery() is called before GC initialization, which
+- the collector is built in a DLL with MANAGED_STACK_ADDRESS_BOEHM_GC_DLL defined, and
+- MANAGED_STACK_ADDRESS_BOEHM_GC_use_threads_discovery() is called before GC initialization, which
   in turn must happen before creating additional threads.
 We generally recommend avoiding this if possible, since it seems to
 be less than 100% reliable.
@@ -185,21 +185,21 @@ additional threads are created.
 
 Threads are also supported in static library builds with Microsoft tools
 (e.g., NT_MAKEFILE), as well as with the CMake and GNU tools.  The collector
-must be built with GC_THREADS defined (this is the default in NT_MAKEFILE,
+must be built with MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS defined (this is the default in NT_MAKEFILE,
 CMakeLists.txt and configure).
 
 For the normal, non-dll-based thread tracking to work properly,
-threads should be created with GC_CreateThread or GC_beginthreadex,
-and exit normally, or call GC_endthreadex or GC_ExitThread.  (For Cygwin, the
+threads should be created with MANAGED_STACK_ADDRESS_BOEHM_GC_CreateThread or MANAGED_STACK_ADDRESS_BOEHM_GC_beginthreadex,
+and exit normally, or call MANAGED_STACK_ADDRESS_BOEHM_GC_endthreadex or MANAGED_STACK_ADDRESS_BOEHM_GC_ExitThread.  (For Cygwin, the
 standard pthread_create/exit calls could be used instead.)  As in the pthread
 case, including gc.h will redefine CreateThread, _beginthreadex,
-_endthreadex, and ExitThread to call the GC_ versions instead.
+_endthreadex, and ExitThread to call the MANAGED_STACK_ADDRESS_BOEHM_GC_ versions instead.
 
-Note that, as usual, GC_CreateThread tends to introduce resource leaks (in the
-C runtime) that are avoided by GC_beginthreadex.  There is currently no
+Note that, as usual, MANAGED_STACK_ADDRESS_BOEHM_GC_CreateThread tends to introduce resource leaks (in the
+C runtime) that are avoided by MANAGED_STACK_ADDRESS_BOEHM_GC_beginthreadex.  There is currently no
 equivalent of _beginthread, and it should not be used.
 
-GC_INIT should be called from the main thread before other GC calls.
+MANAGED_STACK_ADDRESS_BOEHM_GC_INIT should be called from the main thread before other GC calls.
 
 We strongly advise against using the TerminateThread() Windows API call,
 especially with the garbage collector.  Any use is likely to provoke a
@@ -208,7 +208,7 @@ correctly track threads.
 
 To build the collector for MinGW pthreads-win32 (or other non-Cygwin pthreads
 implementation for Windows), use Makefile.direct and explicitly set
-GC_WIN32_PTHREADS (or pass --enable-threads=pthreads to configure).
+MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS (or pass --enable-threads=pthreads to configure).
 Use -DPTW32_STATIC_LIB for the static threads library.
 
 The alternate (better) way to build the library is to use CMake script;

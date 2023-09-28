@@ -25,21 +25,21 @@
 /*
  * Separate free lists are maintained for different sized objects
  * up to MAXOBJBYTES.
- * The call GC_allocobj(i,k) ensures that the freelist for
+ * The call MANAGED_STACK_ADDRESS_BOEHM_GC_allocobj(i,k) ensures that the freelist for
  * kind k objects of size i points to a non-empty
  * free list. It returns a pointer to the first entry on the free list.
- * In a single-threaded world, GC_allocobj may be called to allocate
+ * In a single-threaded world, MANAGED_STACK_ADDRESS_BOEHM_GC_allocobj may be called to allocate
  * an object of small size lb (and NORMAL kind) as follows
- * (GC_generic_malloc_inner is a wrapper over GC_allocobj which also
- * fills in GC_size_map if needed):
+ * (MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner is a wrapper over MANAGED_STACK_ADDRESS_BOEHM_GC_allocobj which also
+ * fills in MANAGED_STACK_ADDRESS_BOEHM_GC_size_map if needed):
  *
- *   lg = GC_size_map[lb];
- *   op = GC_objfreelist[lg];
+ *   lg = MANAGED_STACK_ADDRESS_BOEHM_GC_size_map[lb];
+ *   op = MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist[lg];
  *   if (NULL == op) {
- *     op = GC_generic_malloc_inner(lb, NORMAL, 0);
+ *     op = MANAGED_STACK_ADDRESS_BOEHM_GC_generic_malloc_inner(lb, NORMAL, 0);
  *   } else {
- *     GC_objfreelist[lg] = obj_link(op);
- *     GC_bytes_allocd += GRANULES_TO_BYTES((word)lg);
+ *     MANAGED_STACK_ADDRESS_BOEHM_GC_objfreelist[lg] = obj_link(op);
+ *     MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd += GRANULES_TO_BYTES((word)lg);
  *   }
  *
  * Note that this is very fast if the free list is non-empty; it should
@@ -49,7 +49,7 @@
  */
 
 /*
- * The allocator uses GC_allochblk to allocate large chunks of objects.
+ * The allocator uses MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk to allocate large chunks of objects.
  * These chunks all start on addresses which are multiples of
  * HBLKSZ.   Each allocated chunk has an associated header,
  * which can be located quickly based on the address of the chunk.
@@ -59,236 +59,236 @@
  * allocator.
  */
 
-word GC_non_gc_bytes = 0;  /* Number of bytes not intended to be collected */
+word MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes = 0;  /* Number of bytes not intended to be collected */
 
-word GC_gc_no = 0;
+word MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no = 0;
 
 #ifndef NO_CLOCK
   static unsigned long full_gc_total_time = 0; /* in ms, may wrap */
   static unsigned long stopped_mark_total_time = 0;
   static unsigned32 full_gc_total_ns_frac = 0; /* fraction of 1 ms */
   static unsigned32 stopped_mark_total_ns_frac = 0;
-  static GC_bool measure_performance = FALSE;
+  static MANAGED_STACK_ADDRESS_BOEHM_GC_bool measure_performance = FALSE;
                 /* Do performance measurements if set to true (e.g.,    */
                 /* accumulation of the total time of full collections). */
 
-  GC_API void GC_CALL GC_start_performance_measurement(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_start_performance_measurement(void)
   {
     measure_performance = TRUE;
   }
 
-  GC_API unsigned long GC_CALL GC_get_full_gc_total_time(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_full_gc_total_time(void)
   {
     return full_gc_total_time;
   }
 
-  GC_API unsigned long GC_CALL GC_get_stopped_mark_total_time(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_stopped_mark_total_time(void)
   {
     return stopped_mark_total_time;
   }
 #endif /* !NO_CLOCK */
 
-#ifndef GC_DISABLE_INCREMENTAL
-  GC_INNER GC_bool GC_incremental = FALSE; /* By default, stop the world. */
-  STATIC GC_bool GC_should_start_incremental_collection = FALSE;
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_incremental = FALSE; /* By default, stop the world. */
+  STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_should_start_incremental_collection = FALSE;
 #endif
 
-GC_API int GC_CALL GC_is_incremental_mode(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_is_incremental_mode(void)
 {
-  return (int)GC_incremental;
+  return (int)MANAGED_STACK_ADDRESS_BOEHM_GC_incremental;
 }
 
 #ifdef THREADS
-  int GC_parallel = FALSE;      /* By default, parallel GC is off.      */
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_parallel = FALSE;      /* By default, parallel GC is off.      */
 #endif
 
-#if defined(GC_FULL_FREQ) && !defined(CPPCHECK)
-  int GC_full_freq = GC_FULL_FREQ;
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FULL_FREQ) && !defined(CPPCHECK)
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_full_freq = MANAGED_STACK_ADDRESS_BOEHM_GC_FULL_FREQ;
 #else
-  int GC_full_freq = 19;   /* Every 20th collection is a full   */
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_full_freq = 19;   /* Every 20th collection is a full   */
                            /* collection, whether we need it    */
                            /* or not.                           */
 #endif
 
-STATIC GC_bool GC_need_full_gc = FALSE;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_need_full_gc = FALSE;
                            /* Need full GC due to heap growth.  */
 
 #ifdef THREAD_LOCAL_ALLOC
-  GC_INNER GC_bool GC_world_stopped = FALSE;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped = FALSE;
 #endif
 
-STATIC GC_bool GC_disable_automatic_collection = FALSE;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_disable_automatic_collection = FALSE;
 
-GC_API void GC_CALL GC_set_disable_automatic_collection(int value)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_disable_automatic_collection(int value)
 {
   LOCK();
-  GC_disable_automatic_collection = (GC_bool)value;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_disable_automatic_collection = (MANAGED_STACK_ADDRESS_BOEHM_GC_bool)value;
   UNLOCK();
 }
 
-GC_API int GC_CALL GC_get_disable_automatic_collection(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_disable_automatic_collection(void)
 {
   int value;
 
   LOCK();
-  value = (int)GC_disable_automatic_collection;
+  value = (int)MANAGED_STACK_ADDRESS_BOEHM_GC_disable_automatic_collection;
   UNLOCK();
   return value;
 }
 
-STATIC word GC_used_heap_size_after_full = 0;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_used_heap_size_after_full = 0;
 
 /* Version macros are now defined in gc_version.h, which is included by */
 /* gc.h, which is included by gc_priv.h.                                */
-#ifndef GC_NO_VERSION_VAR
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VERSION_VAR
   EXTERN_C_BEGIN
-  extern const GC_VERSION_VAL_T GC_version;
+  extern const MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_VAL_T MANAGED_STACK_ADDRESS_BOEHM_GC_version;
   EXTERN_C_END
 
-  const GC_VERSION_VAL_T GC_version =
-                ((GC_VERSION_VAL_T)GC_VERSION_MAJOR << 16)
-                | (GC_VERSION_MINOR << 8) | GC_VERSION_MICRO;
+  const MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_VAL_T MANAGED_STACK_ADDRESS_BOEHM_GC_version =
+                ((MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_VAL_T)MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR << 16)
+                | (MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MINOR << 8) | MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MICRO;
 #endif
 
-GC_API GC_VERSION_VAL_T GC_CALL GC_get_version(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_VAL_T MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_version(void)
 {
-  return ((GC_VERSION_VAL_T)GC_VERSION_MAJOR << 16)
-         | (GC_VERSION_MINOR << 8) | GC_VERSION_MICRO;
+  return ((MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_VAL_T)MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MAJOR << 16)
+         | (MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MINOR << 8) | MANAGED_STACK_ADDRESS_BOEHM_GC_VERSION_MICRO;
 }
 
 /* some more variables */
 
-#ifdef GC_DONT_EXPAND
-  int GC_dont_expand = TRUE;
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_DONT_EXPAND
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_dont_expand = TRUE;
 #else
-  int GC_dont_expand = FALSE;
+  int MANAGED_STACK_ADDRESS_BOEHM_GC_dont_expand = FALSE;
 #endif
 
-#if defined(GC_FREE_SPACE_DIVISOR) && !defined(CPPCHECK)
-  word GC_free_space_divisor = GC_FREE_SPACE_DIVISOR; /* must be > 0 */
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREE_SPACE_DIVISOR) && !defined(CPPCHECK)
+  word MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor = MANAGED_STACK_ADDRESS_BOEHM_GC_FREE_SPACE_DIVISOR; /* must be > 0 */
 #else
-  word GC_free_space_divisor = 3;
+  word MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor = 3;
 #endif
 
-GC_INNER int GC_CALLBACK GC_never_stop_func(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER int MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func(void)
 {
   return FALSE;
 }
 
-#if defined(GC_TIME_LIMIT) && !defined(CPPCHECK)
-  unsigned long GC_time_limit = GC_TIME_LIMIT;
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT) && !defined(CPPCHECK)
+  unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit = MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_LIMIT;
                            /* We try to keep pause times from exceeding  */
                            /* this by much. In milliseconds.             */
 #elif defined(PARALLEL_MARK)
-  unsigned long GC_time_limit = GC_TIME_UNLIMITED;
+  unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit = MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED;
                         /* The parallel marker cannot be interrupted for */
                         /* now, so the time limit is absent by default.  */
 #else
-  unsigned long GC_time_limit = 15;
+  unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit = 15;
 #endif
 
 #ifndef NO_CLOCK
-  STATIC unsigned long GC_time_lim_nsec = 0;
-                        /* The nanoseconds add-on to GC_time_limit      */
-                        /* value.  Not updated by GC_set_time_limit().  */
-                        /* Ignored if the value of GC_time_limit is     */
-                        /* GC_TIME_UNLIMITED.                           */
+  STATIC unsigned long MANAGED_STACK_ADDRESS_BOEHM_GC_time_lim_nsec = 0;
+                        /* The nanoseconds add-on to MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit      */
+                        /* value.  Not updated by MANAGED_STACK_ADDRESS_BOEHM_GC_set_time_limit().  */
+                        /* Ignored if the value of MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit is     */
+                        /* MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED.                           */
 
 # define TV_NSEC_LIMIT (1000UL * 1000) /* amount of nanoseconds in 1 ms */
 
-  GC_API void GC_CALL GC_set_time_limit_tv(struct GC_timeval_s tv)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_time_limit_tv(struct MANAGED_STACK_ADDRESS_BOEHM_GC_timeval_s tv)
   {
-    GC_ASSERT(tv.tv_ms <= GC_TIME_UNLIMITED);
-    GC_ASSERT(tv.tv_nsec < TV_NSEC_LIMIT);
-    GC_time_limit = tv.tv_ms;
-    GC_time_lim_nsec = tv.tv_nsec;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(tv.tv_ms <= MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(tv.tv_nsec < TV_NSEC_LIMIT);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit = tv.tv_ms;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_time_lim_nsec = tv.tv_nsec;
   }
 
-  GC_API struct GC_timeval_s GC_CALL GC_get_time_limit_tv(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API struct MANAGED_STACK_ADDRESS_BOEHM_GC_timeval_s MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_time_limit_tv(void)
   {
-    struct GC_timeval_s tv;
+    struct MANAGED_STACK_ADDRESS_BOEHM_GC_timeval_s tv;
 
-    tv.tv_ms = GC_time_limit;
-    tv.tv_nsec = GC_time_lim_nsec;
+    tv.tv_ms = MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit;
+    tv.tv_nsec = MANAGED_STACK_ADDRESS_BOEHM_GC_time_lim_nsec;
     return tv;
   }
 
-  STATIC CLOCK_TYPE GC_start_time = CLOCK_TYPE_INITIALIZER;
+  STATIC CLOCK_TYPE MANAGED_STACK_ADDRESS_BOEHM_GC_start_time = CLOCK_TYPE_INITIALIZER;
                                 /* Time at which we stopped world.      */
-                                /* used only in GC_timeout_stop_func.   */
+                                /* used only in MANAGED_STACK_ADDRESS_BOEHM_GC_timeout_stop_func.   */
 #endif /* !NO_CLOCK */
 
-STATIC int GC_n_attempts = 0;   /* Number of attempts at finishing      */
-                                /* collection within GC_time_limit.     */
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts = 0;   /* Number of attempts at finishing      */
+                                /* collection within MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit.     */
 
-STATIC GC_stop_func GC_default_stop_func = GC_never_stop_func;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func = MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func;
                                 /* Accessed holding the allocator lock. */
 
-GC_API void GC_CALL GC_set_stop_func(GC_stop_func stop_func)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_stop_func(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func)
 {
-  GC_ASSERT(NONNULL_ARG_NOT_NULL(stop_func));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NONNULL_ARG_NOT_NULL(stop_func));
   LOCK();
-  GC_default_stop_func = stop_func;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func = stop_func;
   UNLOCK();
 }
 
-GC_API GC_stop_func GC_CALL GC_get_stop_func(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_stop_func(void)
 {
-  GC_stop_func stop_func;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func;
 
   LOCK();
-  stop_func = GC_default_stop_func;
+  stop_func = MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func;
   UNLOCK();
   return stop_func;
 }
 
-#if defined(GC_DISABLE_INCREMENTAL) || defined(NO_CLOCK)
-# define GC_timeout_stop_func GC_default_stop_func
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL) || defined(NO_CLOCK)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_timeout_stop_func MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func
 #else
-  STATIC int GC_CALLBACK GC_timeout_stop_func(void)
+  STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_CALLBACK MANAGED_STACK_ADDRESS_BOEHM_GC_timeout_stop_func(void)
   {
     CLOCK_TYPE current_time;
     static unsigned count = 0;
     unsigned long time_diff, nsec_diff;
 
-    if (GC_default_stop_func())
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func())
       return TRUE;
 
-    if (GC_time_limit == GC_TIME_UNLIMITED || (count++ & 3) != 0)
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit == MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED || (count++ & 3) != 0)
       return FALSE;
 
     GET_TIME(current_time);
-    time_diff = MS_TIME_DIFF(current_time, GC_start_time);
-    nsec_diff = NS_FRAC_TIME_DIFF(current_time, GC_start_time);
+    time_diff = MS_TIME_DIFF(current_time, MANAGED_STACK_ADDRESS_BOEHM_GC_start_time);
+    nsec_diff = NS_FRAC_TIME_DIFF(current_time, MANAGED_STACK_ADDRESS_BOEHM_GC_start_time);
 #   if defined(CPPCHECK)
-      GC_noop1((word)&nsec_diff);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)&nsec_diff);
 #   endif
-    if (time_diff >= GC_time_limit
-        && (time_diff > GC_time_limit || nsec_diff >= GC_time_lim_nsec)) {
-      GC_COND_LOG_PRINTF("Abandoning stopped marking after %lu ms %lu ns"
+    if (time_diff >= MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit
+        && (time_diff > MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit || nsec_diff >= MANAGED_STACK_ADDRESS_BOEHM_GC_time_lim_nsec)) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Abandoning stopped marking after %lu ms %lu ns"
                          " (attempt %d)\n",
-                         time_diff, nsec_diff, GC_n_attempts);
+                         time_diff, nsec_diff, MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts);
       return TRUE;
     }
 
     return FALSE;
   }
-#endif /* !GC_DISABLE_INCREMENTAL */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL */
 
 #ifdef THREADS
-  GC_INNER word GC_total_stacksize = 0; /* updated on every push_all_stacks */
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER word MANAGED_STACK_ADDRESS_BOEHM_GC_total_stacksize = 0; /* updated on every push_all_stacks */
 #endif
 
 static size_t min_bytes_allocd_minimum = 1;
                         /* The lowest value returned by min_bytes_allocd(). */
 
-GC_API void GC_CALL GC_set_min_bytes_allocd(size_t value)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_min_bytes_allocd(size_t value)
 {
-    GC_ASSERT(value > 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(value > 0);
     min_bytes_allocd_minimum = value;
 }
 
-GC_API size_t GC_CALL GC_get_min_bytes_allocd(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API size_t MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_min_bytes_allocd(void)
 {
     return min_bytes_allocd_minimum;
 }
@@ -306,12 +306,12 @@ static word min_bytes_allocd(void)
                                 /* during normal GC.                    */
 
 #   ifdef THREADS
-      if (GC_need_to_lock) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_need_to_lock) {
         /* We are multi-threaded... */
-        stack_size = GC_total_stacksize;
+        stack_size = MANAGED_STACK_ADDRESS_BOEHM_GC_total_stacksize;
         /* For now, we just use the value computed during the latest GC. */
 #       ifdef DEBUG_THREADS
-          GC_log_printf("Total stacks size: %lu\n",
+          MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Total stacks size: %lu\n",
                         (unsigned long)stack_size);
 #       endif
       } else
@@ -320,60 +320,60 @@ static word min_bytes_allocd(void)
 #     ifdef STACK_NOT_SCANNED
         stack_size = 0;
 #     elif defined(STACK_GROWS_UP)
-        stack_size = (word)(GC_approx_sp() - GC_stackbottom);
+        stack_size = (word)(MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp() - MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom);
 #     else
-        stack_size = (word)(GC_stackbottom - GC_approx_sp());
+        stack_size = (word)(MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom - MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp());
 #     endif
     }
 
-    total_root_size = 2 * stack_size + GC_root_size;
-    scan_size = 2 * GC_composite_in_use + GC_atomic_in_use / 4
+    total_root_size = 2 * stack_size + MANAGED_STACK_ADDRESS_BOEHM_GC_root_size;
+    scan_size = 2 * MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use + MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use / 4
                 + total_root_size;
-    result = scan_size / GC_free_space_divisor;
-    if (GC_incremental) {
+    result = scan_size / MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental) {
       result /= 2;
     }
     return result > min_bytes_allocd_minimum
             ? result : min_bytes_allocd_minimum;
 }
 
-STATIC word GC_non_gc_bytes_at_gc = 0;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes_at_gc = 0;
                 /* Number of explicitly managed bytes of storage        */
                 /* at last collection.                                  */
 
 /* Return the number of bytes allocated, adjusted for explicit storage  */
 /* management, etc.  This number is used in deciding when to trigger    */
 /* collections.                                                         */
-STATIC word GC_adj_bytes_allocd(void)
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_adj_bytes_allocd(void)
 {
     signed_word result;
-    signed_word expl_managed = (signed_word)GC_non_gc_bytes
-                                - (signed_word)GC_non_gc_bytes_at_gc;
+    signed_word expl_managed = (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes
+                                - (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes_at_gc;
 
     /* Don't count what was explicitly freed, or newly allocated for    */
     /* explicit management.  Note that deallocating an explicitly       */
     /* managed object should not alter result, assuming the client      */
     /* is playing by the rules.                                         */
-    result = (signed_word)GC_bytes_allocd
-             + (signed_word)GC_bytes_dropped
-             - (signed_word)GC_bytes_freed
-             + (signed_word)GC_finalizer_bytes_freed
+    result = (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd
+             + (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_dropped
+             - (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_freed
+             + (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_bytes_freed
              - expl_managed;
-    if (result > (signed_word)GC_bytes_allocd) {
-        result = (signed_word)GC_bytes_allocd;
+    if (result > (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd) {
+        result = (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd;
         /* probably client bug or unfortunate scheduling */
     }
-    result += (signed_word)GC_bytes_finalized;
+    result += (signed_word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_finalized;
         /* We count objects enqueued for finalization as though they    */
         /* had been reallocated this round. Finalization is user        */
         /* visible progress.  And if we don't count this, we have       */
         /* stability problems for programs that finalize all objects.   */
-    if (result < (signed_word)(GC_bytes_allocd >> 3)) {
+    if (result < (signed_word)(MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd >> 3)) {
         /* Always count at least 1/8 of the allocations.  We don't want */
         /* to collect too infrequently, since that would inhibit        */
         /* coalescing of free storage blocks.                           */
         /* This also makes us partially robust against client bugs.     */
-        result = (signed_word)(GC_bytes_allocd >> 3);
+        result = (signed_word)(MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd >> 3);
     }
     return (word)result;
 }
@@ -384,7 +384,7 @@ STATIC word GC_adj_bytes_allocd(void)
 /* on the stack by other parts of the collector as roots.  This         */
 /* differs from the code in misc.c, which actually tries to keep the    */
 /* stack clear of long-lived, client-generated garbage.                 */
-STATIC void GC_clear_a_few_frames(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_clear_a_few_frames(void)
 {
 #   ifndef CLEAR_NWORDS
 #     define CLEAR_NWORDS 64
@@ -394,16 +394,16 @@ STATIC void GC_clear_a_few_frames(void)
           CLEAR_NWORDS * sizeof(word));
 }
 
-GC_API void GC_CALL GC_start_incremental_collection(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_start_incremental_collection(void)
 {
-# ifndef GC_DISABLE_INCREMENTAL
-    if (!GC_incremental) return;
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_incremental) return;
 
     LOCK();
-    GC_should_start_incremental_collection = TRUE;
-    if (!GC_dont_gc) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_should_start_incremental_collection = TRUE;
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
       ENTER_GC();
-      GC_collect_a_little_inner(1);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1);
       EXIT_GC();
     }
     UNLOCK();
@@ -411,94 +411,94 @@ GC_API void GC_CALL GC_start_incremental_collection(void)
 }
 
 /* Have we allocated enough to amortize a collection? */
-GC_INNER GC_bool GC_should_collect(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_should_collect(void)
 {
     static word last_min_bytes_allocd;
     static word last_gc_no;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    if (last_gc_no != GC_gc_no) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    if (last_gc_no != MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no) {
       last_min_bytes_allocd = min_bytes_allocd();
-      last_gc_no = GC_gc_no;
+      last_gc_no = MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
     }
-# ifndef GC_DISABLE_INCREMENTAL
-    if (GC_should_start_incremental_collection) {
-      GC_should_start_incremental_collection = FALSE;
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_should_start_incremental_collection) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_should_start_incremental_collection = FALSE;
       return TRUE;
     }
 # endif
-    if (GC_disable_automatic_collection) return FALSE;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_disable_automatic_collection) return FALSE;
 
-    if (GC_last_heap_growth_gc_no == GC_gc_no)
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_growth_gc_no == MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no)
       return TRUE; /* avoid expanding past limits used by blacklisting  */
 
-    return GC_adj_bytes_allocd() >= last_min_bytes_allocd;
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_adj_bytes_allocd() >= last_min_bytes_allocd;
 }
 
-/* STATIC */ GC_start_callback_proc GC_start_call_back = 0;
+/* STATIC */ MANAGED_STACK_ADDRESS_BOEHM_GC_start_callback_proc MANAGED_STACK_ADDRESS_BOEHM_GC_start_call_back = 0;
                         /* Called at start of full collections.         */
                         /* Not called if 0.  Called with the allocation */
                         /* lock held.  Not used by GC itself.           */
 
-GC_API void GC_CALL GC_set_start_callback(GC_start_callback_proc fn)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_start_callback(MANAGED_STACK_ADDRESS_BOEHM_GC_start_callback_proc fn)
 {
     LOCK();
-    GC_start_call_back = fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_start_call_back = fn;
     UNLOCK();
 }
 
-GC_API GC_start_callback_proc GC_CALL GC_get_start_callback(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_start_callback_proc MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_start_callback(void)
 {
-    GC_start_callback_proc fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_start_callback_proc fn;
 
     LOCK();
-    fn = GC_start_call_back;
+    fn = MANAGED_STACK_ADDRESS_BOEHM_GC_start_call_back;
     UNLOCK();
     return fn;
 }
 
-GC_INLINE void GC_notify_full_gc(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE void MANAGED_STACK_ADDRESS_BOEHM_GC_notify_full_gc(void)
 {
-    if (GC_start_call_back != 0) {
-        (*GC_start_call_back)();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_start_call_back != 0) {
+        (*MANAGED_STACK_ADDRESS_BOEHM_GC_start_call_back)();
     }
 }
 
-STATIC GC_bool GC_is_full_gc = FALSE;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc = FALSE;
 
-STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func);
-STATIC void GC_finish_collection(void);
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_stopped_mark(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func);
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_finish_collection(void);
 
 /* Initiate a garbage collection if appropriate.  Choose judiciously    */
 /* between partial, full, and stop-world collections.                   */
-STATIC void GC_maybe_gc(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_maybe_gc(void)
 {
   static int n_partial_gcs = 0;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   ASSERT_CANCEL_DISABLED();
-  if (!GC_should_collect()) return;
+  if (!MANAGED_STACK_ADDRESS_BOEHM_GC_should_collect()) return;
 
-  if (!GC_incremental) {
-    GC_gcollect_inner();
+  if (!MANAGED_STACK_ADDRESS_BOEHM_GC_incremental) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect_inner();
     return;
   }
 
-  GC_ASSERT(!GC_collection_in_progress());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress());
 # ifdef PARALLEL_MARK
-    if (GC_parallel)
-      GC_wait_for_reclaim();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim();
 # endif
-  if (GC_need_full_gc || n_partial_gcs >= GC_full_freq) {
-    GC_COND_LOG_PRINTF(
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_need_full_gc || n_partial_gcs >= MANAGED_STACK_ADDRESS_BOEHM_GC_full_freq) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF(
                 "***>Full mark for collection #%lu after %lu allocd bytes\n",
-                (unsigned long)GC_gc_no + 1, (unsigned long)GC_bytes_allocd);
-    GC_promote_black_lists();
-    (void)GC_reclaim_all((GC_stop_func)0, TRUE);
-    GC_notify_full_gc();
-    GC_clear_marks();
+                (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no + 1, (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_promote_black_lists();
+    (void)MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all((MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func)0, TRUE);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_notify_full_gc();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_clear_marks();
     n_partial_gcs = 0;
-    GC_is_full_gc = TRUE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc = TRUE;
   } else {
     n_partial_gcs++;
   }
@@ -506,114 +506,114 @@ STATIC void GC_maybe_gc(void)
   /* Try to mark with the world stopped.  If we run out of      */
   /* time, this turns into an incremental marking.              */
 # ifndef NO_CLOCK
-    if (GC_time_limit != GC_TIME_UNLIMITED) GET_TIME(GC_start_time);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit != MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED) GET_TIME(MANAGED_STACK_ADDRESS_BOEHM_GC_start_time);
 # endif
-  if (GC_stopped_mark(GC_timeout_stop_func)) {
+  if (MANAGED_STACK_ADDRESS_BOEHM_GC_stopped_mark(MANAGED_STACK_ADDRESS_BOEHM_GC_timeout_stop_func)) {
 #   ifdef SAVE_CALL_CHAIN
-      GC_save_callers(GC_last_stack);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(MANAGED_STACK_ADDRESS_BOEHM_GC_last_stack);
 #   endif
-    GC_finish_collection();
-  } else if (!GC_is_full_gc) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finish_collection();
+  } else if (!MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc) {
     /* Count this as the first attempt. */
-    GC_n_attempts++;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts++;
   }
 }
 
-STATIC GC_on_collection_event_proc GC_on_collection_event = 0;
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event_proc MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event = 0;
 
-GC_API void GC_CALL GC_set_on_collection_event(GC_on_collection_event_proc fn)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event_proc fn)
 {
     /* fn may be 0 (means no event notifier). */
     LOCK();
-    GC_on_collection_event = fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event = fn;
     UNLOCK();
 }
 
-GC_API GC_on_collection_event_proc GC_CALL GC_get_on_collection_event(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event_proc MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_on_collection_event(void)
 {
-    GC_on_collection_event_proc fn;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event_proc fn;
 
     LOCK();
-    fn = GC_on_collection_event;
+    fn = MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event;
     UNLOCK();
     return fn;
 }
 
 /* Stop the world garbage collection.  If stop_func is not      */
-/* GC_never_stop_func then abort if stop_func returns TRUE.     */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func then abort if stop_func returns TRUE.     */
 /* Return TRUE if we successfully completed the collection.     */
-GC_INNER GC_bool GC_try_to_collect_inner(GC_stop_func stop_func)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func)
 {
 #   ifndef NO_CLOCK
       CLOCK_TYPE start_time = CLOCK_TYPE_INITIALIZER;
-      GC_bool start_time_valid;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_bool start_time_valid;
 #   endif
 
     ASSERT_CANCEL_DISABLED();
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_initialized);
-    if (GC_dont_gc || (*stop_func)()) return FALSE;
-    if (GC_on_collection_event)
-      GC_on_collection_event(GC_EVENT_START);
-    if (GC_incremental && GC_collection_in_progress()) {
-      GC_COND_LOG_PRINTF(
-            "GC_try_to_collect_inner: finishing collection in progress\n");
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc || (*stop_func)()) return FALSE;
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_START);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress()) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF(
+            "MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner: finishing collection in progress\n");
       /* Just finish collection already in progress.    */
         do {
             if ((*stop_func)()) {
-              /* TODO: Notify GC_EVENT_ABANDON */
+              /* TODO: Notify MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_ABANDON */
               return FALSE;
             }
             ENTER_GC();
-            GC_collect_a_little_inner(1);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1);
             EXIT_GC();
-        } while (GC_collection_in_progress());
+        } while (MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress());
     }
-    GC_notify_full_gc();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_notify_full_gc();
 #   ifndef NO_CLOCK
       start_time_valid = FALSE;
-      if ((GC_print_stats | (int)measure_performance) != 0) {
-        if (GC_print_stats)
-          GC_log_printf("Initiating full world-stop collection!\n");
+      if ((MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats | (int)measure_performance) != 0) {
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Initiating full world-stop collection!\n");
         start_time_valid = TRUE;
         GET_TIME(start_time);
       }
 #   endif
-    GC_promote_black_lists();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_promote_black_lists();
     /* Make sure all blocks have been reclaimed, so sweep routines      */
     /* don't see cleared mark bits.                                     */
     /* If we're guaranteed to finish, then this is unnecessary.         */
     /* In the find_leak case, we have to finish to guarantee that       */
     /* previously unmarked objects are not reported as leaks.           */
 #       ifdef PARALLEL_MARK
-          if (GC_parallel)
-            GC_wait_for_reclaim();
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel)
+            MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim();
 #       endif
-        if ((GC_find_leak || stop_func != GC_never_stop_func)
-            && !GC_reclaim_all(stop_func, FALSE)) {
+        if ((MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak || stop_func != MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func)
+            && !MANAGED_STACK_ADDRESS_BOEHM_GC_reclaim_all(stop_func, FALSE)) {
             /* Aborted.  So far everything is still consistent. */
-            /* TODO: Notify GC_EVENT_ABANDON */
+            /* TODO: Notify MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_ABANDON */
             return FALSE;
         }
-    GC_invalidate_mark_state();  /* Flush mark stack.   */
-    GC_clear_marks();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_invalidate_mark_state();  /* Flush mark stack.   */
+    MANAGED_STACK_ADDRESS_BOEHM_GC_clear_marks();
 #   ifdef SAVE_CALL_CHAIN
-        GC_save_callers(GC_last_stack);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(MANAGED_STACK_ADDRESS_BOEHM_GC_last_stack);
 #   endif
-    GC_is_full_gc = TRUE;
-    if (!GC_stopped_mark(stop_func)) {
-      if (!GC_incremental) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc = TRUE;
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_stopped_mark(stop_func)) {
+      if (!MANAGED_STACK_ADDRESS_BOEHM_GC_incremental) {
         /* We're partially done and have no way to complete or use      */
         /* current work.  Reestablish invariants as cheaply as          */
         /* possible.                                                    */
-        GC_invalidate_mark_state();
-        GC_unpromote_black_lists();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_invalidate_mark_state();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_unpromote_black_lists();
       } /* else we claim the world is already still consistent.  We'll  */
         /* finish incrementally.                                        */
-      /* TODO: Notify GC_EVENT_ABANDON */
+      /* TODO: Notify MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_ABANDON */
       return FALSE;
     }
-    GC_finish_collection();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finish_collection();
 #   ifndef NO_CLOCK
       if (start_time_valid) {
         CLOCK_TYPE current_time;
@@ -631,40 +631,40 @@ GC_INNER GC_bool GC_try_to_collect_inner(GC_stop_func stop_func)
             full_gc_total_time++;
           }
         }
-        if (GC_print_stats)
-          GC_log_printf("Complete collection took %lu ms %lu ns\n",
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Complete collection took %lu ms %lu ns\n",
                         time_diff, ns_frac_diff);
       }
 #   endif
-    if (GC_on_collection_event)
-      GC_on_collection_event(GC_EVENT_END);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_END);
     return TRUE;
 }
 
-/* The number of extra calls to GC_mark_some that we have made. */
-STATIC int GC_deficit = 0;
+/* The number of extra calls to MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some that we have made. */
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_deficit = 0;
 
-/* The default value of GC_rate.        */
-#ifndef GC_RATE
-# define GC_RATE 10
+/* The default value of MANAGED_STACK_ADDRESS_BOEHM_GC_rate.        */
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_RATE
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_RATE 10
 #endif
 
-/* When GC_collect_a_little_inner() performs n units of GC work, a unit */
-/* is intended to touch roughly GC_rate pages.  (But, every once in     */
+/* When MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner() performs n units of GC work, a unit */
+/* is intended to touch roughly MANAGED_STACK_ADDRESS_BOEHM_GC_rate pages.  (But, every once in     */
 /* a while, we do more than that.)  This needs to be a fairly large     */
 /* number with our current incremental GC strategy, since otherwise we  */
 /* allocate too much during GC, and the cleanup gets expensive.         */
-STATIC int GC_rate = GC_RATE;
+STATIC int MANAGED_STACK_ADDRESS_BOEHM_GC_rate = MANAGED_STACK_ADDRESS_BOEHM_GC_RATE;
 
-GC_API void GC_CALL GC_set_rate(int value)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_rate(int value)
 {
-    GC_ASSERT(value > 0);
-    GC_rate = value;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(value > 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_rate = value;
 }
 
-GC_API int GC_CALL GC_get_rate(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_rate(void)
 {
-    return GC_rate;
+    return MANAGED_STACK_ADDRESS_BOEHM_GC_rate;
 }
 
 /* The default maximum number of prior attempts at world stop marking.  */
@@ -677,114 +677,114 @@ GC_API int GC_CALL GC_get_rate(void)
 /* long it takes.  Does not count the initial root scan for a full GC.  */
 static int max_prior_attempts = MAX_PRIOR_ATTEMPTS;
 
-GC_API void GC_CALL GC_set_max_prior_attempts(int value)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_max_prior_attempts(int value)
 {
-    GC_ASSERT(value >= 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(value >= 0);
     max_prior_attempts = value;
 }
 
-GC_API int GC_CALL GC_get_max_prior_attempts(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_max_prior_attempts(void)
 {
     return max_prior_attempts;
 }
 
-GC_INNER void GC_collect_a_little_inner(int n)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(int n)
 {
     IF_CANCEL(int cancel_state;)
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
     DISABLE_CANCEL(cancel_state);
-    if (GC_incremental && GC_collection_in_progress()) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress()) {
         int i;
-        int max_deficit = GC_rate * n;
+        int max_deficit = MANAGED_STACK_ADDRESS_BOEHM_GC_rate * n;
 
 #       ifdef PARALLEL_MARK
-            if (GC_time_limit != GC_TIME_UNLIMITED)
-                GC_parallel_mark_disabled = TRUE;
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit != MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED)
+                MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled = TRUE;
 #       endif
-        for (i = GC_deficit; i < max_deficit; i++) {
-            if (GC_mark_some(NULL))
+        for (i = MANAGED_STACK_ADDRESS_BOEHM_GC_deficit; i < max_deficit; i++) {
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some(NULL))
                 break;
         }
 #       ifdef PARALLEL_MARK
-            GC_parallel_mark_disabled = FALSE;
+            MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled = FALSE;
 #       endif
 
-        if (i < max_deficit && !GC_dont_gc) {
-            GC_ASSERT(!GC_collection_in_progress());
+        if (i < max_deficit && !MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress());
             /* Need to follow up with a full collection.        */
 #           ifdef SAVE_CALL_CHAIN
-                GC_save_callers(GC_last_stack);
+                MANAGED_STACK_ADDRESS_BOEHM_GC_save_callers(MANAGED_STACK_ADDRESS_BOEHM_GC_last_stack);
 #           endif
 #           ifdef PARALLEL_MARK
-                if (GC_parallel)
-                    GC_wait_for_reclaim();
+                if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel)
+                    MANAGED_STACK_ADDRESS_BOEHM_GC_wait_for_reclaim();
 #           endif
 #           ifndef NO_CLOCK
-                if (GC_time_limit != GC_TIME_UNLIMITED
-                        && GC_n_attempts < max_prior_attempts)
-                    GET_TIME(GC_start_time);
+                if (MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit != MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED
+                        && MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts < max_prior_attempts)
+                    GET_TIME(MANAGED_STACK_ADDRESS_BOEHM_GC_start_time);
 #           endif
-            if (GC_stopped_mark(GC_n_attempts < max_prior_attempts ?
-                                GC_timeout_stop_func : GC_never_stop_func)) {
-                GC_finish_collection();
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_stopped_mark(MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts < max_prior_attempts ?
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_timeout_stop_func : MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func)) {
+                MANAGED_STACK_ADDRESS_BOEHM_GC_finish_collection();
             } else {
-                GC_n_attempts++;
+                MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts++;
             }
         }
-        if (GC_deficit > 0) {
-            GC_deficit -= max_deficit;
-            if (GC_deficit < 0)
-                GC_deficit = 0;
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_deficit > 0) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_deficit -= max_deficit;
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_deficit < 0)
+                MANAGED_STACK_ADDRESS_BOEHM_GC_deficit = 0;
         }
-    } else if (!GC_dont_gc) {
-        GC_maybe_gc();
+    } else if (!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_maybe_gc();
     }
     RESTORE_CANCEL(cancel_state);
 }
 
-GC_INNER void (*GC_check_heap)(void) = 0;
-GC_INNER void (*GC_print_all_smashed)(void) = 0;
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void (*MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap)(void) = 0;
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void (*MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed)(void) = 0;
 
-GC_API int GC_CALL GC_collect_a_little(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little(void)
 {
     int result;
 
-    if (!EXPECT(GC_is_initialized, TRUE)) GC_init();
+    if (!EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized, TRUE)) MANAGED_STACK_ADDRESS_BOEHM_GC_init();
     LOCK();
     ENTER_GC();
     /* Note: if the collection is in progress, this may do marking (not */
     /* stopping the world) even in case of disabled GC.                 */
-    GC_collect_a_little_inner(1);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1);
     EXIT_GC();
-    result = (int)GC_collection_in_progress();
+    result = (int)MANAGED_STACK_ADDRESS_BOEHM_GC_collection_in_progress();
     UNLOCK();
-    if (!result && GC_debugging_started) GC_print_all_smashed();
+    if (!result && MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed();
     return result;
 }
 
 #ifdef THREADS
-  GC_API void GC_CALL GC_stop_world_external(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_stop_world_external(void)
   {
-    GC_ASSERT(GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
     LOCK();
 #   ifdef THREAD_LOCAL_ALLOC
-      GC_ASSERT(!GC_world_stopped);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped);
 #   endif
     STOP_WORLD();
 #   ifdef THREAD_LOCAL_ALLOC
-      GC_world_stopped = TRUE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped = TRUE;
 #   endif
   }
 
-  GC_API void GC_CALL GC_start_world_external(void)
+  MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_start_world_external(void)
   {
 #   ifdef THREAD_LOCAL_ALLOC
-      GC_ASSERT(GC_world_stopped);
-      GC_world_stopped = FALSE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped = FALSE;
 #   else
-      GC_ASSERT(GC_is_initialized);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
 #   endif
     START_WORLD();
     UNLOCK();
@@ -809,7 +809,7 @@ GC_API int GC_CALL GC_collect_a_little(void)
 # ifndef MUNMAP_THRESHOLD
 #   define MUNMAP_THRESHOLD 7
 # endif
-  GC_INNER unsigned GC_unmap_threshold = MUNMAP_THRESHOLD;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_INNER unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold = MUNMAP_THRESHOLD;
 
 # define IF_USE_MUNMAP(x) x
 # define COMMA_IF_USE_MUNMAP(x) /* comma */, x
@@ -819,77 +819,77 @@ GC_API int GC_CALL GC_collect_a_little(void)
 #endif
 
 /* We stop the world and mark from all roots.  If stop_func() ever      */
-/* returns TRUE, we may fail and return FALSE.  Increment GC_gc_no if   */
+/* returns TRUE, we may fail and return FALSE.  Increment MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no if   */
 /* we succeed.                                                          */
-STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_stopped_mark(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func)
 {
-    int abandoned_at;
-    ptr_t cold_gc_frame = GC_approx_sp();
+    int abandoned_at = 0;
+    ptr_t cold_gc_frame = MANAGED_STACK_ADDRESS_BOEHM_GC_approx_sp();
 #   ifndef NO_CLOCK
       CLOCK_TYPE start_time = CLOCK_TYPE_INITIALIZER;
-      GC_bool start_time_valid = FALSE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_bool start_time_valid = FALSE;
 #   endif
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
 #   if !defined(REDIRECT_MALLOC) && defined(USE_WINALLOC)
-        GC_add_current_malloc_heap();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_add_current_malloc_heap();
 #   endif
 #   if defined(REGISTER_LIBRARIES_EARLY)
-        GC_cond_register_dynamic_libraries();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_cond_register_dynamic_libraries();
 #   endif
 
-#   if !defined(GC_NO_FINALIZATION) && !defined(GC_TOGGLE_REFS_NOT_NEEDED)
-      GC_process_togglerefs();
+#   if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_TOGGLE_REFS_NOT_NEEDED)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_process_togglerefs();
 #   endif
 
         /* Output blank line for convenience here.      */
-    GC_COND_LOG_PRINTF(
+    MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF(
               "\n--> Marking for collection #%lu after %lu allocated bytes\n",
-              (unsigned long)GC_gc_no + 1, (unsigned long)GC_bytes_allocd);
+              (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no + 1, (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd);
 #   ifndef NO_CLOCK
-      if (GC_PRINT_STATS_FLAG || measure_performance) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS_FLAG || measure_performance) {
         GET_TIME(start_time);
         start_time_valid = TRUE;
       }
 #   endif
 #   ifdef THREADS
-      if (GC_on_collection_event)
-        GC_on_collection_event(GC_EVENT_PRE_STOP_WORLD);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_PRE_STOP_WORLD);
 #   endif
     STOP_WORLD();
 #   ifdef THREADS
-      if (GC_on_collection_event)
-        GC_on_collection_event(GC_EVENT_POST_STOP_WORLD);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_POST_STOP_WORLD);
 #   endif
 #   ifdef THREAD_LOCAL_ALLOC
-      GC_world_stopped = TRUE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped = TRUE;
 #   endif
 
 #   ifdef MAKE_BACK_GRAPH
-      if (GC_print_back_height) {
-        GC_build_back_graph();
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_back_height) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_build_back_graph();
       }
 #   endif
 
     /* Notify about marking from all roots.     */
-        if (GC_on_collection_event)
-          GC_on_collection_event(GC_EVENT_MARK_START);
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_MARK_START);
 
     /* Minimize junk left in my registers and on the stack.     */
-            GC_clear_a_few_frames();
-            GC_noop6(0,0,0,0,0,0);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_clear_a_few_frames();
+            MANAGED_STACK_ADDRESS_BOEHM_GC_noop6(0,0,0,0,0,0);
 
-        GC_initiate_gc();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_initiate_gc();
 #       ifdef PARALLEL_MARK
-          if (stop_func != GC_never_stop_func)
-            GC_parallel_mark_disabled = TRUE;
+          if (stop_func != MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func)
+            MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled = TRUE;
 #       endif
         for (abandoned_at = 0; !(*stop_func)(); abandoned_at++) {
-          if (GC_mark_some(cold_gc_frame)) {
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some(cold_gc_frame)) {
 #           ifdef PARALLEL_MARK
-              if (GC_parallel && GC_parallel_mark_disabled) {
-                GC_COND_LOG_PRINTF("Stopped marking done after %d iterations"
+              if (MANAGED_STACK_ADDRESS_BOEHM_GC_parallel && MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled) {
+                MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Stopped marking done after %d iterations"
                                    " with disabled parallel marker\n",
                                    abandoned_at);
               }
@@ -899,33 +899,33 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
           }
         }
 #       ifdef PARALLEL_MARK
-          GC_parallel_mark_disabled = FALSE;
+          MANAGED_STACK_ADDRESS_BOEHM_GC_parallel_mark_disabled = FALSE;
 #       endif
 
     if (abandoned_at >= 0) {
-      GC_deficit = abandoned_at; /* Give the mutator a chance. */
-      /* TODO: Notify GC_EVENT_MARK_ABANDON */
+      MANAGED_STACK_ADDRESS_BOEHM_GC_deficit = abandoned_at; /* Give the mutator a chance. */
+      /* TODO: Notify MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_MARK_ABANDON */
     } else {
-      GC_gc_no++;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no++;
       /* Check all debugged objects for consistency.    */
-      if (GC_debugging_started) {
-        (*GC_check_heap)();
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) {
+        (*MANAGED_STACK_ADDRESS_BOEHM_GC_check_heap)();
       }
-      if (GC_on_collection_event)
-        GC_on_collection_event(GC_EVENT_MARK_END);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_MARK_END);
     }
 
 #   ifdef THREADS
-      if (GC_on_collection_event)
-        GC_on_collection_event(GC_EVENT_PRE_START_WORLD);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_PRE_START_WORLD);
 #   endif
 #   ifdef THREAD_LOCAL_ALLOC
-      GC_world_stopped = FALSE;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_world_stopped = FALSE;
 #   endif
     START_WORLD();
 #   ifdef THREADS
-      if (GC_on_collection_event)
-        GC_on_collection_event(GC_EVENT_POST_START_WORLD);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_POST_START_WORLD);
 #   endif
 
 #   ifndef NO_CLOCK
@@ -933,7 +933,7 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
         CLOCK_TYPE current_time;
         unsigned long time_diff, ns_frac_diff;
 
-        /* TODO: Avoid code duplication from GC_try_to_collect_inner */
+        /* TODO: Avoid code duplication from MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner */
         GET_TIME(current_time);
         time_diff = MS_TIME_DIFF(current_time, start_time);
         ns_frac_diff = NS_FRAC_TIME_DIFF(current_time, start_time);
@@ -946,7 +946,7 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
           }
         }
 
-        if (GC_PRINT_STATS_FLAG) {
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS_FLAG) {
           unsigned total_time = world_stopped_total_time;
           unsigned divisor = world_stopped_total_divisor;
 
@@ -963,8 +963,8 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
           world_stopped_total_time = total_time;
           world_stopped_total_divisor = ++divisor;
           if (abandoned_at < 0) {
-            GC_ASSERT(divisor != 0);
-            GC_log_printf("World-stopped marking took %lu ms %lu ns"
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(divisor != 0);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("World-stopped marking took %lu ms %lu ns"
                           " (%u ms in average)\n", time_diff, ns_frac_diff,
                           total_time / divisor);
           }
@@ -973,7 +973,7 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
 #   endif
 
     if (abandoned_at >= 0) {
-      GC_COND_LOG_PRINTF("Abandoned stopped marking after %d iterations\n",
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Abandoned stopped marking after %d iterations\n",
                          abandoned_at);
       return FALSE;
     }
@@ -981,7 +981,7 @@ STATIC GC_bool GC_stopped_mark(GC_stop_func stop_func)
 }
 
 /* Set all mark bits for the free list whose first entry is q   */
-GC_INNER void GC_set_fl_marks(ptr_t q)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_set_fl_marks(ptr_t q)
 {
     if (q /* != NULL */) { /* CPPCHECK */
       struct hblk *h = HBLKPTR(q);
@@ -1011,12 +1011,12 @@ GC_INNER void GC_set_fl_marks(ptr_t q)
     }
 }
 
-#if defined(GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
   /* Check that all mark bits for the free list whose first entry is    */
   /* (*pfreelist) are set.  Check skipped if points to a special value. */
-  void GC_check_fl_marks(void **pfreelist)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_check_fl_marks(void **pfreelist)
   {
-    /* TODO: There is a data race with GC_FAST_MALLOC_GRANS (which does */
+    /* TODO: There is a data race with MANAGED_STACK_ADDRESS_BOEHM_GC_FAST_MALLOC_GRANS (which does */
     /* not do atomic updates to the free-list).  The race seems to be   */
     /* harmless, and for now we just skip this check in case of TSan.   */
 #   if defined(AO_HAVE_load_acquire_read) && !defined(THREAD_SANITIZER)
@@ -1031,7 +1031,7 @@ GC_INNER void GC_set_fl_marks(ptr_t q)
       for (p = list; p != NULL;) {
         AO_t *next;
 
-        if (!GC_is_marked(p)) {
+        if (!MANAGED_STACK_ADDRESS_BOEHM_GC_is_marked(p)) {
           ABORT_ARG2("Unmarked local free list entry",
                      ": object %p on list %p", (void *)p, (void *)list);
         }
@@ -1054,11 +1054,11 @@ GC_INNER void GC_set_fl_marks(ptr_t q)
       (void)pfreelist;
 #   endif
   }
-#endif /* GC_ASSERTIONS && THREAD_LOCAL_ALLOC */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS && THREAD_LOCAL_ALLOC */
 
 /* Clear all mark bits for the free list whose first entry is q */
-/* Decrement GC_bytes_found by number of bytes on free list.    */
-STATIC void GC_clear_fl_marks(ptr_t q)
+/* Decrement MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found by number of bytes on free list.    */
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_clear_fl_marks(ptr_t q)
 {
       struct hblk *h = HBLKPTR(q);
       struct hblk *last_h = h;
@@ -1071,19 +1071,19 @@ STATIC void GC_clear_fl_marks(ptr_t q)
         if (mark_bit_from_hdr(hhdr, bit_no)) {
           size_t n_marks = hhdr -> hb_n_marks;
 
-          GC_ASSERT(n_marks != 0);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(n_marks != 0);
           clear_mark_bit_from_hdr(hhdr, bit_no);
           n_marks--;
 #         ifdef PARALLEL_MARK
             /* Appr. count, don't decrement to zero! */
-            if (0 != n_marks || !GC_parallel) {
+            if (0 != n_marks || !MANAGED_STACK_ADDRESS_BOEHM_GC_parallel) {
               hhdr -> hb_n_marks = n_marks;
             }
 #         else
             hhdr -> hb_n_marks = n_marks;
 #         endif
         }
-        GC_bytes_found -= (signed_word)sz;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found -= (signed_word)sz;
 
         q = (ptr_t)obj_link(q);
         if (q == NULL)
@@ -1098,106 +1098,106 @@ STATIC void GC_clear_fl_marks(ptr_t q)
       }
 }
 
-#if defined(GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
-  void GC_check_tls(void);
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) && defined(THREAD_LOCAL_ALLOC)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_check_tls(void);
 #endif
 
-GC_on_heap_resize_proc GC_on_heap_resize = 0;
+MANAGED_STACK_ADDRESS_BOEHM_GC_on_heap_resize_proc MANAGED_STACK_ADDRESS_BOEHM_GC_on_heap_resize = 0;
 
 /* Used for logging only. */
-GC_INLINE int GC_compute_heap_usage_percent(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE int MANAGED_STACK_ADDRESS_BOEHM_GC_compute_heap_usage_percent(void)
 {
-  word used = GC_composite_in_use + GC_atomic_in_use + GC_bytes_allocd;
-  word heap_sz = GC_heapsize - GC_unmapped_bytes;
+  word used = MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use + MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use + MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd;
+  word heap_sz = MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes;
 # if defined(CPPCHECK)
-    word limit = (GC_WORD_MAX >> 1) / 50; /* to avoid a false positive */
+    word limit = (MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX >> 1) / 50; /* to avoid a false positive */
 # else
-    const word limit = GC_WORD_MAX / 100;
+    const word limit = MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX / 100;
 # endif
 
   return used >= heap_sz ? 0 : used < limit ?
                 (int)((used * 100) / heap_sz) : (int)(used / (heap_sz / 100));
 }
 
-#define GC_DBGLOG_PRINT_HEAP_IN_USE() \
-  GC_DBGLOG_PRINTF("In-use heap: %d%% (%lu KiB pointers + %lu KiB other)\n", \
-                   GC_compute_heap_usage_percent(), \
-                   TO_KiB_UL(GC_composite_in_use), \
-                   TO_KiB_UL(GC_atomic_in_use + GC_bytes_allocd))
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINT_HEAP_IN_USE() \
+  MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINTF("In-use heap: %d%% (%lu KiB pointers + %lu KiB other)\n", \
+                   MANAGED_STACK_ADDRESS_BOEHM_GC_compute_heap_usage_percent(), \
+                   TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_composite_in_use), \
+                   TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_atomic_in_use + MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd))
 
 /* Finish up a collection.  Assumes mark bits are consistent, but the   */
 /* world is otherwise running.                                          */
-STATIC void GC_finish_collection(void)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_finish_collection(void)
 {
 #   ifndef NO_CLOCK
       CLOCK_TYPE start_time = CLOCK_TYPE_INITIALIZER;
       CLOCK_TYPE finalize_time = CLOCK_TYPE_INITIALIZER;
 #   endif
 
-    GC_ASSERT(I_HOLD_LOCK());
-#   if defined(GC_ASSERTIONS) \
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+#   if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS) \
        && defined(THREAD_LOCAL_ALLOC) && !defined(DBG_HDRS_ALL)
         /* Check that we marked some of our own data.           */
         /* TODO: Add more checks. */
-        GC_check_tls();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_check_tls();
 #   endif
 
 #   ifndef NO_CLOCK
-      if (GC_print_stats)
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats)
         GET_TIME(start_time);
 #   endif
-    if (GC_on_collection_event)
-      GC_on_collection_event(GC_EVENT_RECLAIM_START);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_RECLAIM_START);
 
-#   ifndef GC_GET_HEAP_USAGE_NOT_NEEDED
-      if (GC_bytes_found > 0)
-        GC_reclaimed_bytes_before_gc += (word)GC_bytes_found;
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_GET_HEAP_USAGE_NOT_NEEDED
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found > 0)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_reclaimed_bytes_before_gc += (word)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found;
 #   endif
-    GC_bytes_found = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found = 0;
 #   if defined(LINUX) && defined(__ELF__) && !defined(SMALL_CONFIG)
-        if (GETENV("GC_PRINT_ADDRESS_MAP") != 0) {
-          GC_print_address_map();
+        if (GETENV("MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_ADDRESS_MAP") != 0) {
+          MANAGED_STACK_ADDRESS_BOEHM_GC_print_address_map();
         }
 #   endif
     COND_DUMP;
-    if (GC_find_leak) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak) {
       /* Mark all objects on the free list.  All objects should be      */
       /* marked when we're done.                                        */
       word size;        /* current object size  */
       unsigned kind;
       ptr_t q;
 
-      for (kind = 0; kind < GC_n_kinds; kind++) {
+      for (kind = 0; kind < MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds; kind++) {
         for (size = 1; size <= MAXOBJGRANULES; size++) {
-          q = (ptr_t)GC_obj_kinds[kind].ok_freelist[size];
+          q = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist[size];
           if (q != NULL)
-            GC_set_fl_marks(q);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_set_fl_marks(q);
         }
       }
-      GC_start_reclaim(TRUE);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_start_reclaim(TRUE);
         /* The above just checks; it doesn't really reclaim anything.   */
     }
 
-#   ifndef GC_NO_FINALIZATION
-      GC_finalize();
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION
+      MANAGED_STACK_ADDRESS_BOEHM_GC_finalize();
 #   endif
 #   ifndef NO_CLOCK
-      if (GC_print_stats)
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats)
         GET_TIME(finalize_time);
 #   endif
 
-    if (GC_print_back_height) {
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_back_height) {
 #     ifdef MAKE_BACK_GRAPH
-        GC_traverse_back_graph();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_traverse_back_graph();
 #     elif !defined(SMALL_CONFIG)
-        GC_err_printf("Back height not available: "
+        MANAGED_STACK_ADDRESS_BOEHM_GC_err_printf("Back height not available: "
                       "Rebuild collector with -DMAKE_BACK_GRAPH\n");
 #     endif
     }
 
     /* Clear free list mark bits, in case they got accidentally marked   */
-    /* (or GC_find_leak is set and they were intentionally marked).      */
-    /* Also subtract memory remaining from GC_bytes_found count.         */
+    /* (or MANAGED_STACK_ADDRESS_BOEHM_GC_find_leak is set and they were intentionally marked).      */
+    /* Also subtract memory remaining from MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found count.         */
     /* Note that composite objects on free list are cleared.             */
     /* Thus accidentally marking a free list is not a problem;  only     */
     /* objects on the list itself will be marked, and that's fixed here. */
@@ -1206,210 +1206,210 @@ STATIC void GC_finish_collection(void)
       ptr_t q;          /* pointer to current object    */
       unsigned kind;
 
-      for (kind = 0; kind < GC_n_kinds; kind++) {
+      for (kind = 0; kind < MANAGED_STACK_ADDRESS_BOEHM_GC_n_kinds; kind++) {
         for (size = 1; size <= MAXOBJGRANULES; size++) {
-          q = (ptr_t)GC_obj_kinds[kind].ok_freelist[size];
+          q = (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist[size];
           if (q != NULL)
-            GC_clear_fl_marks(q);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_clear_fl_marks(q);
         }
       }
     }
 
-    GC_VERBOSE_LOG_PRINTF("Bytes recovered before sweep - f.l. count = %ld\n",
-                          (long)GC_bytes_found);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_VERBOSE_LOG_PRINTF("Bytes recovered before sweep - f.l. count = %ld\n",
+                          (long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found);
 
     /* Reconstruct free lists to contain everything not marked */
-    GC_start_reclaim(FALSE);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_start_reclaim(FALSE);
 
 #   ifdef USE_MUNMAP
-      if (GC_unmap_threshold > 0 /* unmapping enabled? */
-          && EXPECT(GC_gc_no != 1, TRUE)) /* do not unmap during GC init */
-        GC_unmap_old(GC_unmap_threshold);
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold > 0 /* unmapping enabled? */
+          && EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no != 1, TRUE)) /* do not unmap during GC init */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_old(MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold);
 
-      GC_ASSERT(GC_heapsize >= GC_unmapped_bytes);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize >= MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes);
 #   endif
-    GC_ASSERT(GC_our_mem_bytes >= GC_heapsize);
-    GC_DBGLOG_PRINTF("GC #%lu freed %ld bytes, heap %lu KiB ("
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_our_mem_bytes >= MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINTF("GC #%lu freed %ld bytes, heap %lu KiB ("
                      IF_USE_MUNMAP("+ %lu KiB unmapped ")
                      "+ %lu KiB internal)\n",
-                     (unsigned long)GC_gc_no, (long)GC_bytes_found,
-                     TO_KiB_UL(GC_heapsize - GC_unmapped_bytes) /*, */
-                     COMMA_IF_USE_MUNMAP(TO_KiB_UL(GC_unmapped_bytes)),
-                     TO_KiB_UL(GC_our_mem_bytes - GC_heapsize
-                               + sizeof(GC_arrays)));
-    GC_DBGLOG_PRINT_HEAP_IN_USE();
-    if (GC_is_full_gc) {
-        GC_used_heap_size_after_full = GC_heapsize - GC_large_free_bytes;
-        GC_need_full_gc = FALSE;
+                     (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no, (long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_found,
+                     TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes) /*, */
+                     COMMA_IF_USE_MUNMAP(TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes)),
+                     TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_our_mem_bytes - MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize
+                               + sizeof(MANAGED_STACK_ADDRESS_BOEHM_GC_arrays)));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINT_HEAP_IN_USE();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_used_heap_size_after_full = MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_need_full_gc = FALSE;
     } else {
-        GC_need_full_gc = GC_heapsize - GC_used_heap_size_after_full
-                          > min_bytes_allocd() + GC_large_free_bytes;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_need_full_gc = MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_used_heap_size_after_full
+                          > min_bytes_allocd() + MANAGED_STACK_ADDRESS_BOEHM_GC_large_free_bytes;
     }
 
     /* Reset or increment counters for next cycle */
-    GC_n_attempts = 0;
-    GC_is_full_gc = FALSE;
-    GC_bytes_allocd_before_gc += GC_bytes_allocd;
-    GC_non_gc_bytes_at_gc = GC_non_gc_bytes;
-    GC_bytes_allocd = 0;
-    GC_bytes_dropped = 0;
-    GC_bytes_freed = 0;
-    GC_finalizer_bytes_freed = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_attempts = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd_before_gc += MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes_at_gc = MANAGED_STACK_ADDRESS_BOEHM_GC_non_gc_bytes;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_dropped = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_freed = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_finalizer_bytes_freed = 0;
 
-    if (GC_on_collection_event)
-      GC_on_collection_event(GC_EVENT_RECLAIM_END);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event)
+      MANAGED_STACK_ADDRESS_BOEHM_GC_on_collection_event(MANAGED_STACK_ADDRESS_BOEHM_GC_EVENT_RECLAIM_END);
 #   ifndef NO_CLOCK
-      if (GC_print_stats) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats) {
         CLOCK_TYPE done_time;
 
         GET_TIME(done_time);
-#       if !defined(SMALL_CONFIG) && !defined(GC_NO_FINALIZATION)
+#       if !defined(SMALL_CONFIG) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION)
           /* A convenient place to output finalization statistics.      */
-          GC_print_finalization_stats();
+          MANAGED_STACK_ADDRESS_BOEHM_GC_print_finalization_stats();
 #       endif
-        GC_log_printf("Finalize and initiate sweep took %lu ms %lu ns"
+        MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("Finalize and initiate sweep took %lu ms %lu ns"
                       " + %lu ms %lu ns\n",
                       MS_TIME_DIFF(finalize_time, start_time),
                       NS_FRAC_TIME_DIFF(finalize_time, start_time),
                       MS_TIME_DIFF(done_time, finalize_time),
                       NS_FRAC_TIME_DIFF(done_time, finalize_time));
       }
-#   elif !defined(SMALL_CONFIG) && !defined(GC_NO_FINALIZATION)
-      if (GC_print_stats)
-        GC_print_finalization_stats();
+#   elif !defined(SMALL_CONFIG) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FINALIZATION)
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_print_stats)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_print_finalization_stats();
 #   endif
 }
 
-STATIC word GC_heapsize_at_forced_unmap = 0;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize_at_forced_unmap = 0;
                                 /* accessed with the allocation lock held */
 
-/* If stop_func == 0 then GC_default_stop_func is used instead.         */
-STATIC GC_bool GC_try_to_collect_general(GC_stop_func stop_func,
-                                         GC_bool force_unmap)
+/* If stop_func == 0 then MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func is used instead.         */
+STATIC MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_general(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func,
+                                         MANAGED_STACK_ADDRESS_BOEHM_GC_bool force_unmap)
 {
-    GC_bool result;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool result;
     IF_USE_MUNMAP(unsigned old_unmap_threshold;)
     IF_CANCEL(int cancel_state;)
 
-    if (!EXPECT(GC_is_initialized, TRUE)) GC_init();
-    if (GC_debugging_started) GC_print_all_smashed();
-    GC_INVOKE_FINALIZERS();
+    if (!EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized, TRUE)) MANAGED_STACK_ADDRESS_BOEHM_GC_init();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed();
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INVOKE_FINALIZERS();
     LOCK();
     if (force_unmap) {
       /* Record current heap size to make heap growth more conservative */
       /* afterwards (as if the heap is growing from zero size again).   */
-      GC_heapsize_at_forced_unmap = GC_heapsize;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize_at_forced_unmap = MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize;
     }
     DISABLE_CANCEL(cancel_state);
 #   ifdef USE_MUNMAP
-      old_unmap_threshold = GC_unmap_threshold;
+      old_unmap_threshold = MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold;
       if (force_unmap ||
-          (GC_force_unmap_on_gcollect && old_unmap_threshold > 0))
-        GC_unmap_threshold = 1; /* unmap as much as possible */
+          (MANAGED_STACK_ADDRESS_BOEHM_GC_force_unmap_on_gcollect && old_unmap_threshold > 0))
+        MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold = 1; /* unmap as much as possible */
 #   endif
     ENTER_GC();
     /* Minimize junk left in my registers */
-      GC_noop6(0,0,0,0,0,0);
-    result = GC_try_to_collect_inner(stop_func != 0 ? stop_func :
-                                     GC_default_stop_func);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_noop6(0,0,0,0,0,0);
+    result = MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner(stop_func != 0 ? stop_func :
+                                     MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func);
     EXIT_GC();
-    IF_USE_MUNMAP(GC_unmap_threshold = old_unmap_threshold); /* restore */
+    IF_USE_MUNMAP(MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold = old_unmap_threshold); /* restore */
     RESTORE_CANCEL(cancel_state);
     UNLOCK();
     if (result) {
-        if (GC_debugging_started) GC_print_all_smashed();
-        GC_INVOKE_FINALIZERS();
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_debugging_started) MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_smashed();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_INVOKE_FINALIZERS();
     }
     return result;
 }
 
 /* Externally callable routines to invoke full, stop-the-world collection. */
 
-GC_API int GC_CALL GC_try_to_collect(GC_stop_func stop_func)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect(MANAGED_STACK_ADDRESS_BOEHM_GC_stop_func stop_func)
 {
-    GC_ASSERT(NONNULL_ARG_NOT_NULL(stop_func));
-    return (int)GC_try_to_collect_general(stop_func, FALSE);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(NONNULL_ARG_NOT_NULL(stop_func));
+    return (int)MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_general(stop_func, FALSE);
 }
 
-GC_API void GC_CALL GC_gcollect(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect(void)
 {
-    /* 0 is passed as stop_func to get GC_default_stop_func value       */
+    /* 0 is passed as stop_func to get MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func value       */
     /* while holding the allocation lock (to prevent data races).       */
-    (void)GC_try_to_collect_general(0, FALSE);
+    (void)MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_general(0, FALSE);
     if (get_have_errors())
-      GC_print_all_errors();
+      MANAGED_STACK_ADDRESS_BOEHM_GC_print_all_errors();
 }
 
-GC_API void GC_CALL GC_gcollect_and_unmap(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect_and_unmap(void)
 {
     /* Collect and force memory unmapping to OS. */
-    (void)GC_try_to_collect_general(GC_never_stop_func, TRUE);
+    (void)MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_general(MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func, TRUE);
 }
 
-GC_INNER ptr_t GC_os_get_mem(size_t bytes)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(size_t bytes)
 {
   struct hblk *space = GET_MEM(bytes); /* HBLKSIZE-aligned */
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (EXPECT(NULL == space, FALSE)) return NULL;
 # ifdef USE_PROC_FOR_LIBRARIES
-    /* Add HBLKSIZE aligned, GET_MEM-generated block to GC_our_memory. */
-    if (GC_n_memory >= MAX_HEAP_SECTS)
+    /* Add HBLKSIZE aligned, GET_MEM-generated block to MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory. */
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory >= MAX_HEAP_SECTS)
       ABORT("Too many GC-allocated memory sections: Increase MAX_HEAP_SECTS");
-    GC_our_memory[GC_n_memory].hs_start = (ptr_t)space;
-    GC_our_memory[GC_n_memory].hs_bytes = bytes;
-    GC_n_memory++;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory].hs_start = (ptr_t)space;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_our_memory[MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory].hs_bytes = bytes;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_memory++;
 # endif
-  GC_our_mem_bytes += bytes;
-  GC_VERBOSE_LOG_PRINTF("Got %lu bytes from OS\n", (unsigned long)bytes);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_our_mem_bytes += bytes;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_VERBOSE_LOG_PRINTF("Got %lu bytes from OS\n", (unsigned long)bytes);
   return (ptr_t)space;
 }
 
 /* Use the chunk of memory starting at p of size bytes as part of the heap. */
 /* Assumes p is HBLKSIZE aligned, bytes argument is a multiple of HBLKSIZE. */
-STATIC void GC_add_to_heap(struct hblk *p, size_t bytes)
+STATIC void MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_heap(struct hblk *p, size_t bytes)
 {
     hdr * phdr;
     word endp;
     size_t old_capacity = 0;
     void *old_heap_sects = NULL;
-#   ifdef GC_ASSERTIONS
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
       unsigned i;
 #   endif
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT((word)p % HBLKSIZE == 0);
-    GC_ASSERT(bytes % HBLKSIZE == 0);
-    GC_ASSERT(bytes > 0);
-    GC_ASSERT(GC_all_nils != NULL);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)p % HBLKSIZE == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(bytes % HBLKSIZE == 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(bytes > 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_all_nils != NULL);
 
-    if (EXPECT(GC_n_heap_sects == GC_capacity_heap_sects, FALSE)) {
-      /* Allocate new GC_heap_sects with sufficient capacity.   */
+    if (EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects == MANAGED_STACK_ADDRESS_BOEHM_GC_capacity_heap_sects, FALSE)) {
+      /* Allocate new MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects with sufficient capacity.   */
 #     ifndef INITIAL_HEAP_SECTS
 #       define INITIAL_HEAP_SECTS 32
 #     endif
-      size_t new_capacity = GC_n_heap_sects > 0 ?
-                (size_t)GC_n_heap_sects * 2 : INITIAL_HEAP_SECTS;
+      size_t new_capacity = MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects > 0 ?
+                (size_t)MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects * 2 : INITIAL_HEAP_SECTS;
       void *new_heap_sects =
-                GC_scratch_alloc(new_capacity * sizeof(struct HeapSect));
+                MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc(new_capacity * sizeof(struct HeapSect));
 
       if (NULL == new_heap_sects) {
         /* Retry with smaller yet sufficient capacity.  */
-        new_capacity = (size_t)GC_n_heap_sects + INITIAL_HEAP_SECTS;
+        new_capacity = (size_t)MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects + INITIAL_HEAP_SECTS;
         new_heap_sects =
-                GC_scratch_alloc(new_capacity * sizeof(struct HeapSect));
+                MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_alloc(new_capacity * sizeof(struct HeapSect));
         if (NULL == new_heap_sects)
           ABORT("Insufficient memory for heap sections");
       }
-      old_capacity = GC_capacity_heap_sects;
-      old_heap_sects = GC_heap_sects;
-      /* Transfer GC_heap_sects contents to the newly allocated array.  */
-      if (GC_n_heap_sects > 0)
+      old_capacity = MANAGED_STACK_ADDRESS_BOEHM_GC_capacity_heap_sects;
+      old_heap_sects = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects;
+      /* Transfer MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects contents to the newly allocated array.  */
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects > 0)
         BCOPY(old_heap_sects, new_heap_sects,
-              GC_n_heap_sects * sizeof(struct HeapSect));
-      GC_capacity_heap_sects = new_capacity;
-      GC_heap_sects = (struct HeapSect *)new_heap_sects;
-      GC_COND_LOG_PRINTF("Grew heap sections array to %lu elements\n",
+              MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects * sizeof(struct HeapSect));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_capacity_heap_sects = new_capacity;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects = (struct HeapSect *)new_heap_sects;
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Grew heap sections array to %lu elements\n",
                          (unsigned long)new_capacity);
     }
 
@@ -1426,233 +1426,233 @@ STATIC void GC_add_to_heap(struct hblk *p, size_t bytes)
         if (0 == bytes) return;
         endp -= HBLKSIZE;
     }
-    phdr = GC_install_header(p);
+    phdr = MANAGED_STACK_ADDRESS_BOEHM_GC_install_header(p);
     if (EXPECT(NULL == phdr, FALSE)) {
         /* This is extremely unlikely. Can't add it.  This will         */
         /* almost certainly result in a 0 return from the allocator,    */
         /* which is entirely appropriate.                               */
         return;
     }
-    GC_ASSERT(endp > (word)p && endp == (word)p + bytes);
-#   ifdef GC_ASSERTIONS
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(endp > (word)p && endp == (word)p + bytes);
+#   ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
       /* Ensure no intersection between sections.       */
-      for (i = 0; i < GC_n_heap_sects; i++) {
-        word hs_start = (word)GC_heap_sects[i].hs_start;
-        word hs_end = hs_start + GC_heap_sects[i].hs_bytes;
+      for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects; i++) {
+        word hs_start = (word)MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start;
+        word hs_end = hs_start + MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes;
 
-        GC_ASSERT(!((hs_start <= (word)p && (word)p < hs_end)
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!((hs_start <= (word)p && (word)p < hs_end)
                     || (hs_start < endp && endp <= hs_end)
                     || ((word)p < hs_start && hs_end < endp)));
       }
 #   endif
-    GC_heap_sects[GC_n_heap_sects].hs_start = (ptr_t)p;
-    GC_heap_sects[GC_n_heap_sects].hs_bytes = bytes;
-    GC_n_heap_sects++;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects].hs_start = (ptr_t)p;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects].hs_bytes = bytes;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects++;
     phdr -> hb_sz = bytes;
     phdr -> hb_flags = 0;
-    GC_freehblk(p);
-    GC_heapsize += bytes;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_freehblk(p);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize += bytes;
 
-    if ((word)p <= (word)GC_least_plausible_heap_addr
-        || EXPECT(NULL == GC_least_plausible_heap_addr, FALSE)) {
-        GC_least_plausible_heap_addr = (void *)((ptr_t)p - sizeof(word));
+    if ((word)p <= (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr
+        || EXPECT(NULL == MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr, FALSE)) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr = (void *)((ptr_t)p - sizeof(word));
                 /* Making it a little smaller than necessary prevents   */
                 /* us from getting a false hit from the variable        */
                 /* itself.  There's some unintentional reflection       */
                 /* here.                                                */
     }
-    if (endp > (word)GC_greatest_plausible_heap_addr) {
-        GC_greatest_plausible_heap_addr = (void *)endp;
+    if (endp > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr) {
+        MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr = (void *)endp;
     }
 #   ifdef SET_REAL_HEAP_BOUNDS
-      if ((word)p < GC_least_real_heap_addr
-          || EXPECT(0 == GC_least_real_heap_addr, FALSE))
-        GC_least_real_heap_addr = (word)p - sizeof(word);
-      if (endp > GC_greatest_real_heap_addr) {
+      if ((word)p < MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr
+          || EXPECT(0 == MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr, FALSE))
+        MANAGED_STACK_ADDRESS_BOEHM_GC_least_real_heap_addr = (word)p - sizeof(word);
+      if (endp > MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr) {
 #       ifdef INCLUDE_LINUX_THREAD_DESCR
           /* Avoid heap intersection with the static data roots. */
-          GC_exclude_static_roots_inner((void *)p, (void *)endp);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_exclude_static_roots_inner((void *)p, (void *)endp);
 #       endif
-        GC_greatest_real_heap_addr = endp;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_real_heap_addr = endp;
       }
 #   endif
     if (EXPECT(old_capacity > 0, FALSE)) {
 #     ifndef GWW_VDB
-        /* Recycling may call GC_add_to_heap() again but should not     */
-        /* cause resizing of GC_heap_sects.                             */
-        GC_scratch_recycle_no_gww(old_heap_sects,
+        /* Recycling may call MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_heap() again but should not     */
+        /* cause resizing of MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects.                             */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_no_gww(old_heap_sects,
                                   old_capacity * sizeof(struct HeapSect));
 #     else
         /* TODO: implement GWW-aware recycling as in alloc_mark_stack */
-        GC_noop1((word)old_heap_sects);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)old_heap_sects);
 #     endif
     }
 }
 
 #if !defined(NO_DEBUGGING)
-  void GC_print_heap_sects(void)
+  void MANAGED_STACK_ADDRESS_BOEHM_GC_print_heap_sects(void)
   {
     unsigned i;
 
-    GC_printf("Total heap size: %lu" IF_USE_MUNMAP(" (%lu unmapped)") "\n",
-              (unsigned long)GC_heapsize /*, */
-              COMMA_IF_USE_MUNMAP((unsigned long)GC_unmapped_bytes));
+    MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Total heap size: %lu" IF_USE_MUNMAP(" (%lu unmapped)") "\n",
+              (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize /*, */
+              COMMA_IF_USE_MUNMAP((unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes));
 
-    for (i = 0; i < GC_n_heap_sects; i++) {
-      ptr_t start = GC_heap_sects[i].hs_start;
-      size_t len = GC_heap_sects[i].hs_bytes;
+    for (i = 0; i < MANAGED_STACK_ADDRESS_BOEHM_GC_n_heap_sects; i++) {
+      ptr_t start = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_start;
+      size_t len = MANAGED_STACK_ADDRESS_BOEHM_GC_heap_sects[i].hs_bytes;
       struct hblk *h;
       unsigned nbl = 0;
 
       for (h = (struct hblk *)start; (word)h < (word)(start + len); h++) {
-        if (GC_is_black_listed(h, HBLKSIZE)) nbl++;
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_is_black_listed(h, HBLKSIZE)) nbl++;
       }
-      GC_printf("Section %d from %p to %p %u/%lu blacklisted\n",
+      MANAGED_STACK_ADDRESS_BOEHM_GC_printf("Section %d from %p to %p %u/%lu blacklisted\n",
                 i, (void *)start, (void *)&start[len],
                 nbl, (unsigned long)divHBLKSZ(len));
     }
   }
 #endif
 
-void * GC_least_plausible_heap_addr = (void *)GC_WORD_MAX;
-void * GC_greatest_plausible_heap_addr = 0;
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr = (void *)MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX;
+void * MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr = 0;
 
-STATIC word GC_max_heapsize = 0;
+STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize = 0;
 
-GC_API void GC_CALL GC_set_max_heap_size(GC_word n)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_max_heap_size(MANAGED_STACK_ADDRESS_BOEHM_GC_word n)
 {
-    GC_max_heapsize = n;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize = n;
 }
 
-word GC_max_retries = 0;
+word MANAGED_STACK_ADDRESS_BOEHM_GC_max_retries = 0;
 
-GC_INNER void GC_scratch_recycle_inner(void *ptr, size_t bytes)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER void MANAGED_STACK_ADDRESS_BOEHM_GC_scratch_recycle_inner(void *ptr, size_t bytes)
 {
   size_t page_offset;
   size_t displ = 0;
   size_t recycled_bytes;
 
-  GC_ASSERT(I_HOLD_LOCK());
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
   if (NULL == ptr) return;
 
-  GC_ASSERT(bytes != 0);
-  GC_ASSERT(GC_page_size != 0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(bytes != 0);
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size != 0);
   /* TODO: Assert correct memory flags if GWW_VDB */
-  page_offset = (word)ptr & (GC_page_size - 1);
+  page_offset = (word)ptr & (MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - 1);
   if (page_offset != 0)
-    displ = GC_page_size - page_offset;
-  recycled_bytes = bytes > displ ? (bytes - displ) & ~(GC_page_size - 1) : 0;
-  GC_COND_LOG_PRINTF("Recycle %lu/%lu scratch-allocated bytes at %p\n",
+    displ = MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - page_offset;
+  recycled_bytes = bytes > displ ? (bytes - displ) & ~(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - 1) : 0;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Recycle %lu/%lu scratch-allocated bytes at %p\n",
                 (unsigned long)recycled_bytes, (unsigned long)bytes, ptr);
   if (recycled_bytes > 0)
-    GC_add_to_heap((struct hblk *)((word)ptr + displ), recycled_bytes);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_heap((struct hblk *)((word)ptr + displ), recycled_bytes);
 }
 
 /* This explicitly increases the size of the heap.  It is used          */
-/* internally, but may also be invoked from GC_expand_hp by the user.   */
+/* internally, but may also be invoked from MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp by the user.   */
 /* The argument is in units of HBLKSIZE (zero is treated as 1).         */
 /* Returns FALSE on failure.                                            */
-GC_INNER GC_bool GC_expand_hp_inner(word n)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner(word n)
 {
     size_t bytes;
     struct hblk * space;
     word expansion_slop;        /* Number of bytes by which we expect   */
                                 /* the heap to expand soon.             */
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_page_size != 0);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size != 0);
     if (0 == n) n = 1;
     bytes = ROUNDUP_PAGESIZE((size_t)n * HBLKSIZE);
-    GC_DBGLOG_PRINT_HEAP_IN_USE();
-    if (GC_max_heapsize != 0
-        && (GC_max_heapsize < (word)bytes
-            || GC_heapsize > GC_max_heapsize - (word)bytes)) {
+    MANAGED_STACK_ADDRESS_BOEHM_GC_DBGLOG_PRINT_HEAP_IN_USE();
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize != 0
+        && (MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize < (word)bytes
+            || MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize > MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize - (word)bytes)) {
         /* Exceeded self-imposed limit */
         return FALSE;
     }
-    space = (struct hblk *)GC_os_get_mem(bytes);
+    space = (struct hblk *)MANAGED_STACK_ADDRESS_BOEHM_GC_os_get_mem(bytes);
     if (EXPECT(NULL == space, FALSE)) {
         WARN("Failed to expand heap by %" WARN_PRIuPTR " KiB\n", bytes >> 10);
         return FALSE;
     }
-    GC_last_heap_growth_gc_no = GC_gc_no;
-    GC_INFOLOG_PRINTF("Grow heap to %lu KiB after %lu bytes allocated\n",
-                      TO_KiB_UL(GC_heapsize + bytes),
-                      (unsigned long)GC_bytes_allocd);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_growth_gc_no = MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_INFOLOG_PRINTF("Grow heap to %lu KiB after %lu bytes allocated\n",
+                      TO_KiB_UL(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize + bytes),
+                      (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd);
 
     /* Adjust heap limits generously for blacklisting to work better.   */
-    /* GC_add_to_heap performs minimal adjustment needed for            */
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_heap performs minimal adjustment needed for            */
     /* correctness.                                                     */
     expansion_slop = min_bytes_allocd() + 4 * MAXHINCR * HBLKSIZE;
-    if ((GC_last_heap_addr == 0 && !((word)space & SIGNB))
-        || (GC_last_heap_addr != 0
-            && (word)GC_last_heap_addr < (word)space)) {
+    if ((MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_addr == 0 && !((word)space & SIGNB))
+        || (MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_addr != 0
+            && (word)MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_addr < (word)space)) {
         /* Assume the heap is growing up. */
         word new_limit = (word)space + (word)bytes + expansion_slop;
         if (new_limit > (word)space
-            && (word)GC_greatest_plausible_heap_addr < new_limit)
-          GC_greatest_plausible_heap_addr = (void *)new_limit;
+            && (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr < new_limit)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr = (void *)new_limit;
     } else {
         /* Heap is growing down. */
         word new_limit = (word)space - expansion_slop - sizeof(word);
         if (new_limit < (word)space
-            && (word)GC_least_plausible_heap_addr > new_limit)
-          GC_least_plausible_heap_addr = (void *)new_limit;
+            && (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr > new_limit)
+          MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr = (void *)new_limit;
     }
-    GC_last_heap_addr = (ptr_t)space;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_last_heap_addr = (ptr_t)space;
 
-    GC_add_to_heap(space, bytes);
-    if (GC_on_heap_resize)
-        (*GC_on_heap_resize)(GC_heapsize);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_add_to_heap(space, bytes);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_on_heap_resize)
+        (*MANAGED_STACK_ADDRESS_BOEHM_GC_on_heap_resize)(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize);
 
     return TRUE;
 }
 
 /* Really returns a bool, but it's externally visible, so that's clumsy. */
-GC_API int GC_CALL GC_expand_hp(size_t bytes)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API int MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp(size_t bytes)
 {
     word n_blocks = OBJ_SZ_TO_BLOCKS_CHECKED(bytes);
     word old_heapsize;
-    GC_bool result;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool result;
 
-    if (!EXPECT(GC_is_initialized, TRUE)) GC_init();
+    if (!EXPECT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized, TRUE)) MANAGED_STACK_ADDRESS_BOEHM_GC_init();
     LOCK();
-    old_heapsize = GC_heapsize;
-    result = GC_expand_hp_inner(n_blocks);
+    old_heapsize = MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize;
+    result = MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner(n_blocks);
     if (result) {
-      GC_requested_heapsize += bytes;
-      if (GC_dont_gc) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_requested_heapsize += bytes;
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
         /* Do not call WARN if the heap growth is intentional.  */
-        GC_ASSERT(GC_heapsize >= old_heapsize);
-        GC_heapsize_on_gc_disable += GC_heapsize - old_heapsize;
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize >= old_heapsize);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize_on_gc_disable += MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - old_heapsize;
       }
     }
     UNLOCK();
     return (int)result;
 }
 
-GC_INNER unsigned GC_fail_count = 0;
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count = 0;
                         /* How many consecutive GC/expansion failures?  */
-                        /* Reset by GC_allochblk.                       */
+                        /* Reset by MANAGED_STACK_ADDRESS_BOEHM_GC_allochblk.                       */
 
 /* The minimum value of the ratio of allocated bytes since the latest   */
 /* GC to the amount of finalizers created since that GC which triggers  */
 /* the collection instead heap expansion.  Has no effect in the         */
 /* incremental mode.                                                    */
-#if defined(GC_ALLOCD_BYTES_PER_FINALIZER) && !defined(CPPCHECK)
-  STATIC word GC_allocd_bytes_per_finalizer = GC_ALLOCD_BYTES_PER_FINALIZER;
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ALLOCD_BYTES_PER_FINALIZER) && !defined(CPPCHECK)
+  STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_allocd_bytes_per_finalizer = MANAGED_STACK_ADDRESS_BOEHM_GC_ALLOCD_BYTES_PER_FINALIZER;
 #else
-  STATIC word GC_allocd_bytes_per_finalizer = 10000;
+  STATIC word MANAGED_STACK_ADDRESS_BOEHM_GC_allocd_bytes_per_finalizer = 10000;
 #endif
 
-GC_API void GC_CALL GC_set_allocd_bytes_per_finalizer(GC_word value)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API void MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_set_allocd_bytes_per_finalizer(MANAGED_STACK_ADDRESS_BOEHM_GC_word value)
 {
-  GC_allocd_bytes_per_finalizer = value;
+  MANAGED_STACK_ADDRESS_BOEHM_GC_allocd_bytes_per_finalizer = value;
 }
 
-GC_API GC_word GC_CALL GC_get_allocd_bytes_per_finalizer(void)
+MANAGED_STACK_ADDRESS_BOEHM_GC_API MANAGED_STACK_ADDRESS_BOEHM_GC_word MANAGED_STACK_ADDRESS_BOEHM_GC_CALL MANAGED_STACK_ADDRESS_BOEHM_GC_get_allocd_bytes_per_finalizer(void)
 {
-  return GC_allocd_bytes_per_finalizer;
+  return MANAGED_STACK_ADDRESS_BOEHM_GC_allocd_bytes_per_finalizer;
 }
 
 static word last_fo_entries = 0;
@@ -1663,42 +1663,42 @@ static word last_bytes_finalized = 0;
 /* available (setting retry value to TRUE unless this is the first call */
 /* in a loop) or until it fails by returning FALSE.  The flags argument */
 /* should be IGNORE_OFF_PAGE or 0.                                      */
-GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER MANAGED_STACK_ADDRESS_BOEHM_GC_bool MANAGED_STACK_ADDRESS_BOEHM_GC_collect_or_expand(word needed_blocks,
                                       unsigned flags,
-                                      GC_bool retry)
+                                      MANAGED_STACK_ADDRESS_BOEHM_GC_bool retry)
 {
-    GC_bool gc_not_stopped = TRUE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool gc_not_stopped = TRUE;
     word blocks_to_get;
     IF_CANCEL(int cancel_state;)
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
     DISABLE_CANCEL(cancel_state);
-    if (!GC_incremental && !GC_dont_gc &&
-        ((GC_dont_expand && GC_bytes_allocd > 0)
-         || (GC_fo_entries > last_fo_entries
-             && (last_bytes_finalized | GC_bytes_finalized) != 0
-             && (GC_fo_entries - last_fo_entries)
-                * GC_allocd_bytes_per_finalizer > GC_bytes_allocd)
-         || GC_should_collect())) {
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && !MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc &&
+        ((MANAGED_STACK_ADDRESS_BOEHM_GC_dont_expand && MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd > 0)
+         || (MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries > last_fo_entries
+             && (last_bytes_finalized | MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_finalized) != 0
+             && (MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries - last_fo_entries)
+                * MANAGED_STACK_ADDRESS_BOEHM_GC_allocd_bytes_per_finalizer > MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd)
+         || MANAGED_STACK_ADDRESS_BOEHM_GC_should_collect())) {
       /* Try to do a full collection using 'default' stop_func (unless  */
       /* nothing has been allocated since the latest collection or heap */
       /* expansion is disabled).                                        */
-      gc_not_stopped = GC_try_to_collect_inner(
-                        GC_bytes_allocd > 0 && (!GC_dont_expand || !retry) ?
-                        GC_default_stop_func : GC_never_stop_func);
+      gc_not_stopped = MANAGED_STACK_ADDRESS_BOEHM_GC_try_to_collect_inner(
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd > 0 && (!MANAGED_STACK_ADDRESS_BOEHM_GC_dont_expand || !retry) ?
+                        MANAGED_STACK_ADDRESS_BOEHM_GC_default_stop_func : MANAGED_STACK_ADDRESS_BOEHM_GC_never_stop_func);
       if (gc_not_stopped == TRUE || !retry) {
         /* Either the collection hasn't been aborted or this is the     */
         /* first attempt (in a loop).                                   */
-        last_fo_entries = GC_fo_entries;
-        last_bytes_finalized = GC_bytes_finalized;
+        last_fo_entries = MANAGED_STACK_ADDRESS_BOEHM_GC_fo_entries;
+        last_bytes_finalized = MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_finalized;
         RESTORE_CANCEL(cancel_state);
         return TRUE;
       }
     }
 
-    blocks_to_get = (GC_heapsize - GC_heapsize_at_forced_unmap)
-                        / (HBLKSIZE * GC_free_space_divisor)
+    blocks_to_get = (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize_at_forced_unmap)
+                        / (HBLKSIZE * MANAGED_STACK_ADDRESS_BOEHM_GC_free_space_divisor)
                     + needed_blocks;
     if (blocks_to_get > MAXHINCR) {
       word slop;
@@ -1717,59 +1717,59 @@ GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
       } else {
         blocks_to_get = MAXHINCR;
       }
-      if (blocks_to_get > divHBLKSZ(GC_WORD_MAX))
-        blocks_to_get = divHBLKSZ(GC_WORD_MAX);
+      if (blocks_to_get > divHBLKSZ(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX))
+        blocks_to_get = divHBLKSZ(MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_MAX);
     } else if (blocks_to_get < MINHINCR) {
       blocks_to_get = MINHINCR;
     }
 
-    if (GC_max_heapsize > GC_heapsize) {
-      word max_get_blocks = divHBLKSZ(GC_max_heapsize - GC_heapsize);
+    if (MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize > MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize) {
+      word max_get_blocks = divHBLKSZ(MANAGED_STACK_ADDRESS_BOEHM_GC_max_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize);
       if (blocks_to_get > max_get_blocks)
         blocks_to_get = max_get_blocks > needed_blocks
                         ? max_get_blocks : needed_blocks;
     }
 
 #   ifdef USE_MUNMAP
-      if (GC_unmap_threshold > 1) {
+      if (MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_threshold > 1) {
         /* Return as much memory to the OS as possible before   */
         /* trying to get memory from it.                        */
-        GC_unmap_old(0);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_unmap_old(0);
       }
 #   endif
-    if (!GC_expand_hp_inner(blocks_to_get)
+    if (!MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner(blocks_to_get)
         && (blocks_to_get == needed_blocks
-            || !GC_expand_hp_inner(needed_blocks))) {
+            || !MANAGED_STACK_ADDRESS_BOEHM_GC_expand_hp_inner(needed_blocks))) {
       if (gc_not_stopped == FALSE) {
-        /* Don't increment GC_fail_count here (and no warning).     */
-        GC_gcollect_inner();
-        GC_ASSERT(GC_bytes_allocd == 0);
-      } else if (GC_fail_count++ < GC_max_retries) {
+        /* Don't increment MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count here (and no warning).     */
+        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect_inner();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_bytes_allocd == 0);
+      } else if (MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count++ < MANAGED_STACK_ADDRESS_BOEHM_GC_max_retries) {
         WARN("Out of Memory!  Trying to continue...\n", 0);
-        GC_gcollect_inner();
+        MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect_inner();
       } else {
-#       if !defined(AMIGA) || !defined(GC_AMIGA_FASTALLOC)
+#       if !defined(AMIGA) || !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC)
 #         ifdef USE_MUNMAP
-            GC_ASSERT(GC_heapsize >= GC_unmapped_bytes);
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize >= MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes);
 #         endif
 #         if !defined(SMALL_CONFIG) && (CPP_WORDSZ >= 32)
 #           define MAX_HEAPSIZE_WARNED_IN_BYTES (5 << 20) /* 5 MB */
-            if (GC_heapsize > (word)MAX_HEAPSIZE_WARNED_IN_BYTES) {
+            if (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize > (word)MAX_HEAPSIZE_WARNED_IN_BYTES) {
               WARN("Out of Memory! Heap size: %" WARN_PRIuPTR " MiB."
                    " Returning NULL!\n",
-                   (GC_heapsize - GC_unmapped_bytes) >> 20);
+                   (MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes) >> 20);
             } else
 #         endif
           /* else */ {
               WARN("Out of Memory! Heap size: %" WARN_PRIuPTR " bytes."
-                   " Returning NULL!\n", GC_heapsize - GC_unmapped_bytes);
+                   " Returning NULL!\n", MANAGED_STACK_ADDRESS_BOEHM_GC_heapsize - MANAGED_STACK_ADDRESS_BOEHM_GC_unmapped_bytes);
           }
 #       endif
         RESTORE_CANCEL(cancel_state);
         return FALSE;
       }
-    } else if (GC_fail_count) {
-      GC_COND_LOG_PRINTF("Memory available again...\n");
+    } else if (MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count) {
+      MANAGED_STACK_ADDRESS_BOEHM_GC_COND_LOG_PRINTF("Memory available again...\n");
     }
     RESTORE_CANCEL(cancel_state);
     return TRUE;
@@ -1780,48 +1780,48 @@ GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
  * Return a pointer to the first object on the free list.
  * The object MUST BE REMOVED FROM THE FREE LIST BY THE CALLER.
  */
-GC_INNER ptr_t GC_allocobj(size_t gran, int kind)
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_allocobj(size_t gran, int kind)
 {
-    void ** flh = &GC_obj_kinds[kind].ok_freelist[gran];
-    GC_bool tried_minor = FALSE;
-    GC_bool retry = FALSE;
+    void ** flh = &MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_freelist[gran];
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool tried_minor = FALSE;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_bool retry = FALSE;
 
-    GC_ASSERT(I_HOLD_LOCK());
-    GC_ASSERT(GC_is_initialized);
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(I_HOLD_LOCK());
+    MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(MANAGED_STACK_ADDRESS_BOEHM_GC_is_initialized);
     if (0 == gran) return NULL;
 
     while (NULL == *flh) {
       ENTER_GC();
-#     ifndef GC_DISABLE_INCREMENTAL
-        if (GC_incremental && GC_time_limit != GC_TIME_UNLIMITED
-            && !GC_dont_gc) {
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit != MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED
+            && !MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
           /* True incremental mode, not just generational.      */
           /* Do our share of marking work.                      */
-          GC_collect_a_little_inner(1);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1);
         }
 #     endif
       /* Sweep blocks for objects of this size */
-        GC_ASSERT(!GC_is_full_gc
-                  || NULL == GC_obj_kinds[kind].ok_reclaim_list
-                  || NULL == GC_obj_kinds[kind].ok_reclaim_list[gran]);
-        GC_continue_reclaim(gran, kind);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!MANAGED_STACK_ADDRESS_BOEHM_GC_is_full_gc
+                  || NULL == MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_reclaim_list
+                  || NULL == MANAGED_STACK_ADDRESS_BOEHM_GC_obj_kinds[kind].ok_reclaim_list[gran]);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_continue_reclaim(gran, kind);
       EXIT_GC();
 #     if defined(CPPCHECK)
-        GC_noop1((word)&flh);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)&flh);
 #     endif
       if (NULL == *flh) {
-        GC_new_hblk(gran, kind);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_new_hblk(gran, kind);
 #       if defined(CPPCHECK)
-          GC_noop1((word)&flh);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_noop1((word)&flh);
 #       endif
         if (NULL == *flh) {
           ENTER_GC();
-          if (GC_incremental && GC_time_limit == GC_TIME_UNLIMITED
-              && !tried_minor && !GC_dont_gc) {
-            GC_collect_a_little_inner(1);
+          if (MANAGED_STACK_ADDRESS_BOEHM_GC_incremental && MANAGED_STACK_ADDRESS_BOEHM_GC_time_limit == MANAGED_STACK_ADDRESS_BOEHM_GC_TIME_UNLIMITED
+              && !tried_minor && !MANAGED_STACK_ADDRESS_BOEHM_GC_dont_gc) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_collect_a_little_inner(1);
             tried_minor = TRUE;
           } else {
-            if (!GC_collect_or_expand(1, 0 /* flags */, retry)) {
+            if (!MANAGED_STACK_ADDRESS_BOEHM_GC_collect_or_expand(1, 0 /* flags */, retry)) {
               EXIT_GC();
               return NULL;
             }
@@ -1832,7 +1832,7 @@ GC_INNER ptr_t GC_allocobj(size_t gran, int kind)
       }
     }
     /* Successful allocation; reset failure count.      */
-    GC_fail_count = 0;
+    MANAGED_STACK_ADDRESS_BOEHM_GC_fail_count = 0;
 
     return (ptr_t)(*flh);
 }

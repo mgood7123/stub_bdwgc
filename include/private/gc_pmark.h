@@ -20,22 +20,22 @@
  * Declarations of mark stack.  Needed by marker and client supplied mark
  * routines.  Transitively include gc_priv.h.
  */
-#ifndef GC_PMARK_H
-#define GC_PMARK_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_PMARK_H
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_PMARK_H
 
-#if defined(HAVE_CONFIG_H) && !defined(GC_PRIVATE_H)
+#if defined(HAVE_CONFIG_H) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H)
   /* When gc_pmark.h is included from gc_priv.h, some of macros might   */
   /* be undefined in gcconfig.h, so skip config.h in this case.         */
 # include "config.h"
 #endif
 
-#ifndef GC_BUILD
-# define GC_BUILD
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_BUILD
 #endif
 
 #if (defined(__linux__) || defined(__GLIBC__) || defined(__GNU__)) \
-    && !defined(_GNU_SOURCE) && defined(GC_PTHREADS) \
-    && !defined(GC_NO_PTHREAD_SIGMASK)
+    && !defined(_GNU_SOURCE) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_PTHREAD_SIGMASK)
 # define _GNU_SOURCE 1
 #endif
 
@@ -49,7 +49,7 @@
 EXTERN_C_BEGIN
 
 /* The real declarations of the following is in gc_priv.h, so that      */
-/* we can avoid scanning GC_mark_procs table.                           */
+/* we can avoid scanning MANAGED_STACK_ADDRESS_BOEHM_GC_mark_procs table.                           */
 
 #ifndef MARK_DESCR_OFFSET
 # define MARK_DESCR_OFFSET sizeof(word)
@@ -57,17 +57,17 @@ EXTERN_C_BEGIN
 
 /* Mark descriptor stuff that should remain private for now, mostly     */
 /* because it's hard to export CPP_WORDSZ without including gcconfig.h. */
-#define BITMAP_BITS (CPP_WORDSZ - GC_DS_TAG_BITS)
+#define BITMAP_BITS (CPP_WORDSZ - MANAGED_STACK_ADDRESS_BOEHM_GC_DS_TAG_BITS)
 #define PROC(descr) \
-      (GC_mark_procs[((descr) >> GC_DS_TAG_BITS) & (GC_MAX_MARK_PROCS-1)])
+      (MANAGED_STACK_ADDRESS_BOEHM_GC_mark_procs[((descr) >> MANAGED_STACK_ADDRESS_BOEHM_GC_DS_TAG_BITS) & (MANAGED_STACK_ADDRESS_BOEHM_GC_MAX_MARK_PROCS-1)])
 #define ENV(descr) \
-      ((descr) >> (GC_DS_TAG_BITS + GC_LOG_MAX_MARK_PROCS))
-#define MAX_ENV (((word)1 << (BITMAP_BITS - GC_LOG_MAX_MARK_PROCS)) - 1)
+      ((descr) >> (MANAGED_STACK_ADDRESS_BOEHM_GC_DS_TAG_BITS + MANAGED_STACK_ADDRESS_BOEHM_GC_LOG_MAX_MARK_PROCS))
+#define MAX_ENV (((word)1 << (BITMAP_BITS - MANAGED_STACK_ADDRESS_BOEHM_GC_LOG_MAX_MARK_PROCS)) - 1)
 
-GC_EXTERN unsigned GC_n_mark_procs;
+MANAGED_STACK_ADDRESS_BOEHM_GC_EXTERN unsigned MANAGED_STACK_ADDRESS_BOEHM_GC_n_mark_procs;
 
 /* Number of mark stack entries to discard on overflow. */
-#define GC_MARK_STACK_DISCARDS (INITIAL_MARK_STACK_SIZE/8)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_MARK_STACK_DISCARDS (INITIAL_MARK_STACK_SIZE/8)
 
 #ifdef PARALLEL_MARK
     /*
@@ -75,10 +75,10 @@ GC_EXTERN unsigned GC_n_mark_procs;
      * This works roughly as follows:
      *  The main mark stack never shrinks, but it can grow.
      *
-     *  The initiating threads holds the GC lock, and sets GC_help_wanted.
+     *  The initiating threads holds the GC lock, and sets MANAGED_STACK_ADDRESS_BOEHM_GC_help_wanted.
      *
      *  Other threads:
-     *     1) update helper_count (while holding the mark lock).
+     *     1) update helper_count (while holding mark_lock.)
      *     2) allocate a local mark stack
      *     repeatedly:
      *          3) Steal a global mark stack entry by atomically replacing
@@ -89,39 +89,39 @@ GC_EXTERN unsigned GC_n_mark_procs;
      *          6) If necessary, copy local stack to global one,
      *             holding mark lock.
      *    7) Stop when the global mark stack is empty.
-     *    8) decrement helper_count (holding the mark lock).
+     *    8) decrement helper_count (holding mark_lock).
      *
      * This is an experiment to see if we can do something along the lines
      * of the University of Tokyo SGC in a less intrusive, though probably
      * also less performant, way.
      */
 
-    /* GC_mark_stack_top is protected by mark lock.     */
+    /* MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top is protected by mark lock.     */
 
     /*
-     * GC_notify_all_marker() is used when GC_help_wanted is first set,
+     * MANAGED_STACK_ADDRESS_BOEHM_GC_notify_all_marker() is used when MANAGED_STACK_ADDRESS_BOEHM_GC_help_wanted is first set,
      * when the last helper becomes inactive,
      * when something is added to the global mark stack, and just after
-     * GC_mark_no is incremented.
+     * MANAGED_STACK_ADDRESS_BOEHM_GC_mark_no is incremented.
      * This could be split into multiple CVs (and probably should be to
      * scale to really large numbers of processors.)
      */
 #endif /* PARALLEL_MARK */
 
-GC_INNER mse * GC_signal_mark_stack_overflow(mse *msp);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER mse * MANAGED_STACK_ADDRESS_BOEHM_GC_signal_mark_stack_overflow(mse *msp);
 
 /* Push the object obj with corresponding heap block header hhdr onto   */
 /* the mark stack.  Returns the updated mark_stack_top value.           */
-GC_INLINE mse * GC_push_obj(ptr_t obj, hdr * hhdr, mse * mark_stack_top,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE mse * MANAGED_STACK_ADDRESS_BOEHM_GC_push_obj(ptr_t obj, hdr * hhdr, mse * mark_stack_top,
                             mse * mark_stack_limit)
 {
   word descr = hhdr -> hb_descr;
 
-  GC_ASSERT(!HBLK_IS_FREE(hhdr));
+  MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(!HBLK_IS_FREE(hhdr));
   if (descr != 0) {
     mark_stack_top++;
     if ((word)mark_stack_top >= (word)mark_stack_limit) {
-      mark_stack_top = GC_signal_mark_stack_overflow(mark_stack_top);
+      mark_stack_top = MANAGED_STACK_ADDRESS_BOEHM_GC_signal_mark_stack_overflow(mark_stack_top);
     }
     mark_stack_top -> mse_start = obj;
     mark_stack_top -> mse_descr.w = descr;
@@ -135,7 +135,7 @@ GC_INLINE mse * GC_push_obj(ptr_t obj, hdr * hhdr, mse * mark_stack_top,
   do { \
     hdr * my_hhdr; \
     HC_GET_HDR(current, my_hhdr, source); /* contains "break" */ \
-    mark_stack_top = GC_push_contents_hdr(current, mark_stack_top, \
+    mark_stack_top = MANAGED_STACK_ADDRESS_BOEHM_GC_push_contents_hdr(current, mark_stack_top, \
                                           mark_stack_limit, \
                                           source, my_hhdr, TRUE); \
   } while (0)
@@ -216,10 +216,10 @@ GC_INLINE mse * GC_push_obj(ptr_t obj, hdr * hhdr, mse * mark_stack_top,
 
 #ifdef ENABLE_TRACE
 # define TRACE(source, cmd) \
-        if (GC_trace_addr != 0 && (ptr_t)(source) == GC_trace_addr) cmd
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr != 0 && (ptr_t)(source) == MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr) cmd
 # define TRACE_TARGET(target, cmd) \
-        if (GC_trace_addr != NULL && GC_is_heap_ptr(GC_trace_addr) \
-            && (target) == *(ptr_t *)GC_trace_addr) cmd
+        if (MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr != NULL && MANAGED_STACK_ADDRESS_BOEHM_GC_is_heap_ptr(MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr) \
+            && (target) == *(ptr_t *)MANAGED_STACK_ADDRESS_BOEHM_GC_trace_addr) cmd
 #else
 # define TRACE(source, cmd)
 # define TRACE_TARGET(source, cmd)
@@ -234,9 +234,9 @@ GC_INLINE mse * GC_push_obj(ptr_t obj, hdr * hhdr, mse * mark_stack_top,
 /* here.  Note in particular that the "displ" value is the displacement */
 /* from the beginning of the heap block, which may itself be in the     */
 /* interior of a large object.                                          */
-GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
+MANAGED_STACK_ADDRESS_BOEHM_GC_INLINE mse * MANAGED_STACK_ADDRESS_BOEHM_GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
                                      mse * mark_stack_limit, ptr_t source,
-                                     hdr * hhdr, GC_bool do_offset_check)
+                                     hdr * hhdr, MANAGED_STACK_ADDRESS_BOEHM_GC_bool do_offset_check)
 {
   do {
     size_t displ = HBLKDISPL(current); /* Displacement in block; in bytes. */
@@ -251,7 +251,7 @@ GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
 #   else
       size_t gran_displ = BYTES_TO_GRANULES(displ);
       size_t gran_offset = hhdr -> hb_map[gran_displ];
-      size_t byte_offset = displ & (GC_GRANULE_BYTES-1);
+      size_t byte_offset = displ & (MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES-1);
 
       /* The following always fails for large block references.         */
       if (EXPECT((gran_offset | byte_offset) != 0, FALSE))
@@ -269,16 +269,16 @@ GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
         base = (ptr_t)hhdr->hb_block;
         obj_displ = (size_t)(current - base);
         if (obj_displ != displ) {
-          GC_ASSERT(obj_displ < hhdr -> hb_sz);
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(obj_displ < hhdr -> hb_sz);
           /* Must be in all_interior_pointer case, not first block      */
           /* already did validity check on cache miss.                  */
-        } else if (do_offset_check && !GC_valid_offsets[obj_displ]) {
-          GC_ADD_TO_BLACK_LIST_NORMAL(current, source);
+        } else if (do_offset_check && !MANAGED_STACK_ADDRESS_BOEHM_GC_valid_offsets[obj_displ]) {
+          MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_NORMAL(current, source);
           break;
         }
-        GC_ASSERT(hhdr -> hb_sz > HBLKSIZE
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr -> hb_sz > HBLKSIZE
                   || hhdr -> hb_block == HBLKPTR(current));
-        GC_ASSERT((word)hhdr->hb_block <= (word)current);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT((word)hhdr->hb_block <= (word)current);
         gran_displ = 0;
       } else {
 #       ifndef MARK_BIT_PER_OBJ
@@ -295,11 +295,11 @@ GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
             size_t obj_displ;
 
             /* Accurate enough if HBLKSIZE <= 2**15.    */
-            GC_STATIC_ASSERT(HBLKSIZE <= (1 << 15));
+            MANAGED_STACK_ADDRESS_BOEHM_GC_STATIC_ASSERT(HBLKSIZE <= (1 << 15));
             obj_displ = (((low_prod >> 16) + 1) * (size_t)hhdr->hb_sz) >> 16;
 #         endif
-          if (do_offset_check && !GC_valid_offsets[obj_displ]) {
-            GC_ADD_TO_BLACK_LIST_NORMAL(current, source);
+          if (do_offset_check && !MANAGED_STACK_ADDRESS_BOEHM_GC_valid_offsets[obj_displ]) {
+            MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_TO_BLACK_LIST_NORMAL(current, source);
             break;
           }
 #         ifndef MARK_BIT_PER_OBJ
@@ -312,22 +312,22 @@ GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
 #   ifdef MARK_BIT_PER_OBJ
       /* May get here for pointer to start of block not at the          */
       /* beginning of object.  If so, it is valid, and we are fine.     */
-      GC_ASSERT(gran_displ <= HBLK_OBJS(hhdr -> hb_sz));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(gran_displ <= HBLK_OBJS(hhdr -> hb_sz));
 #   else
-      GC_ASSERT(hhdr == GC_find_header(base));
-      GC_ASSERT(gran_displ % BYTES_TO_GRANULES(hhdr -> hb_sz) == 0);
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(hhdr == MANAGED_STACK_ADDRESS_BOEHM_GC_find_header(base));
+      MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERT(gran_displ % BYTES_TO_GRANULES(hhdr -> hb_sz) == 0);
 #   endif
-    TRACE(source, GC_log_printf("GC #%lu: passed validity tests\n",
-                                (unsigned long)GC_gc_no));
+    TRACE(source, MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("GC #%lu: passed validity tests\n",
+                                (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no));
     SET_MARK_BIT_EXIT_IF_SET(hhdr, gran_displ); /* contains "break" */
-    TRACE(source, GC_log_printf("GC #%lu: previously unmarked\n",
-                                (unsigned long)GC_gc_no));
-    TRACE_TARGET(base, GC_log_printf("GC #%lu: marking %p from %p instead\n",
-                                     (unsigned long)GC_gc_no, (void *)base,
+    TRACE(source, MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("GC #%lu: previously unmarked\n",
+                                (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no));
+    TRACE_TARGET(base, MANAGED_STACK_ADDRESS_BOEHM_GC_log_printf("GC #%lu: marking %p from %p instead\n",
+                                     (unsigned long)MANAGED_STACK_ADDRESS_BOEHM_GC_gc_no, (void *)base,
                                      (void *)source));
     INCR_MARKS(hhdr);
-    GC_STORE_BACK_PTR(source, base);
-    mark_stack_top = GC_push_obj(base, hhdr, mark_stack_top,
+    MANAGED_STACK_ADDRESS_BOEHM_GC_STORE_BACK_PTR(source, base);
+    mark_stack_top = MANAGED_STACK_ADDRESS_BOEHM_GC_push_obj(base, hhdr, mark_stack_top,
                                  mark_stack_limit);
   } while (0);
   return mark_stack_top;
@@ -335,64 +335,66 @@ GC_INLINE mse * GC_push_contents_hdr(ptr_t current, mse * mark_stack_top,
 
 #if defined(PRINT_BLACK_LIST) || defined(KEEP_BACK_PTRS)
 # define PUSH_ONE_CHECKED_STACK(p, source) \
-        GC_mark_and_push_stack((ptr_t)(p), (ptr_t)(source))
+        MANAGED_STACK_ADDRESS_BOEHM_GC_mark_and_push_stack((ptr_t)(p), (ptr_t)(source))
 #else
 # define PUSH_ONE_CHECKED_STACK(p, source) \
-        GC_mark_and_push_stack((ptr_t)(p))
+        MANAGED_STACK_ADDRESS_BOEHM_GC_mark_and_push_stack((ptr_t)(p))
 #endif
 
-/* Push a single value onto mark stack. Mark from the object        */
-/* pointed to by p.  The argument should be of word type.           */
-/* Invoke FIXUP_POINTER(p) before any further processing.  p is     */
-/* considered valid even if it is an interior pointer.  Previously  */
-/* marked objects are not pushed.  Hence we make progress even      */
-/* if the mark stack overflows.                                     */
+/*
+ * Push a single value onto mark stack. Mark from the object pointed to by p.
+ * Invoke FIXUP_POINTER(p) before any further processing.
+ * P is considered valid even if it is an interior pointer.
+ * Previously marked objects are not pushed.  Hence we make progress even
+ * if the mark stack overflows.
+ */
+
 #ifdef NEED_FIXUP_POINTER
     /* Try both the raw version and the fixed up one.   */
-# define GC_PUSH_ONE_STACK(p, source) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PUSH_ONE_STACK(p, source) \
     do { \
-      if ((p) > (word)GC_least_plausible_heap_addr \
-          && (p) < (word)GC_greatest_plausible_heap_addr) { \
-        PUSH_ONE_CHECKED_STACK(p, source); \
+      if ((word)(p) > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr \
+          && (word)(p) < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr) { \
+         PUSH_ONE_CHECKED_STACK(p, source); \
       } \
       FIXUP_POINTER(p); \
-      if ((p) > (word)GC_least_plausible_heap_addr \
-          && (p) < (word)GC_greatest_plausible_heap_addr) { \
-        PUSH_ONE_CHECKED_STACK(p, source); \
+      if ((word)(p) > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr \
+          && (word)(p) < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr) { \
+         PUSH_ONE_CHECKED_STACK(p, source); \
       } \
     } while (0)
 #else /* !NEED_FIXUP_POINTER */
-# define GC_PUSH_ONE_STACK(p, source) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PUSH_ONE_STACK(p, source) \
     do { \
-      if ((p) > (word)GC_least_plausible_heap_addr \
-          && (p) < (word)GC_greatest_plausible_heap_addr) { \
-        PUSH_ONE_CHECKED_STACK(p, source); \
+      if ((word)(p) > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr \
+          && (word)(p) < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr) { \
+         PUSH_ONE_CHECKED_STACK(p, source); \
       } \
     } while (0)
 #endif
 
 /* As above, but interior pointer recognition as for normal heap pointers. */
-#define GC_PUSH_ONE_HEAP(p, source, mark_stack_top) \
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_PUSH_ONE_HEAP(p,source,mark_stack_top) \
     do { \
       FIXUP_POINTER(p); \
-      if ((p) > (word)GC_least_plausible_heap_addr \
-          && (p) < (word)GC_greatest_plausible_heap_addr) \
-        mark_stack_top = GC_mark_and_push((void *)(p), mark_stack_top, \
-                                GC_mark_stack_limit, (void * *)(source)); \
+      if ((word)(p) > (word)MANAGED_STACK_ADDRESS_BOEHM_GC_least_plausible_heap_addr \
+          && (word)(p) < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_greatest_plausible_heap_addr) \
+        mark_stack_top = MANAGED_STACK_ADDRESS_BOEHM_GC_mark_and_push((void *)(p), mark_stack_top, \
+                                MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_limit, (void * *)(source)); \
     } while (0)
 
 /* Mark starting at mark stack entry top (incl.) down to        */
 /* mark stack entry bottom (incl.).  Stop after performing      */
 /* about one page worth of work.  Return the new mark stack     */
 /* top entry.                                                   */
-GC_INNER mse * GC_mark_from(mse * top, mse * bottom, mse *limit);
+MANAGED_STACK_ADDRESS_BOEHM_GC_INNER mse * MANAGED_STACK_ADDRESS_BOEHM_GC_mark_from(mse * top, mse * bottom, mse *limit);
 
 #define MARK_FROM_MARK_STACK() \
-        GC_mark_stack_top = GC_mark_from(GC_mark_stack_top, \
-                                         GC_mark_stack, \
-                                         GC_mark_stack + GC_mark_stack_size);
+        MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top = MANAGED_STACK_ADDRESS_BOEHM_GC_mark_from(MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top, \
+                                         MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack, \
+                                         MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack + MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_size);
 
-#define GC_mark_stack_empty() ((word)GC_mark_stack_top < (word)GC_mark_stack)
+#define MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_empty() ((word)MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack_top < (word)MANAGED_STACK_ADDRESS_BOEHM_GC_mark_stack)
 
                                 /* Current state of marking, as follows.*/
 
@@ -415,11 +417,11 @@ GC_INNER mse * GC_mark_from(mse * top, mse * bottom, mse *limit);
                                 /* being pushed.  "I" holds, except     */
                                 /* that grungy roots may point to       */
                                 /* unmarked objects, as may marked      */
-                                /* grungy objects above GC_scan_ptr.    */
+                                /* grungy objects above MANAGED_STACK_ADDRESS_BOEHM_GC_scan_ptr.    */
 
 #define MS_PUSH_UNCOLLECTABLE 2 /* "I" holds, except that marked        */
                                 /* uncollectible objects above          */
-                                /* GC_scan_ptr may point to unmarked    */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_scan_ptr may point to unmarked    */
                                 /* objects.  Roots may point to         */
                                 /* unmarked objects.                    */
 
@@ -428,11 +430,11 @@ GC_INNER mse * GC_mark_from(mse * top, mse * bottom, mse *limit);
 #define MS_PARTIALLY_INVALID 4  /* "I" may not hold, e.g. because of    */
                                 /* the mark stack overflow.  However,   */
                                 /* marked heap objects below            */
-                                /* GC_scan_ptr point to marked or       */
+                                /* MANAGED_STACK_ADDRESS_BOEHM_GC_scan_ptr point to marked or       */
                                 /* stacked objects.                     */
 
 #define MS_INVALID 5            /* "I" may not hold.                    */
 
 EXTERN_C_END
 
-#endif  /* GC_PMARK_H */
+#endif  /* MANAGED_STACK_ADDRESS_BOEHM_GC_PMARK_H */

@@ -63,7 +63,7 @@ struct a_s {
 
 static word nested_sp(void)
 {
-# if GC_GNUC_PREREQ(4, 0)
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 0)
     return (word)__builtin_frame_address(0);
 # else
     volatile word sp;
@@ -141,8 +141,8 @@ int main(void)
     if (y == 1) LONGJMP(b, 1);
 # endif
     printf("Some GC internal configuration stuff: \n");
-    printf("\tWORDSZ = %lu, ALIGNMENT = %d, GC_GRANULE_BYTES = %d\n",
-           (unsigned long)CPP_WORDSZ, ALIGNMENT, GC_GRANULE_BYTES);
+    printf("\tWORDSZ = %lu, ALIGNMENT = %d, MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES = %d\n",
+           (unsigned long)CPP_WORDSZ, ALIGNMENT, MANAGED_STACK_ADDRESS_BOEHM_GC_GRANULE_BYTES);
     printf("\tUsing one mark ");
 #   ifdef USE_MARK_BYTES
       printf("byte");

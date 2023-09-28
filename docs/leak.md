@@ -2,7 +2,7 @@
 
 The garbage collector may be used as a leak detector. In this case, the
 primary function of the collector is to report objects that were allocated
-(typically with `GC_MALLOC`), not deallocated (normally with `GC_FREE`), but
+(typically with `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC`), not deallocated (normally with `MANAGED_STACK_ADDRESS_BOEHM_GC_FREE`), but
 are no longer accessible. Since the object is no longer accessible, there
 is normally no way to deallocate the object at a later time; thus it can
 safely be assumed that the object has been "leaked".
@@ -19,7 +19,7 @@ of paging.
 The garbage collector provides leak detection support. This includes the
 following features:
 
-  1. Leak detection mode can be initiated at run-time by `GC_set_find_leak(1)`
+  1. Leak detection mode can be initiated at run-time by `MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(1)`
   call at program startup instead of building the collector with `FIND_LEAK`
   macro defined.
   2. Leaked objects should be reported and then correctly garbage collected.
@@ -29,12 +29,12 @@ To use the collector as a leak detector, do the following steps:
   1. Activate the leak detection mode as described above.
   2. Change the program so that all allocation and deallocation goes through
   the garbage collector.
-  3. Arrange to call `GC_gcollect` (or `CHECK_LEAKS()`) at appropriate points
+  3. Arrange to call `MANAGED_STACK_ADDRESS_BOEHM_GC_gcollect` (or `CHECK_LEAKS()`) at appropriate points
   to check for leaks. (This happens implicitly but probably not with
   a sufficient frequency for long running programs.)
 
 The second step can usually be accomplished with the
-`-DREDIRECT_MALLOC=GC_malloc` option when the collector is built, or by
+`-DREDIRECT_MALLOC=MANAGED_STACK_ADDRESS_BOEHM_GC_malloc` option when the collector is built, or by
 defining `malloc`, `calloc`, `realloc`, `free` (as well as `posix_memalign`,
 `reallocarray`, `strdup`, `strndup`, `wcsdup`, BSD `memalign`, GNU `valloc`,
 GNU `pvalloc`) to call the corresponding garbage collector function. But this,
@@ -43,8 +43,8 @@ does not keep track of the information about how objects were allocated. The
 error reports will include only object addresses.
 
 For more precise error reports, as much of the program as possible should use
-the all uppercase variants of these functions, after defining `GC_DEBUG`, and
-then including `gc.h`. In this environment `GC_MALLOC` is a macro which causes
+the all uppercase variants of these functions, after defining `MANAGED_STACK_ADDRESS_BOEHM_GC_DEBUG`, and
+then including `gc.h`. In this environment `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` is a macro which causes
 at least the file name and line number at the allocation point to be saved
 as part of the object. Leak reports will then also include this information.
 
@@ -57,7 +57,7 @@ The same is generally true of thread support. However, the correct leak
 reports should be generated with linuxthreads, at least.
 
 On a few platforms (currently Solaris/SPARC, Irix, and, with
-`-DSAVE_CALL_CHAIN`, Linux/x86), `GC_MALLOC` also causes some more information
+`-DSAVE_CALL_CHAIN`, Linux/x86), `MANAGED_STACK_ADDRESS_BOEHM_GC_MALLOC` also causes some more information
 about its call stack to be saved in the object. Such information is reproduced
 in the error reports in very non-symbolic form, but it can be very useful with
 the aid of a debugger.
@@ -68,7 +68,7 @@ The `leak_detector.h` file is included in the "include" subdirectory of the
 distribution.
 
 Assume the collector has been built with `-DFIND_LEAK` or
-`GC_set_find_leak(1)` exists as the first statement in `main`.
+`MANAGED_STACK_ADDRESS_BOEHM_GC_set_find_leak(1)` exists as the first statement in `main`.
 
 The program to be tested for leaks could look like `tests/leak.c` file
 of the distribution.
@@ -108,7 +108,7 @@ and on Solaris the error report is:
 
 In the latter two cases some additional information is given about how malloc
 was called when the leaked object was allocated. For Solaris, the first line
-specifies the arguments to `GC_debug_malloc` (the actual allocation routine),
+specifies the arguments to `MANAGED_STACK_ADDRESS_BOEHM_GC_debug_malloc` (the actual allocation routine),
 The second one specifies the program counter inside `main`, the third one
 specifies the arguments to `main`, and, finally, the program counter inside
 the caller to `main` (i.e. in the C startup code). In the Irix case, only the
@@ -131,7 +131,7 @@ a program a.out under Linux/x86 as follows:
   in `/usr/bin`. (It comes with most Linux distributions.)
   3. If possible, compile your program, which we'll call `a.out`, with full
   debug information. This will improve the quality of the leak reports.
-  With this approach, it is no longer necessary to call `GC_` routines
+  With this approach, it is no longer necessary to call `MANAGED_STACK_ADDRESS_BOEHM_GC_` routines
   explicitly, though that can also improve the quality of the leak reports.
   4. Build the collector and install it in directory _foo_ as follows (it may
   be safe to omit the `--disable-threads` option on Linux, but the combination
@@ -146,9 +146,9 @@ a program a.out under Linux/x86 as follows:
   console window if something goes wrong, respectively):
 
    - `LD_PRELOAD=_foo_/lib/libgc.so`
-   - `GC_FIND_LEAK`
-   - `GC_PRINT_STATS`
-   - `GC_LOOP_ON_ABORT`
+   - `MANAGED_STACK_ADDRESS_BOEHM_GC_FIND_LEAK`
+   - `MANAGED_STACK_ADDRESS_BOEHM_GC_PRINT_STATS`
+   - `MANAGED_STACK_ADDRESS_BOEHM_GC_LOOP_ON_ABORT`
 
   6. Simply run `a.out` as you normally would. Note that if you run anything
   else (e.g. your editor) with those environment variables set, it will also

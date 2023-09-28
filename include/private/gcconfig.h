@@ -26,7 +26,7 @@
 #ifndef GCCONFIG_H
 #define GCCONFIG_H
 
-#ifndef GC_H
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_H
 # ifdef HAVE_CONFIG_H
 #   include "config.h"
 # endif
@@ -67,15 +67,15 @@ EXTERN_C_BEGIN
 
 /* Convenient internal macro to test version of Clang.  */
 #if defined(__clang__) && defined(__clang_major__)
-# define GC_CLANG_PREREQ(major, minor) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(major, minor) \
     ((__clang_major__ << 8) + __clang_minor__ >= ((major) << 8) + (minor))
-# define GC_CLANG_PREREQ_FULL(major, minor, patchlevel) \
-            (GC_CLANG_PREREQ(major, (minor) + 1) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ_FULL(major, minor, patchlevel) \
+            (MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(major, (minor) + 1) \
                 || (__clang_major__ == (major) && __clang_minor__ == (minor) \
                     && __clang_patchlevel__ >= (patchlevel)))
 #else
-# define GC_CLANG_PREREQ(major, minor) 0 /* FALSE */
-# define GC_CLANG_PREREQ_FULL(major, minor, patchlevel) 0
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(major, minor) 0 /* FALSE */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ_FULL(major, minor, patchlevel) 0
 #endif
 
 #ifdef LINT2
@@ -83,11 +83,11 @@ EXTERN_C_BEGIN
   /* like "Array compared to 0", "Comparison of identical expressions", */
   /* "Untrusted loop bound" output by some static code analysis tools.  */
   /* The argument should not be a literal value.  The result is         */
-  /* converted to word type.  (Actually, GC_word is used instead of     */
+  /* converted to word type.  (Actually, MANAGED_STACK_ADDRESS_BOEHM_GC_word is used instead of     */
   /* word type as the latter might be undefined at the place of use.)   */
-# define COVERT_DATAFLOW(w) (~(GC_word)(w)^(~(GC_word)0))
+# define COVERT_DATAFLOW(w) (~(MANAGED_STACK_ADDRESS_BOEHM_GC_word)(w)^(~(MANAGED_STACK_ADDRESS_BOEHM_GC_word)0))
 #else
-# define COVERT_DATAFLOW(w) ((GC_word)(w))
+# define COVERT_DATAFLOW(w) ((MANAGED_STACK_ADDRESS_BOEHM_GC_word)(w))
 #endif
 
 /* Machine dependent parameters.  Some tuning parameters can be found   */
@@ -130,7 +130,7 @@ EXTERN_C_BEGIN
 /* And one for FreeBSD: */
 # if (defined(__FreeBSD__) || defined(__DragonFly__) \
       || defined(__FreeBSD_kernel__)) && !defined(FREEBSD) \
-     && !defined(GC_NO_FREEBSD) /* Orbis compiler defines __FreeBSD__ */
+     && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_FREEBSD) /* Orbis compiler defines __FreeBSD__ */
 #   define FREEBSD
 # endif
 
@@ -182,7 +182,7 @@ EXTERN_C_BEGIN
 #   elif !defined(ANY_BSD) && !defined(DARWIN) && !defined(LINUX) \
          && !defined(QNX) && !defined(NN_PLATFORM_CTR) \
          && !defined(SN_TARGET_PSP2) && !defined(_WIN32) \
-         && !defined(__CEGCC__) && !defined(GC_NO_NOSYS)
+         && !defined(__CEGCC__) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_NOSYS)
 #     define NOSYS
 #     define mach_type_known
 #   endif
@@ -680,10 +680,10 @@ EXTERN_C_BEGIN
  *
  * DATASTART is the beginning of the data segment.
  * On some platforms SEARCH_FOR_DATA_START is defined.
- * The latter will cause GC_data_start to
+ * The latter will cause MANAGED_STACK_ADDRESS_BOEHM_GC_data_start to
  * be set to an address determined by accessing data backwards from _end
  * until an unmapped page is found.  DATASTART will be defined to be
- * GC_data_start.
+ * MANAGED_STACK_ADDRESS_BOEHM_GC_data_start.
  * On UNIX-like systems, the collector will scan the area between DATASTART
  * and DATAEND for root pointers.
  *
@@ -712,9 +712,9 @@ EXTERN_C_BEGIN
  * is not defined and NO_PROC_STAT is defined, we revert to HEURISTIC2.)
  * If either of the last two macros are defined, then STACKBOTTOM is computed
  * during collector startup using one of the following two heuristics:
- * HEURISTIC1:  Take an address inside GC_init's frame, and round it up to
+ * HEURISTIC1:  Take an address inside MANAGED_STACK_ADDRESS_BOEHM_GC_init's frame, and round it up to
  *              the next multiple of STACK_GRAN.
- * HEURISTIC2:  Take an address inside GC_init's frame, increment it repeatedly
+ * HEURISTIC2:  Take an address inside MANAGED_STACK_ADDRESS_BOEHM_GC_init's frame, increment it repeatedly
  *              in small steps (decrement if STACK_GROWS_UP), and read the value
  *              at each location.  Remember the value when the first
  *              Segmentation violation or Bus error is signaled.  Round that
@@ -731,17 +731,17 @@ EXTERN_C_BEGIN
  * If no expression for STACKBOTTOM can be found, and neither of the above
  * heuristics are usable, the collector can still be used with all of the above
  * undefined, provided one of the following is done:
- * 1) GC_mark_roots can be changed to somehow mark from the correct stack(s)
+ * 1) MANAGED_STACK_ADDRESS_BOEHM_GC_mark_roots can be changed to somehow mark from the correct stack(s)
  *    without reference to STACKBOTTOM.  This is appropriate for use in
  *    conjunction with thread packages, since there will be multiple stacks.
  *    (Allocating thread stacks in the heap, and treating them as ordinary
  *    heap data objects is also possible as a last resort.  However, this is
  *    likely to introduce significant amounts of excess storage retention
  *    unless the dead parts of the thread stacks are periodically cleared.)
- * 2) Client code may set GC_stackbottom before calling any GC_ routines.
+ * 2) Client code may set MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom before calling any MANAGED_STACK_ADDRESS_BOEHM_GC_ routines.
  *    If the author of the client code controls the main program, this is
  *    easily accomplished by introducing a new main program, setting
- *    GC_stackbottom to the address of a local variable, and then calling
+ *    MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom to the address of a local variable, and then calling
  *    the original main program.  The new main program would read something
  *    like (provided real_main() is not inlined by the compiler):
  *
@@ -753,7 +753,7 @@ EXTERN_C_BEGIN
  *              {
  *                  volatile int dummy;
  *
- *                  GC_stackbottom = (ptr_t)(&dummy);
+ *                  MANAGED_STACK_ADDRESS_BOEHM_GC_stackbottom = (ptr_t)(&dummy);
  *                  return real_main(argc, argv, envp);
  *              }
  *
@@ -769,15 +769,15 @@ EXTERN_C_BEGIN
  * selection will be made, based on GetWriteWatch availability.
  *
  * An architecture may define DYNAMIC_LOADING if dyn_load.c
- * defined GC_register_dynamic_libraries() for the architecture.
+ * defined MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries() for the architecture.
  *
  * An architecture may define PREFETCH(x) to preload the cache with *x.
  * This defaults to GCC built-in operation (or a no-op for other compilers).
  *
- * GC_PREFETCH_FOR_WRITE(x) is used if *x is about to be written.
+ * MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) is used if *x is about to be written.
  *
  * An architecture may also define CLEAR_DOUBLE(x) to be a fast way to
- * clear the two words at GC_malloc-aligned address x.  By default,
+ * clear the two words at MANAGED_STACK_ADDRESS_BOEHM_GC_malloc-aligned address x.  By default,
  * word stores of 0 are used instead.
  *
  * HEAP_START may be defined as the initial address hint for mmap-based
@@ -792,10 +792,10 @@ EXTERN_C_BEGIN
 
 /* Convenient internal macro to test glibc version (if compiled against). */
 #if defined(__GLIBC__) && defined(__GLIBC_MINOR__)
-# define GC_GLIBC_PREREQ(major, minor) \
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(major, minor) \
             ((__GLIBC__ << 8) + __GLIBC_MINOR__ >= ((major) << 8) + (minor))
 #else
-# define GC_GLIBC_PREREQ(major, minor) 0 /* FALSE */
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(major, minor) 0 /* FALSE */
 #endif
 
 #define PTRT_ROUNDUP_BY_MASK(p, mask) \
@@ -803,15 +803,15 @@ EXTERN_C_BEGIN
 
 /* If available, we can use __builtin_unwind_init() to push the     */
 /* relevant registers onto the stack.                               */
-# if GC_GNUC_PREREQ(2, 8) \
-     && !GC_GNUC_PREREQ(11, 0) /* broken at least in 11.2.0 on cygwin64 */ \
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(2, 8) \
+     && !MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(11, 0) /* broken at least in 11.2.0 on cygwin64 */ \
      && !defined(__INTEL_COMPILER) && !defined(__PATHCC__) \
      && !defined(__FUJITSU) /* for FX10 system */ \
      && !(defined(POWERPC) && defined(DARWIN)) /* for MacOS X 10.3.9 */ \
      && !defined(E2K) && !defined(RTEMS) \
      && !defined(__ARMCC_VERSION) /* does not exist in armcc gnu emu */ \
      && (!defined(__clang__) \
-         || GC_CLANG_PREREQ(8, 0) /* was no-op in clang-3 at least */)
+         || MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(8, 0) /* was no-op in clang-3 at least */)
 #   define HAVE_BUILTIN_UNWIND_INIT
 # endif
 
@@ -869,9 +869,9 @@ EXTERN_C_BEGIN
 #   endif
 #   if !defined(ALPHA) && !defined(SPARC)
       extern char etext[];
-#     define DATASTART GC_FreeBSDGetDataStart(0x1000, (ptr_t)etext)
+#     define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_FreeBSDGetDataStart(0x1000, (ptr_t)etext)
 #     define DATASTART_USES_BSDGETDATASTART
-#     ifndef GC_FREEBSD_THREADS
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS
 #       define MPROTECT_VDB
 #     endif
 #   endif
@@ -995,7 +995,7 @@ EXTERN_C_BEGIN
 #   define NO_PTHREAD_GETATTR_NP
 #   define USE_MMAP_ANON
 #   define GETPAGESIZE() 65536 /* FIXME: Not real page size */
-#   define MAX_NACL_GC_THREADS 1024
+#   define MAX_NACL_MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS 1024
 # endif /* NACL */
 
 # ifdef NETBSD
@@ -1019,7 +1019,7 @@ EXTERN_C_BEGIN
 
 # ifdef OPENBSD
 #   define OS_TYPE "OPENBSD"
-#   ifndef GC_OPENBSD_THREADS
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_OPENBSD_THREADS
 #     define HEURISTIC2
 #   endif
 #   ifdef __ELF__
@@ -1050,7 +1050,7 @@ EXTERN_C_BEGIN
 # ifdef SOLARIS
 #   define OS_TYPE "SOLARIS"
     extern int _etext[], _end[];
-    ptr_t GC_SysVGetDataStart(size_t, ptr_t);
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
 #   define DATASTART_IS_FUNC
 #   define DATAEND ((ptr_t)(_end))
 #   if !defined(USE_MMAP) && defined(REDIRECT_MALLOC)
@@ -1065,7 +1065,7 @@ EXTERN_C_BEGIN
 #   else
 #     define HEAP_START DATAEND
 #   endif
-#   ifndef GC_THREADS
+#   ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #     define MPROTECT_VDB
 #   endif
 #   define DYNAMIC_LOADING
@@ -1111,7 +1111,7 @@ EXTERN_C_BEGIN
 #   endif
 #   ifdef LINUX
 #       ifdef __ELF__
-#         if GC_GLIBC_PREREQ(2, 0)
+#         if MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 0)
 #           define SEARCH_FOR_DATA_START
 #         else
             extern char **__environ;
@@ -1194,7 +1194,7 @@ EXTERN_C_BEGIN
         /* The performance impact of prefetches is untested */
 #       define PREFETCH(x) \
           __asm__ __volatile__ ("dcbt 0,%0" : : "r" ((const void *) (x)))
-#       define GC_PREFETCH_FOR_WRITE(x) \
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) \
           __asm__ __volatile__ ("dcbtst 0,%0" : : "r" ((const void *) (x)))
 #     endif
 #   endif
@@ -1306,7 +1306,7 @@ EXTERN_C_BEGIN
     /* Don't define USE_ASM_PUSH_REGS.  We do use an asm helper, but    */
     /* not to push the registers on the mark stack.                     */
 #   ifdef SOLARIS
-#       define DATASTART GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
 #       define PROC_VDB
 #       define GETPAGESIZE() (unsigned)sysconf(_SC_PAGESIZE)
                 /* getpagesize() appeared to be missing from at least   */
@@ -1315,8 +1315,8 @@ EXTERN_C_BEGIN
 #   ifdef DRSNX
 #       define OS_TYPE "DRSNX"
         extern int etext[];
-        ptr_t GC_SysVGetDataStart(size_t, ptr_t);
-#       define DATASTART GC_SysVGetDataStart(0x10000, (ptr_t)etext)
+        ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x10000, (ptr_t)etext)
 #       define DATASTART_IS_FUNC
 #       define MPROTECT_VDB
 #       define STACKBOTTOM ((ptr_t)0xdfff0000)
@@ -1328,11 +1328,11 @@ EXTERN_C_BEGIN
 #     endif
 #     define SVR4
       extern int _etext[];
-      ptr_t GC_SysVGetDataStart(size_t, ptr_t);
+      ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
 #     ifdef __arch64__
-#       define DATASTART GC_SysVGetDataStart(0x100000, (ptr_t)_etext)
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x100000, (ptr_t)_etext)
 #     else
-#       define DATASTART GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
 #     endif
 #     define DATASTART_IS_FUNC
 #   endif
@@ -1350,10 +1350,10 @@ EXTERN_C_BEGIN
 #       endif
 #       define NEED_FIND_LIMIT
 #       define DATASTART ((ptr_t)(&etext))
-        void * GC_find_limit(void *, int);
-#       define DATAEND (ptr_t)GC_find_limit(DATASTART, TRUE)
+        void * MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit(void *, int);
+#       define DATAEND (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit(DATASTART, TRUE)
 #       define DATAEND_IS_FUNC
-#       define GC_HAVE_DATAREGION2
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_DATAREGION2
 #       define DATASTART2 ((ptr_t)(&edata))
 #       define DATAEND2 ((ptr_t)(&end))
 #   endif
@@ -1393,7 +1393,7 @@ EXTERN_C_BEGIN
       /* Nothing specific. */
 #   endif
 #   ifdef SOLARIS
-#       define DATASTART GC_SysVGetDataStart(0x1000, (ptr_t)_etext)
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x1000, (ptr_t)_etext)
         /* At least in Solaris 2.5, PROC_VDB gives wrong values for     */
         /* dirty bits.  It appears to be fixed in 2.8 and 2.9.          */
 #       ifdef SOLARIS25_PROC_VDB_BUG_FIXED
@@ -1418,8 +1418,8 @@ EXTERN_C_BEGIN
 #   ifdef DGUX
 #       define OS_TYPE "DGUX"
         extern int _etext, _end;
-        ptr_t GC_SysVGetDataStart(size_t, ptr_t);
-#       define DATASTART GC_SysVGetDataStart(0x1000, (ptr_t)(&_etext))
+        ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x1000, (ptr_t)(&_etext))
 #       define DATASTART_IS_FUNC
 #       define DATAEND ((ptr_t)(&_end))
 #       define HEURISTIC2
@@ -1435,7 +1435,7 @@ EXTERN_C_BEGIN
                 /* This encourages mmap to give us low addresses,       */
                 /* thus allowing the heap to grow to ~3 GB.             */
 #       ifdef __ELF__
-#            if GC_GLIBC_PREREQ(2, 0) || defined(HOST_ANDROID)
+#            if MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 0) || defined(HOST_ANDROID)
 #                define SEARCH_FOR_DATA_START
 #            else
                  extern char **__environ;
@@ -1449,15 +1449,15 @@ EXTERN_C_BEGIN
                               /* contain large read-only data tables    */
                               /* that we'd rather not scan.             */
 #            endif
-#            if !defined(GC_NO_SIGSETJMP) && (defined(HOST_TIZEN) \
+#            if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP) && (defined(HOST_TIZEN) \
                     || (defined(HOST_ANDROID) \
-                        && !(GC_GNUC_PREREQ(4, 8) || GC_CLANG_PREREQ(3, 2) \
+                        && !(MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 8) || MANAGED_STACK_ADDRESS_BOEHM_GC_CLANG_PREREQ(3, 2) \
                              || __ANDROID_API__ >= 18)))
                /* Older Android NDK releases lack sigsetjmp in x86 libc */
                /* (setjmp is used instead to find data_start).  The bug */
                /* is fixed in Android NDK r8e (so, ok to use sigsetjmp  */
                /* if gcc4.8+, clang3.2+ or Android API level 18+).      */
-#              define GC_NO_SIGSETJMP 1
+#              define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP 1
 #            endif
 #       else
              extern int etext[];
@@ -1473,15 +1473,15 @@ EXTERN_C_BEGIN
 #         ifdef FORCE_WRITE_PREFETCH
             /* Using prefetches for write seems to have a slight negative    */
             /* impact on performance, at least for a PIII/500.               */
-#           define GC_PREFETCH_FOR_WRITE(x) \
+#           define MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) \
               __asm__ __volatile__ ("prefetcht0 %0" : : "m"(*(char *)(x)))
 #         else
-#           define GC_NO_PREFETCH_FOR_WRITE
+#           define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_PREFETCH_FOR_WRITE
 #         endif
 #       elif defined(USE_3DNOW_PREFETCH)
 #         define PREFETCH(x) \
             __asm__ __volatile__ ("prefetch %0" : : "m"(*(char *)(x)))
-#         define GC_PREFETCH_FOR_WRITE(x) \
+#         define MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) \
             __asm__ __volatile__ ("prefetchw %0" : : "m"(*(char *)(x)))
 #       endif
 #       if defined(__GLIBC__) && !defined(__UCLIBC__) \
@@ -1498,8 +1498,8 @@ EXTERN_C_BEGIN
 #   endif
 #   ifdef CYGWIN32
 #       define WOW64_THREAD_CONTEXT_WORKAROUND
-#       define DATASTART ((ptr_t)GC_DATASTART)  /* From gc.h */
-#       define DATAEND   ((ptr_t)GC_DATAEND)
+#       define DATASTART ((ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_DATASTART)  /* From gc.h */
+#       define DATAEND   ((ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_DATAEND)
 #       ifndef USE_WINALLOC
 #         /* MPROTECT_VDB does not work, it leads to a spurious exit.   */
 #       endif
@@ -1656,7 +1656,7 @@ EXTERN_C_BEGIN
 #     ifndef HBLKSIZE
 #       define HBLKSIZE 4096
 #     endif
-#     if GC_GLIBC_PREREQ(2, 2)
+#     if MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 2)
 #       define LINUX_STACKBOTTOM
 #     else
 #       define STACKBOTTOM ((ptr_t)0x7fff8000)
@@ -1681,7 +1681,7 @@ EXTERN_C_BEGIN
 #       define DATASTART (PTRT_ROUNDUP_BY_MASK(etext, 0x3ffff) \
                                 + ((word)(etext) & 0xffff))
 #       define DATAEND ((ptr_t)(edata))
-#       define GC_HAVE_DATAREGION2
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_DATAREGION2
 #       define DATASTART2 (_DYNAMIC_LINKING \
                 ? PTRT_ROUNDUP_BY_MASK((word)_gp + 0x8000, 0x3ffff) \
                 : (ptr_t)edata)
@@ -1784,7 +1784,7 @@ EXTERN_C_BEGIN
 #   endif
 #   define STACK_GROWS_UP
 #   ifdef HPUX
-#     ifndef GC_THREADS
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #       define MPROTECT_VDB
 #     endif
 #     ifdef USE_HPUX_FIXED_STACKBOTTOM
@@ -1847,10 +1847,10 @@ EXTERN_C_BEGIN
 #       endif
 #       define NEED_FIND_LIMIT
 #       define DATASTART ((ptr_t)(&etext))
-        void * GC_find_limit(void *, int);
-#       define DATAEND (ptr_t)GC_find_limit(DATASTART, TRUE)
+        void * MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit(void *, int);
+#       define DATAEND (ptr_t)MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit(DATASTART, TRUE)
 #       define DATAEND_IS_FUNC
-#       define GC_HAVE_DATAREGION2
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_HAVE_DATAREGION2
 #       define DATASTART2 ((ptr_t)(&edata))
 #       define DATAEND2 ((ptr_t)(&end))
 #   endif
@@ -1872,7 +1872,7 @@ EXTERN_C_BEGIN
         extern int __start[];
 #       define HEURISTIC2_LIMIT ((ptr_t)((word)(__start) \
                                          & ~(word)(getpagesize()-1)))
-#       ifndef GC_OSF1_THREADS
+#       ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_OSF1_THREADS
           /* Unresolved signal issues with threads.     */
 #         define MPROTECT_VDB
 #       endif
@@ -1935,7 +1935,7 @@ EXTERN_C_BEGIN
 #         ifndef __INTEL_COMPILER
 #           define PREFETCH(x) \
               __asm__ ("        lfetch  [%0]": : "r"(x))
-#           define GC_PREFETCH_FOR_WRITE(x) \
+#           define MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) \
               __asm__ ("        lfetch.excl     [%0]": : "r"(x))
 #           define CLEAR_DOUBLE(x) \
               __asm__ ("        stf.spill       [%0]=f0": : "r"((void *)(x)))
@@ -1944,7 +1944,7 @@ EXTERN_C_BEGIN
 #           include <ia64intrin.h>
             EXTERN_C_BEGIN
 #           define PREFETCH(x) __lfetch(__lfhint_none, (x))
-#           define GC_PREFETCH_FOR_WRITE(x) __lfetch(__lfhint_nta, (x))
+#           define MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) __lfetch(__lfhint_nta, (x))
 #           define CLEAR_DOUBLE(x) __stf_spill((void *)(x), 0)
 #         endif /* __INTEL_COMPILER */
 #       endif
@@ -1991,8 +1991,8 @@ EXTERN_C_BEGIN
 #   endif
 #   ifdef DGUX
 #       define OS_TYPE "DGUX"
-        ptr_t GC_SysVGetDataStart(size_t, ptr_t);
-#       define DATASTART GC_SysVGetDataStart(0x10000, (ptr_t)etext)
+        ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x10000, (ptr_t)etext)
 #       define DATASTART_IS_FUNC
 #   endif
 # endif /* M88K */
@@ -2007,8 +2007,8 @@ EXTERN_C_BEGIN
 #       define OS_TYPE "UTS4"
         extern int _etext[];
         extern int _end[];
-        ptr_t GC_SysVGetDataStart(size_t, ptr_t);
-#       define DATASTART GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
+        ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(size_t, ptr_t);
+#       define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x10000, (ptr_t)_etext)
 #       define DATASTART_IS_FUNC
 #       define DATAEND ((ptr_t)(_end))
 #       define HEURISTIC2
@@ -2116,7 +2116,7 @@ EXTERN_C_BEGIN
 #   endif
 #   define CPP_WORDSZ 32
 #   ifdef LINUX
-#       if GC_GLIBC_PREREQ(2, 0) || defined(HOST_ANDROID)
+#       if MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 0) || defined(HOST_ANDROID)
 #           define SEARCH_FOR_DATA_START
 #       else
             extern char **__environ;
@@ -2337,7 +2337,7 @@ EXTERN_C_BEGIN
 #   endif
 #   ifdef SOLARIS
 #     define ELF_CLASS ELFCLASS64
-#     define DATASTART GC_SysVGetDataStart(0x1000, (ptr_t)_etext)
+#     define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_SysVGetDataStart(0x1000, (ptr_t)_etext)
 #     ifdef SOLARIS25_PROC_VDB_BUG_FIXED
 #       define PROC_VDB
 #     endif
@@ -2376,7 +2376,7 @@ EXTERN_C_BEGIN
 #   ifdef MSWIN32
 #       define RETRY_GET_THREAD_CONTEXT
 #       if !defined(__GNUC__) || defined(__INTEL_COMPILER) \
-           || (GC_GNUC_PREREQ(4, 7) && !defined(__MINGW64__))
+           || (MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(4, 7) && !defined(__MINGW64__))
           /* Older GCC and Mingw-w64 (both GCC and Clang) do not    */
           /* support SetUnhandledExceptionFilter() properly on x64. */
 #         define MPROTECT_VDB
@@ -2465,7 +2465,7 @@ EXTERN_C_BEGIN
       /* native support of memory mapping.  Use sbrk() instead.     */
 #     undef USE_MMAP
 #     undef USE_MUNMAP
-#     if defined(GC_THREADS) && !defined(CPPCHECK)
+#     if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS) && !defined(CPPCHECK)
 #       error No threads support yet
 #     endif
 #   endif
@@ -2475,15 +2475,15 @@ EXTERN_C_BEGIN
 #     define STACKBOTTOM ((ptr_t)&__global_base)
 #     define DATASTART   ((ptr_t)&__global_base)
 #     define DATAEND     ((ptr_t)&__heap_base)
-#     ifndef GC_NO_SIGSETJMP
-#       define GC_NO_SIGSETJMP 1 /* no support of signals */
+#     ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP
+#       define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP 1 /* no support of signals */
 #     endif
 #     ifndef NO_CLOCK
 #       define NO_CLOCK 1 /* no support of clock */
 #     endif
 #     undef USE_MMAP /* similar to Emscripten */
 #     undef USE_MUNMAP
-#     if defined(GC_THREADS) && !defined(CPPCHECK)
+#     if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS) && !defined(CPPCHECK)
 #       error No threads support yet
 #     endif
 #   endif
@@ -2516,7 +2516,7 @@ EXTERN_C_BEGIN
 #   define USE_MMAP_ANON
 #endif
 
-#if defined(GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
     && !defined(USE_PROC_FOR_LIBRARIES) && !defined(NO_PROC_FOR_LIBRARIES)
     /* Nptl allocates thread stacks with mmap, which is fine.  But it   */
     /* keeps a cache of thread stacks.  Thread stacks contain the       */
@@ -2611,7 +2611,7 @@ EXTERN_C_BEGIN
 # define USE_TKILL_ON_ANDROID
 #endif
 
-#if defined(MPROTECT_VDB) && defined(__GLIBC__) && !GC_GLIBC_PREREQ(2, 2)
+#if defined(MPROTECT_VDB) && defined(__GLIBC__) && !MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 2)
 # error glibc too old?
 #endif
 
@@ -2643,35 +2643,35 @@ EXTERN_C_BEGIN
 # endif
 #endif
 
-#if !defined(GC_EXPLICIT_SIGNALS_UNBLOCK) && defined(SUNOS5SIGS) \
-    && !defined(GC_NO_PTHREAD_SIGMASK)
-# define GC_EXPLICIT_SIGNALS_UNBLOCK
+#if !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_EXPLICIT_SIGNALS_UNBLOCK) && defined(SUNOS5SIGS) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_PTHREAD_SIGMASK)
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_EXPLICIT_SIGNALS_UNBLOCK
 #endif
 
-#if !defined(NO_SIGNALS_UNBLOCK_IN_MAIN) && defined(GC_NO_PTHREAD_SIGMASK)
+#if !defined(NO_SIGNALS_UNBLOCK_IN_MAIN) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_PTHREAD_SIGMASK)
 # define NO_SIGNALS_UNBLOCK_IN_MAIN
 #endif
 
 #if !defined(NO_MARKER_SPECIAL_SIGMASK) \
-    && (defined(NACL) || defined(GC_WIN32_PTHREADS))
+    && (defined(NACL) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS))
   /* Either there is no pthread_sigmask(), or GC marker thread cannot   */
   /* steal and drop user signal calls.                                  */
 # define NO_MARKER_SPECIAL_SIGMASK
 #endif
 
-#ifdef GC_NETBSD_THREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS
 # define SIGRTMIN 33
 # define SIGRTMAX 63
   /* It seems to be necessary to wait until threads have restarted.     */
   /* But it is unclear why that is the case.                            */
-# define GC_NETBSD_THREADS_WORKAROUND
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS_WORKAROUND
 #endif
 
-#ifdef GC_OPENBSD_THREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_OPENBSD_THREADS
   EXTERN_C_END
 # include <sys/param.h>
   EXTERN_C_BEGIN
-#endif /* GC_OPENBSD_THREADS */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_OPENBSD_THREADS */
 
 #if defined(AIX) || defined(ANY_BSD) || defined(BSD) || defined(DARWIN) \
     || defined(DGUX) || defined(HAIKU) || defined(HPUX) || defined(HURD) \
@@ -2713,9 +2713,9 @@ EXTERN_C_BEGIN
 # undef DYNAMIC_LOADING
 #endif
 
-#if defined(SMALL_CONFIG) && !defined(GC_DISABLE_INCREMENTAL)
+#if defined(SMALL_CONFIG) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL)
   /* Presumably not worth the space it takes.   */
-# define GC_DISABLE_INCREMENTAL
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
 #endif
 
 #if (defined(MSWIN32) || defined(MSWINCE)) && !defined(USE_WINALLOC)
@@ -2746,20 +2746,20 @@ EXTERN_C_BEGIN
 #endif
 
 #if defined(USE_MUNMAP) && defined(COUNT_UNMAPPED_REGIONS) \
-    && !defined(GC_UNMAPPED_REGIONS_SOFT_LIMIT)
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_UNMAPPED_REGIONS_SOFT_LIMIT)
   /* The default limit of vm.max_map_count on Linux is ~65530.          */
   /* There is approximately one mapped region to every unmapped region. */
   /* Therefore if we aim to use up to half of vm.max_map_count for the  */
   /* GC (leaving half for the rest of the process) then the number of   */
   /* unmapped regions should be one quarter of vm.max_map_count.        */
 # if defined(__DragonFly__)
-#   define GC_UNMAPPED_REGIONS_SOFT_LIMIT (1000000 / 4)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_UNMAPPED_REGIONS_SOFT_LIMIT (1000000 / 4)
 # else
-#   define GC_UNMAPPED_REGIONS_SOFT_LIMIT 16384
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_UNMAPPED_REGIONS_SOFT_LIMIT 16384
 # endif
 #endif
 
-#if defined(GC_DISABLE_INCREMENTAL) || defined(DEFAULT_VDB)
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL) || defined(DEFAULT_VDB)
 # undef GWW_VDB
 # undef MPROTECT_VDB
 # undef PCR_VDB
@@ -2789,7 +2789,7 @@ EXTERN_C_BEGIN
 # endif
 #endif /* SOFT_VDB */
 
-#ifdef GC_DISABLE_INCREMENTAL
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL
 # undef CHECKSUMS
 #endif
 
@@ -2799,17 +2799,17 @@ EXTERN_C_BEGIN
 #endif
 
 #if defined(BASE_ATOMIC_OPS_EMULATED)
-  /* GC_write_fault_handler() cannot use lock-based atomic primitives   */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_write_fault_handler() cannot use lock-based atomic primitives   */
   /* as this could lead to a deadlock.                                  */
 # undef MPROTECT_VDB
 #endif
 
-#if defined(USE_PROC_FOR_LIBRARIES) && defined(GC_LINUX_THREADS)
+#if defined(USE_PROC_FOR_LIBRARIES) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS)
   /* Incremental GC based on mprotect is incompatible with /proc roots. */
 # undef MPROTECT_VDB
 #endif
 
-#if defined(MPROTECT_VDB) && defined(GC_PREFER_MPROTECT_VDB)
+#if defined(MPROTECT_VDB) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PREFER_MPROTECT_VDB)
   /* Choose MPROTECT_VDB manually (if multiple strategies available).   */
 # undef PCR_VDB
 # undef PROC_VDB
@@ -2837,7 +2837,7 @@ EXTERN_C_BEGIN
 # define NO_SA_SIGACTION
 #endif
 
-#if (defined(NO_SA_SIGACTION) || defined(GC_NO_SIGSETJMP)) \
+#if (defined(NO_SA_SIGACTION) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_SIGSETJMP)) \
     && defined(MPROTECT_VDB) && !defined(DARWIN) \
     && !defined(MSWIN32) && !defined(MSWINCE)
 # undef MPROTECT_VDB
@@ -2845,12 +2845,12 @@ EXTERN_C_BEGIN
 
 #if !defined(PCR_VDB) && !defined(PROC_VDB) && !defined(MPROTECT_VDB) \
     && !defined(GWW_VDB) && !defined(SOFT_VDB) && !defined(DEFAULT_VDB) \
-    && !defined(GC_DISABLE_INCREMENTAL)
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL)
 # define DEFAULT_VDB
 #endif
 
 #if defined(CHECK_SOFT_VDB) && !defined(CPPCHECK) \
-    && (defined(GC_PREFER_MPROTECT_VDB) \
+    && (defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PREFER_MPROTECT_VDB) \
         || !defined(SOFT_VDB) || !defined(MPROTECT_VDB))
 # error Invalid config for CHECK_SOFT_VDB
 #endif
@@ -2883,7 +2883,7 @@ EXTERN_C_BEGIN
 #endif
 
 #ifndef PREFETCH
-# if GC_GNUC_PREREQ(3, 0) && !defined(NO_PREFETCH)
+# if MANAGED_STACK_ADDRESS_BOEHM_GC_GNUC_PREREQ(3, 0) && !defined(NO_PREFETCH)
 #   define PREFETCH(x) __builtin_prefetch((x), 0, 0)
 # elif defined(_MSC_VER) && !defined(NO_PREFETCH) \
        && (defined(_M_IX86) || defined(_M_X64)) && !defined(_CHPE_ONLY_) \
@@ -2898,8 +2898,8 @@ EXTERN_C_BEGIN
 # endif
 #endif /* !PREFETCH */
 
-#ifndef GC_PREFETCH_FOR_WRITE
-  /* The default GC_PREFETCH_FOR_WRITE(x) is defined in gc_inline.h,    */
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE
+  /* The default MANAGED_STACK_ADDRESS_BOEHM_GC_PREFETCH_FOR_WRITE(x) is defined in gc_inline.h,    */
   /* the later one is included from gc_priv.h.                          */
 #endif
 
@@ -2908,7 +2908,7 @@ EXTERN_C_BEGIN
 #endif
 
 #ifndef STATIC
-# ifdef GC_ASSERTIONS
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ASSERTIONS
 #   define STATIC /* ignore to aid debugging (or profiling) */
 # else
 #   define STATIC static
@@ -2923,7 +2923,7 @@ EXTERN_C_BEGIN
 # define NO_UNIX_GET_MEM
 #endif
 
-/* Do we need the GC_find_limit machinery to find the end of    */
+/* Do we need the MANAGED_STACK_ADDRESS_BOEHM_GC_find_limit machinery to find the end of    */
 /* a data segment (or the backing store base)?                  */
 #if defined(HEURISTIC2) || defined(SEARCH_FOR_DATA_START) \
     || defined(HPUX_MAIN_STACKBOTTOM) || defined(IA64) \
@@ -2944,14 +2944,14 @@ EXTERN_C_BEGIN
 # define REGISTER_LIBRARIES_EARLY
   /* We sometimes use dl_iterate_phdr, which may acquire an internal    */
   /* lock.  This isn't safe after the world has stopped.  So we must    */
-  /* call GC_register_dynamic_libraries before stopping the world.      */
+  /* call MANAGED_STACK_ADDRESS_BOEHM_GC_register_dynamic_libraries before stopping the world.      */
   /* For performance reasons, this may be beneficial on other           */
   /* platforms as well, though it should be avoided on Windows.         */
 #endif /* LINUX */
 
 #if defined(SEARCH_FOR_DATA_START)
-  extern ptr_t GC_data_start;
-# define DATASTART GC_data_start
+  extern ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_data_start;
+# define DATASTART MANAGED_STACK_ADDRESS_BOEHM_GC_data_start
 #endif
 
 #ifndef HEAP_START
@@ -2968,13 +2968,13 @@ EXTERN_C_BEGIN
 /* code are forwarded to real (libc) calloc without any special */
 /* handling on the libgc side.  Checking glibc version at       */
 /* compile time for the purpose seems to be fine.               */
-#if defined(GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
-    && defined(__GLIBC__) && !GC_GLIBC_PREREQ(2, 34) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
+    && defined(__GLIBC__) && !MANAGED_STACK_ADDRESS_BOEHM_GC_GLIBC_PREREQ(2, 34) \
     && !defined(HAVE_LIBPTHREAD_SO)
 # define HAVE_LIBPTHREAD_SO
 #endif
 
-#if defined(GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) && defined(REDIRECT_MALLOC) \
     && !defined(INCLUDE_LINUX_THREAD_DESCR)
   /* Will not work, since libc and the dynamic loader use thread        */
   /* locals, sometimes as the only reference.                           */
@@ -2982,65 +2982,65 @@ EXTERN_C_BEGIN
 #endif
 
 #if !defined(CPPCHECK)
-# if defined(GC_IRIX_THREADS) && !defined(IRIX5)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_IRIX_THREADS) && !defined(IRIX5)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_LINUX_THREADS) && !defined(LINUX) && !defined(NACL)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_LINUX_THREADS) && !defined(LINUX) && !defined(NACL)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_NETBSD_THREADS) && !defined(NETBSD)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NETBSD_THREADS) && !defined(NETBSD)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_FREEBSD_THREADS) && !defined(FREEBSD)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_FREEBSD_THREADS) && !defined(FREEBSD)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_SOLARIS_THREADS) && !defined(SOLARIS)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_SOLARIS_THREADS) && !defined(SOLARIS)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_HPUX_THREADS) && !defined(HPUX)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_HPUX_THREADS) && !defined(HPUX)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_AIX_THREADS) && !defined(_AIX)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AIX_THREADS) && !defined(_AIX)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_WIN32_THREADS) && !defined(ANY_MSWIN) && !defined(MSWIN_XBOX1)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) && !defined(ANY_MSWIN) && !defined(MSWIN_XBOX1)
 #   error Inconsistent configuration
 # endif
-# if defined(GC_WIN32_PTHREADS) && defined(CYGWIN32)
+# if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS) && defined(CYGWIN32)
 #   error Inconsistent configuration
 # endif
 #endif /* !CPPCHECK */
 
-#if defined(PCR) || defined(GC_WIN32_THREADS) || defined(GC_PTHREADS) \
+#if defined(PCR) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) \
     || ((defined(NN_PLATFORM_CTR) || defined(NINTENDO_SWITCH) \
          || defined(SN_TARGET_PS3) \
-         || defined(SN_TARGET_PSP2)) && defined(GC_THREADS))
+         || defined(SN_TARGET_PSP2)) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS))
 # define THREADS
 #endif
 
 #if defined(PARALLEL_MARK) && !defined(THREADS) && !defined(CPPCHECK)
-# error Invalid config: PARALLEL_MARK requires GC_THREADS
+# error Invalid config: PARALLEL_MARK requires MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS
 #endif
 
 #if defined(GWW_VDB) && !defined(USE_WINALLOC) && !defined(CPPCHECK)
 # error Invalid config: GWW_VDB requires USE_WINALLOC
 #endif
 
-/* Whether GC_page_size is to be set to a value other than page size.   */
+/* Whether MANAGED_STACK_ADDRESS_BOEHM_GC_page_size is to be set to a value other than page size.   */
 #if defined(CYGWIN32) && (defined(MPROTECT_VDB) || defined(USE_MUNMAP)) \
     || (!defined(ANY_MSWIN) && !defined(WASI) && !defined(USE_MMAP) \
-        && (defined(GC_DISABLE_INCREMENTAL) || defined(DEFAULT_VDB)))
+        && (defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISABLE_INCREMENTAL) || defined(DEFAULT_VDB)))
   /* Cygwin: use the allocation granularity instead.  Other than WASI   */
   /* or Windows: use HBLKSIZE instead (unless mmap() is used).          */
 # define ALT_PAGESIZE_USED
-# ifndef GC_NO_VALLOC
+# ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_VALLOC
     /* Nonetheless, we need the real page size is some extra functions. */
 #   define REAL_PAGESIZE_NEEDED
 # endif
 #endif
 
-#if defined(GC_PTHREADS) && !defined(GC_DARWIN_THREADS) \
-    && !defined(GC_WIN32_THREADS) && !defined(PLATFORM_STOP_WORLD) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_THREADS) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) && !defined(PLATFORM_STOP_WORLD) \
     && !defined(SN_TARGET_PSP2)
 # define PTHREAD_STOP_WORLD_IMPL
 #endif
@@ -3059,7 +3059,7 @@ EXTERN_C_BEGIN
     && !defined(NO_CRT) && !defined(NO_WRAP_MARK_SOME)
   /* Under rare conditions, we may end up marking from nonexistent      */
   /* memory.  Hence we need to be prepared to recover by running        */
-  /* GC_mark_some with a suitable handler in place.                     */
+  /* MANAGED_STACK_ADDRESS_BOEHM_GC_mark_some with a suitable handler in place.                     */
   /* TODO: Should we also define it for Cygwin?                         */
 # define WRAP_MARK_SOME
 #endif
@@ -3069,7 +3069,7 @@ EXTERN_C_BEGIN
 # define NO_SEH_AVAILABLE
 #endif
 
-#ifdef GC_WIN32_THREADS
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS
   /* The number of copied registers in copy_ptr_regs.   */
 # if defined(I386)
 #   ifdef WOW64_THREAD_CONTEXT_WORKAROUND
@@ -3097,43 +3097,43 @@ EXTERN_C_BEGIN
 # elif defined(PPC)
 #   define PUSHED_REGS_COUNT 29
 # endif
-#endif /* GC_WIN32_THREADS */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS */
 
-#if defined(PARALLEL_MARK) && defined(GC_PTHREADS) \
-    && !defined(GC_PTHREADS_PARAMARK) && !defined(__MINGW32__)
+#if defined(PARALLEL_MARK) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS_PARAMARK) && !defined(__MINGW32__)
   /* Use pthread-based parallel mark implementation.    */
   /* Except for MinGW 32/64 to workaround a deadlock in */
   /* winpthreads-3.0b internals.                        */
-# define GC_PTHREADS_PARAMARK
+# define MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS_PARAMARK
 #else
-# undef GC_PTHREADS_PARAMARK /* just in case defined by client */
+# undef MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS_PARAMARK /* just in case defined by client */
 #endif
 
-#ifndef GC_NO_THREADS_DISCOVERY
-# ifdef GC_DARWIN_THREADS
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
+# ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_DARWIN_THREADS
     /* Task-based thread registration requires stack-frame-walking code. */
 #   if defined(DARWIN_DONT_PARSE_STACK)
-#     define GC_NO_THREADS_DISCOVERY
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
 #   endif
-# elif defined(GC_WIN32_THREADS)
+# elif defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS)
     /* DllMain-based thread registration is currently incompatible      */
     /* with thread-local allocation, pthreads and WinCE.                */
-#   if (!defined(GC_DLL) && !defined(GC_INSIDE_DLL)) || defined(GC_PTHREADS) \
+#   if (!defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DLL) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_INSIDE_DLL)) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) \
        || defined(MSWINCE) || defined(NO_CRT) || defined(THREAD_LOCAL_ALLOC)
-#     define GC_NO_THREADS_DISCOVERY
+#     define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
 #   endif
 # else
-#   define GC_NO_THREADS_DISCOVERY
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
 # endif
-#endif /* !GC_NO_THREADS_DISCOVERY */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY */
 
-#if defined(GC_DISCOVER_TASK_THREADS) && defined(GC_NO_THREADS_DISCOVERY) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DISCOVER_TASK_THREADS) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY) \
     && !defined(CPPCHECK)
-# error Defined both GC_DISCOVER_TASK_THREADS and GC_NO_THREADS_DISCOVERY
+# error Defined both MANAGED_STACK_ADDRESS_BOEHM_GC_DISCOVER_TASK_THREADS and MANAGED_STACK_ADDRESS_BOEHM_GC_NO_THREADS_DISCOVERY
 #endif
 
 #if defined(PARALLEL_MARK) && !defined(DEFAULT_STACK_MAYBE_SMALL) \
-    && (defined(HPUX) || defined(GC_DGUX386_THREADS) \
+    && (defined(HPUX) || defined(MANAGED_STACK_ADDRESS_BOEHM_GC_DGUX386_THREADS) \
         || defined(NO_GETCONTEXT) /* e.g. musl */)
     /* TODO: Test default stack size in configure. */
 # define DEFAULT_STACK_MAYBE_SMALL
@@ -3147,12 +3147,12 @@ EXTERN_C_BEGIN
 #if defined(HOST_ANDROID) && !defined(THREADS) \
     && !defined(USE_GET_STACKBASE_FOR_MAIN)
   /* Always use pthread_attr_getstack on Android ("-lpthread" option is  */
-  /* not needed to be specified manually) since GC_linux_main_stack_base */
+  /* not needed to be specified manually) since MANAGED_STACK_ADDRESS_BOEHM_GC_linux_main_stack_base */
   /* causes app crash if invoked inside Dalvik VM.                       */
 # define USE_GET_STACKBASE_FOR_MAIN
 #endif
 
-/* Outline pthread primitives to use in GC_get_[main_]stack_base.       */
+/* Outline pthread primitives to use in MANAGED_STACK_ADDRESS_BOEHM_GC_get_[main_]stack_base.       */
 #if ((defined(FREEBSD) && defined(__GLIBC__)) /* kFreeBSD */ \
      || defined(LINUX) || defined(KOS) || defined(NETBSD)) \
     && !defined(NO_PTHREAD_GETATTR_NP)
@@ -3168,7 +3168,7 @@ EXTERN_C_BEGIN
 # define HAVE_CLOCK_GETTIME 1
 #endif
 
-#if defined(GC_PTHREADS) && !defined(E2K) && !defined(IA64) \
+#if defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(E2K) && !defined(IA64) \
     && (!defined(DARWIN) || defined(DARWIN_DONT_PARSE_STACK)) \
     && !defined(SN_TARGET_PSP2) && !defined(REDIRECT_MALLOC)
   /* Note: unimplemented in case of redirection of malloc() because     */
@@ -3202,24 +3202,24 @@ EXTERN_C_BEGIN
 
 #if !defined(CAN_HANDLE_FORK) && !defined(NO_HANDLE_FORK) \
     && !defined(HAVE_NO_FORK) \
-    && ((defined(GC_PTHREADS) && !defined(NACL) \
-         && !defined(GC_WIN32_PTHREADS) && !defined(USE_WINALLOC)) \
+    && ((defined(MANAGED_STACK_ADDRESS_BOEHM_GC_PTHREADS) && !defined(NACL) \
+         && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_PTHREADS) && !defined(USE_WINALLOC)) \
         || (defined(DARWIN) && defined(MPROTECT_VDB)) || defined(HANDLE_FORK))
-  /* Attempts (where supported and requested) to make GC_malloc work in */
+  /* Attempts (where supported and requested) to make MANAGED_STACK_ADDRESS_BOEHM_GC_malloc work in */
   /* a child process fork'ed from a multi-threaded parent.              */
 # define CAN_HANDLE_FORK
 #endif
 
 /* Workaround "failed to create new win32 semaphore" Cygwin fatal error */
 /* during semaphores fixup-after-fork.                                  */
-#if defined(CYGWIN32) && defined(GC_WIN32_THREADS) \
+#if defined(CYGWIN32) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_WIN32_THREADS) \
     && defined(CAN_HANDLE_FORK) && !defined(EMULATE_PTHREAD_SEMAPHORE) \
     && !defined(CYGWIN_SEM_FIXUP_AFTER_FORK_BUG_FIXED)
 # define EMULATE_PTHREAD_SEMAPHORE
 #endif
 
 #if defined(CAN_HANDLE_FORK) && !defined(CAN_CALL_ATFORK) \
-    && !defined(GC_NO_CAN_CALL_ATFORK) && !defined(HOST_TIZEN) \
+    && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_NO_CAN_CALL_ATFORK) && !defined(HOST_TIZEN) \
     && !defined(HURD) && (!defined(HOST_ANDROID) || __ANDROID_API__ >= 21)
   /* Have working pthread_atfork().     */
 # define CAN_CALL_ATFORK
@@ -3264,15 +3264,15 @@ EXTERN_C_BEGIN
 # endif
 #endif /* !STRTOULL */
 
-#ifndef GC_WORD_C
+#ifndef MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C
 # if defined(_WIN64) && !defined(__GNUC__)
-#   define GC_WORD_C(val) val##ui64
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(val) val##ui64
 # elif defined(_LLP64) || defined(__LLP64__) || defined(_WIN64)
-#   define GC_WORD_C(val) val##ULL
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(val) val##ULL
 # else
-#   define GC_WORD_C(val) ((word)val##UL)
+#   define MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C(val) ((word)val##UL)
 # endif
-#endif /* !GC_WORD_C */
+#endif /* !MANAGED_STACK_ADDRESS_BOEHM_GC_WORD_C */
 
 #if defined(__has_feature)
   /* __has_feature() is supported.      */
@@ -3307,8 +3307,8 @@ EXTERN_C_BEGIN
 /* Set SAVE_CALL_CHAIN if we can.  SAVE_CALL_COUNT can be specified     */
 /* at build time, though we feel free to adjust it slightly.            */
 /* Define NEED_CALLINFO if we either save the call stack or             */
-/* GC_ADD_CALLER is defined.                                            */
-/* GC_CAN_SAVE_CALL_STACKS is set in gc.h.                              */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER is defined.                                            */
+/* MANAGED_STACK_ADDRESS_BOEHM_GC_CAN_SAVE_CALL_STACKS is set in gc.h.                              */
 #if defined(SPARC)
 # define CAN_SAVE_CALL_ARGS
 #endif
@@ -3319,17 +3319,18 @@ EXTERN_C_BEGIN
 # define CAN_SAVE_CALL_ARGS
 #endif
 
-#if defined(SAVE_CALL_COUNT) && !defined(GC_ADD_CALLER) \
-    && defined(GC_CAN_SAVE_CALL_STACKS)
+#if defined(SAVE_CALL_COUNT) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER) \
+    && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_CAN_SAVE_CALL_STACKS)
 # define SAVE_CALL_CHAIN
 #endif
-
 #ifdef SAVE_CALL_CHAIN
 # if defined(SAVE_CALL_NARGS) && defined(CAN_SAVE_CALL_ARGS)
 #   define NARGS SAVE_CALL_NARGS
 # else
 #   define NARGS 0      /* Number of arguments to save for each call.   */
 # endif
+#endif
+#ifdef SAVE_CALL_CHAIN
 # if !defined(SAVE_CALL_COUNT) || defined(CPPCHECK)
 #   define NFRAMES 6    /* Number of frames to save. Even for   */
                         /* alignment reasons.                   */
@@ -3337,7 +3338,8 @@ EXTERN_C_BEGIN
 #   define NFRAMES ((SAVE_CALL_COUNT + 1) & ~1)
 # endif
 # define NEED_CALLINFO
-#elif defined(GC_ADD_CALLER)
+#endif /* SAVE_CALL_CHAIN */
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_ADD_CALLER
 # define NFRAMES 1
 # define NARGS 0
 # define NEED_CALLINFO
@@ -3356,23 +3358,20 @@ EXTERN_C_BEGIN
 
 #if defined(POINTER_MASK) && !defined(POINTER_SHIFT)
 # define POINTER_SHIFT 0
-#elif !defined(POINTER_MASK) && defined(POINTER_SHIFT)
-# define POINTER_MASK GC_WORD_MAX
+#endif
+
+#if defined(POINTER_SHIFT) && !defined(POINTER_MASK)
+# define POINTER_MASK ((word)(signed_word)(-1))
+#endif
+
+#if !defined(FIXUP_POINTER) && defined(POINTER_MASK)
+# define FIXUP_POINTER(p) (p = ((p) & POINTER_MASK) << POINTER_SHIFT)
 #endif
 
 #if defined(FIXUP_POINTER)
-  /* Custom FIXUP_POINTER(p).   */
-# define NEED_FIXUP_POINTER
-#elif defined(DYNAMIC_POINTER_MASK)
-# define FIXUP_POINTER(p) (p = ((p) & GC_pointer_mask) << GC_pointer_shift)
-# undef POINTER_MASK
-# undef POINTER_SHIFT
-# define NEED_FIXUP_POINTER
-#elif defined(POINTER_MASK)
-# define FIXUP_POINTER(p) (p = ((p) & POINTER_MASK) << POINTER_SHIFT)
 # define NEED_FIXUP_POINTER
 #else
-# define FIXUP_POINTER(p) (void)(p)
+# define FIXUP_POINTER(p)
 #endif
 
 #if defined(REDIRECT_MALLOC) && defined(THREADS) && !defined(LINUX) \
@@ -3380,11 +3379,11 @@ EXTERN_C_BEGIN
     /* May work on other platforms (e.g. Darwin) provided the client    */
     /* ensures all the client threads are registered with the GC,       */
     /* e.g. by using the preprocessor-based interception of the thread  */
-    /* primitives (i.e., define GC_THREADS and include gc.h from all    */
+    /* primitives (i.e., define MANAGED_STACK_ADDRESS_BOEHM_GC_THREADS and include gc.h from all    */
     /* the client files those are using pthread_create and friends).    */
 #endif
 
-#ifdef GC_PRIVATE_H
+#ifdef MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H
         /* This relies on some type definitions from gc_priv.h, from    */
         /* where it's normally included.                                */
         /*                                                              */
@@ -3401,21 +3400,21 @@ EXTERN_C_BEGIN
         /* GET_MEM is currently not assumed to retrieve 0 filled space, */
         /* though we should perhaps take advantage of the case in which */
         /* does.                                                        */
-# define hblk GC_hblk_s
+# define hblk MANAGED_STACK_ADDRESS_BOEHM_GC_hblk_s
   struct hblk;  /* See gc_priv.h. */
 # if defined(PCR)
     char * real_malloc(size_t bytes);
 #   define GET_MEM(bytes) HBLKPTR(real_malloc(SIZET_SAT_ADD(bytes, \
-                                                            GC_page_size)) \
-                                          + GC_page_size-1)
+                                                            MANAGED_STACK_ADDRESS_BOEHM_GC_page_size)) \
+                                          + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1)
 # elif defined(OS2)
     void * os2_alloc(size_t bytes);
 #   define GET_MEM(bytes) HBLKPTR((ptr_t)os2_alloc( \
                                             SIZET_SAT_ADD(bytes, \
-                                                          GC_page_size)) \
-                                  + GC_page_size-1)
+                                                          MANAGED_STACK_ADDRESS_BOEHM_GC_page_size)) \
+                                  + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1)
 # elif defined(NEXT) || defined(DOS4GW) || defined(NONSTOP) \
-        || (defined(AMIGA) && !defined(GC_AMIGA_FASTALLOC)) \
+        || (defined(AMIGA) && !defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC)) \
         || (defined(SOLARIS) && !defined(USE_MMAP)) || defined(RTEMS) \
         || defined(EMBOX) || defined(KOS) || defined(__CC_ARM)
     /* TODO: Use page_alloc() directly on Embox.    */
@@ -3424,35 +3423,35 @@ EXTERN_C_BEGIN
 #   endif
 #   define GET_MEM(bytes) HBLKPTR((size_t)calloc(1, \
                                             SIZET_SAT_ADD(bytes, \
-                                                          GC_page_size)) \
-                                  + GC_page_size - 1)
+                                                          MANAGED_STACK_ADDRESS_BOEHM_GC_page_size)) \
+                                  + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size - 1)
 # elif defined(MSWIN_XBOX1)
-    ptr_t GC_durango_get_mem(size_t bytes);
-#   define GET_MEM(bytes) (struct hblk *)GC_durango_get_mem(bytes)
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_durango_get_mem(size_t bytes);
+#   define GET_MEM(bytes) (struct hblk *)MANAGED_STACK_ADDRESS_BOEHM_GC_durango_get_mem(bytes)
 # elif defined(MSWIN32) || defined(CYGWIN32)
-    ptr_t GC_win32_get_mem(size_t bytes);
-#   define GET_MEM(bytes) (struct hblk *)GC_win32_get_mem(bytes)
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_win32_get_mem(size_t bytes);
+#   define GET_MEM(bytes) (struct hblk *)MANAGED_STACK_ADDRESS_BOEHM_GC_win32_get_mem(bytes)
 # elif defined(MACOS)
 #   if defined(USE_TEMPORARY_MEMORY)
-      Ptr GC_MacTemporaryNewPtr(size_t size, Boolean clearMemory);
-#     define GET_MEM(bytes) HBLKPTR(GC_MacTemporaryNewPtr( \
+      Ptr MANAGED_STACK_ADDRESS_BOEHM_GC_MacTemporaryNewPtr(size_t size, Boolean clearMemory);
+#     define GET_MEM(bytes) HBLKPTR(MANAGED_STACK_ADDRESS_BOEHM_GC_MacTemporaryNewPtr( \
                                         SIZET_SAT_ADD(bytes, \
-                                                      GC_page_size), true) \
-                        + GC_page_size-1)
+                                                      MANAGED_STACK_ADDRESS_BOEHM_GC_page_size), true) \
+                        + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1)
 #   else
 #     define GET_MEM(bytes) HBLKPTR(NewPtrClear(SIZET_SAT_ADD(bytes, \
-                                                              GC_page_size)) \
-                                    + GC_page_size-1)
+                                                              MANAGED_STACK_ADDRESS_BOEHM_GC_page_size)) \
+                                    + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1)
 #   endif
 # elif defined(MSWINCE)
-    ptr_t GC_wince_get_mem(size_t bytes);
-#   define GET_MEM(bytes) (struct hblk *)GC_wince_get_mem(bytes)
-# elif defined(AMIGA) && defined(GC_AMIGA_FASTALLOC)
-    void *GC_amiga_get_mem(size_t bytes);
-#   define GET_MEM(bytes) HBLKPTR((size_t)GC_amiga_get_mem( \
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_wince_get_mem(size_t bytes);
+#   define GET_MEM(bytes) (struct hblk *)MANAGED_STACK_ADDRESS_BOEHM_GC_wince_get_mem(bytes)
+# elif defined(AMIGA) && defined(MANAGED_STACK_ADDRESS_BOEHM_GC_AMIGA_FASTALLOC)
+    void *MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_get_mem(size_t bytes);
+#   define GET_MEM(bytes) HBLKPTR((size_t)MANAGED_STACK_ADDRESS_BOEHM_GC_amiga_get_mem( \
                                             SIZET_SAT_ADD(bytes, \
-                                                          GC_page_size)) \
-                          + GC_page_size-1)
+                                                          MANAGED_STACK_ADDRESS_BOEHM_GC_page_size)) \
+                          + MANAGED_STACK_ADDRESS_BOEHM_GC_page_size-1)
 # elif defined(PLATFORM_GETMEM)
     void *platform_get_mem(size_t bytes);
 #   define GET_MEM(bytes) (struct hblk*)platform_get_mem(bytes)
@@ -3466,16 +3465,16 @@ EXTERN_C_BEGIN
     void *switch_get_mem(size_t bytes);
 #   define GET_MEM(bytes) (struct hblk*)switch_get_mem(bytes)
 # elif defined(HAIKU)
-    ptr_t GC_haiku_get_mem(size_t bytes);
-#   define GET_MEM(bytes) (struct hblk*)GC_haiku_get_mem(bytes)
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_haiku_get_mem(size_t bytes);
+#   define GET_MEM(bytes) (struct hblk*)MANAGED_STACK_ADDRESS_BOEHM_GC_haiku_get_mem(bytes)
 # elif defined(EMSCRIPTEN_TINY)
     void *emmalloc_memalign(size_t alignment, size_t size);
-#   define GET_MEM(bytes) (struct hblk*)emmalloc_memalign(GC_page_size, bytes)
+#   define GET_MEM(bytes) (struct hblk*)emmalloc_memalign(MANAGED_STACK_ADDRESS_BOEHM_GC_page_size, bytes)
 # else
-    ptr_t GC_unix_get_mem(size_t bytes);
-#   define GET_MEM(bytes) (struct hblk *)GC_unix_get_mem(bytes)
+    ptr_t MANAGED_STACK_ADDRESS_BOEHM_GC_unix_get_mem(size_t bytes);
+#   define GET_MEM(bytes) (struct hblk *)MANAGED_STACK_ADDRESS_BOEHM_GC_unix_get_mem(bytes)
 # endif
-#endif /* GC_PRIVATE_H */
+#endif /* MANAGED_STACK_ADDRESS_BOEHM_GC_PRIVATE_H */
 
 EXTERN_C_END
 
